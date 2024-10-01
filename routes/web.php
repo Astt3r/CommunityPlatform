@@ -25,6 +25,11 @@ Route::get('/projects', function () {
     return Inertia::render('Projects');
 })->name('projects');
 
+Route::get('/vecinos', function () {
+    return Inertia::render('Vecinos');
+})->name('vecinos');
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
