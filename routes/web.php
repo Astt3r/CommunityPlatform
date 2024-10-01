@@ -19,15 +19,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    Route::get('/projects', function () {
+        return Inertia::render('Projects');
+    })->name('projects');
+    Route::get('/vecinos', function () {
+        return Inertia::render('Vecinos');
+    })->name('vecinos');
 });
 
-Route::get('/projects', function () {
-    return Inertia::render('Projects');
-})->name('projects');
 
-Route::get('/vecinos', function () {
-    return Inertia::render('Vecinos');
-})->name('vecinos');
+
+
 
 
 
