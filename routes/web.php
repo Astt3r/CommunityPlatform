@@ -29,6 +29,10 @@ Route::get('/vecinos', function () {
     return Inertia::render('Vecinos');
 })->name('vecinos');
 
+Route::get('/finanzas', function () {
+    return Inertia::render('Finanzas');
+})->name('finanzas');
+
 
 
 Route::middleware('auth')->group(function () {
