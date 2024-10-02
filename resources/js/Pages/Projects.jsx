@@ -21,7 +21,7 @@ export default function Dashboard() {
                             <div id="content-wrapper">
                                         <div className="section">
                                             <h2 className="text-xl font-semibold">Bienvenido a la Plataforma de Gestión de Juntas de Vecinos</h2>
-                                            <p>Aquí puedes gestionar proyectos comunitarios, eventos, finanzas y mucho más.</p>
+                                            <p>Panel de Proyectos.</p>
                                             <div className="quick-access grid grid-cols-2 gap-4">
                                                 <div className="bg-blue-500 p-4 text-white"><a href="#">Crear Proyecto</a></div>
                                                 <div className="bg-blue-500 p-4 text-white"><a href="#">Ver Proyectos</a></div>
