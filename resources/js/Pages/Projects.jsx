@@ -17,6 +17,37 @@ export default function Dashboard() {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             Vista Proyectos
+
+                            <div id="content-wrapper">
+                                        <div className="section">
+                                            <h2 className="text-xl font-semibold">Bienvenido a la Plataforma de Gestión de Juntas de Vecinos</h2>
+                                            <p>Aquí puedes gestionar proyectos comunitarios, eventos, finanzas y mucho más.</p>
+                                            <div className="quick-access grid grid-cols-2 gap-4">
+                                                <div className="bg-blue-500 p-4 text-white"><a href="#">Crear Proyecto</a></div>
+                                                <div className="bg-blue-500 p-4 text-white"><a href="#">Ver Proyectos</a></div>
+                                                
+                                            </div>
+                                        </div>
+
+                                        <div className="section my-6">
+                                            <h2 className="text-xl font-semibold">Proyectos Actuales</h2>
+                                            <div className="projects grid grid-cols-2 gap-4">
+                                                <div className="p-4 border">
+                                                    <h3 className="font-bold">Proyecto A</h3>
+                                                    <p>Descripción breve del proyecto.</p>
+                                                    <p><strong>Estado:</strong> En curso</p>
+                                                </div>
+                                                <div className="p-4 border">
+                                                    <h3 className="font-bold">Proyecto B</h3>
+                                                    <p>Descripción breve del proyecto.</p>
+                                                    <p><strong>Estado:</strong> Finalizado</p>
+                                                </div>
+                                            </div>
+                                            <a href="#" className="block mt-4">Ver Todos los Proyectos</a>
+                                        </div>
+
+                                        
+                                    </div>
                         </div>
                     </div>
                 </div>

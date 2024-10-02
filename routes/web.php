@@ -25,6 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/vecinos', function () {
         return Inertia::render('Vecinos');
     })->name('vecinos');
+
+    
+    Route::get('/projects_crear', function () {
+        return Inertia::render('ProjectsCrear');
+    })->name('projects_crear');
 });
 
 
