@@ -36,6 +36,9 @@ Route::middleware('auth')->group(function () {
 
 
 
+
+
+
 Route::get('/finanzas', function () {
     return Inertia::render('Finanzas');
 })->name('finanzas');
