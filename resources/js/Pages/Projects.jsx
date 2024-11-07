@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 
 
 export default function Dashboard() {
@@ -11,14 +11,10 @@ export default function Dashboard() {
                         Proyectos
                     </h2>
                     <div className="flex justify-end">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded align-right"
-                            onClick={() => {
-                                /* Lógica para crear un nuevo proyecto */
-                            }}
-                        >
-                            Crear Nuevo Proyecto
-                        </button>
+                        <Link
+                            href={route("projects_crear")}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                            ></Link>
                     </div>
                 </div>
             }
