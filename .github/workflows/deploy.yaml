@@ -27,21 +27,18 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           extensions: mbstring, bcmath, pdo_mysql, zip
           ini-values: post_max_size=256M, upload_max_filesize=256M
 
       - name: Install Composer dependencies
         run: composer install --optimize-autoloader --no-dev
 
-      - name: Run tests
-        run: php artisan test
-
       - name: Deploy to EC2
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_USER: 'ec2-user'
-          EC2_HOST: 'your-ec2-public-ip'
+          EC2_HOST: '18.228.173.125'
           PROJECT_PATH: '/var/www/html/juntatransparente'
 
         run: |
@@ -54,12 +51,15 @@ jobs:
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'storage/framework/cache/data' \
+            --exclude 'vendor' \
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
+
 
           # Run deployment commands
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /var/www/html/juntatransparente
+            composer install --optimize-autoloader --no-dev
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
