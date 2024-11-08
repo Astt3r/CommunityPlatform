@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReunionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -49,5 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/meetings', [ReunionController::class, 'index'])->name('meetings.index');
+Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meetings.create');
+Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting_store');
+
 
 require __DIR__ . '/auth.php';

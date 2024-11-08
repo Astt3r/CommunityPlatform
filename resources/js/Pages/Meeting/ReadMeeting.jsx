@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 
-export default function Meetings() {
+export default function Meetings({ meetings = [] }) {
     return (
         <AuthenticatedLayout
             header={
@@ -21,7 +21,6 @@ export default function Meetings() {
             }
         >
             <Head title="Reuniones" />
-
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -30,29 +29,41 @@ export default function Meetings() {
                                 Reuniones Realizadas
                             </h2>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                {/* Ejemplo de reunión */}
-                                <div className="p-4 border rounded-lg">
-                                    <h3 className="font-bold text-lg">Tema Principal</h3>
-                                    <p className="text-gray-600">
-                                        Descripción breve de la reunión realizada.
-                                    </p>
-                                    <p>
-                                        <strong>Fecha:</strong> 2024-11-01
-                                    </p>
-                                    <p>
-                                        <strong>Lugar:</strong> Sala de Conferencias A
-                                    </p>
-                                    <p>
-                                        <strong>Convocada por:</strong> Administrador
-                                    </p>
-                                    <p>
-                                        <strong>Estado:</strong> Finalizada
-                                    </p>
-                                    <a href="#" className="text-blue-500 mt-2 block">
-                                        Ver Detalles
-                                    </a>
-                                </div>
-                                {/* Repetir el componente de reunión para cada reunión en la lista */}
+                                {meetings.map((meeting) => (
+                                    <div
+                                        key={meeting.id_reunion}
+                                        className="p-4 border rounded-lg"
+                                    >
+                                        <h3 className="font-bold text-lg">
+                                            {meeting.tema_principal}
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            {meeting.descripcion}
+                                        </p>
+                                        <p>
+                                            <strong>Fecha:</strong>{" "}
+                                            {meeting.fecha_reunion}
+                                        </p>
+                                        <p>
+                                            <strong>Lugar:</strong>{" "}
+                                            {meeting.lugar}
+                                        </p>
+                                        <p>
+                                            <strong>Convocada por:</strong>{" "}
+                                            {meeting.convocada_por}
+                                        </p>
+                                        <p>
+                                            <strong>Estado:</strong>{" "}
+                                            {meeting.estado}
+                                        </p>
+                                        <a
+                                            href="#"
+                                            className="text-blue-500 mt-2 block"
+                                        >
+                                            Ver Detalles
+                                        </a>
+                                    </div>
+                                ))}
                             </div>
                             <a href="#" className="block mt-6 text-blue-500">
                                 Ver Todas las Reuniones

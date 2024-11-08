@@ -1,7 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 
-
 export default function Dashboard() {
     return (
         <AuthenticatedLayout
@@ -14,7 +13,9 @@ export default function Dashboard() {
                         <Link
                             href={route("projects.create")}
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                            ></Link>
+                        >
+                            Crear Nuevo Proyecto
+                        </Link>
                     </div>
                 </div>
             }
@@ -33,11 +34,6 @@ export default function Dashboard() {
                                         Juntas de Vecinos
                                     </h2>
                                     <p>Panel de Proyectos.</p>
-                                    <div className="quick-access grid grid-cols-2 gap-4">
-                                        <div className="bg-blue-500 p-4 text-white">
-                                            <a href="#">Crear Proyecto</a>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div className="section my-6">
