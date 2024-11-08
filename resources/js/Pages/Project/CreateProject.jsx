@@ -33,7 +33,7 @@ export default function ProjectsCrear() {
                 </h2>
             }
         >
-            <form onSubmit={submit} className="max-w-md mx-auto p-4 space-y-4 bg-gray-100 rounded">
+            <form onSubmit={submit} className="max-w-sm mx-auto">
                 <div>
                     <InputLabel htmlFor="name" value="Nombre del Proyecto" />
                     <TextInput
@@ -41,7 +41,7 @@ export default function ProjectsCrear() {
                         type="text"
                         name="name"
                         value={data.name}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         autoComplete="name"
                         isFocused={true}
                         onChange={(e) => setData("name", e.target.value)}
@@ -56,7 +56,7 @@ export default function ProjectsCrear() {
                         type="text"
                         name="descripcion"
                         value={data.descripcion}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         onChange={(e) => setData("descripcion", e.target.value)}
                     />
                     <InputError message={errors.descripcion} className="mt-2" />
@@ -69,7 +69,7 @@ export default function ProjectsCrear() {
                         type="text"
                         name="problema"
                         value={data.problema}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         onChange={(e) => setData("problema", e.target.value)}
                     />
                     <InputError message={errors.problema} className="mt-2" />
@@ -108,7 +108,7 @@ export default function ProjectsCrear() {
                         type="text"
                         name="estado"
                         value={data.estado}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         onChange={(e) => setData("estado", e.target.value)}
                     />
                     <InputError message={errors.estado} className="mt-2" />
@@ -121,7 +121,7 @@ export default function ProjectsCrear() {
                         type="text"
                         name="responsable"
                         value={data.responsable}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         onChange={(e) => setData("responsable", e.target.value)}
                     />
                     <InputError message={errors.responsable} className="mt-2" />
@@ -134,7 +134,7 @@ export default function ProjectsCrear() {
                         type="number"
                         name="presupuesto"
                         value={data.presupuesto}
-                        className="mt-1 block w-full"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         onChange={(e) => setData("presupuesto", e.target.value)}
                     />
                     <InputError message={errors.presupuesto} className="mt-2" />
@@ -156,14 +156,14 @@ export default function ProjectsCrear() {
                 <div className="flex justify-end space-x-2 mt-4">
                     <button
                         type="button"
-                        className="px-4 py-2 bg-gray-300 text-black rounded"
+                        className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
                         onClick={() => reset()}
                     >
                         Cancelar
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded"
+                        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         disabled={processing}
                     >
                         Agregar
