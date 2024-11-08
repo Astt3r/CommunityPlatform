@@ -18,15 +18,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-    
+
     Route::get('/projects', function () {
         return Inertia::render('Project/ReadProject');
     })->name('projects');
-    
+
+    Route::get(uri: '/meeting', action: function () {
+        return Inertia::render(component: 'Meeting/ReadMeeting');
+    })->name(name: 'meeting');
+
+    Route::get(uri: '/meeting/create', action: function () {
+        return Inertia::render(component: 'Meeting/CreateMeeting');
+    })->name(name: 'meeting.create');
+
     Route::get('/vecinos', function () {
         return Inertia::render('Vecinos');
     })->name('vecinos');
-    
+
     Route::get('/projects/create', function () {
         return Inertia::render('Project/CreateProject');
     })->name('projects.create');
@@ -42,4 +50,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
