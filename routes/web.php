@@ -19,17 +19,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    
     Route::get('/projects', function () {
-        return Inertia::render('Projects');
+        return Inertia::render('Project/ReadProject');
     })->name('projects');
+    
     Route::get('/vecinos', function () {
         return Inertia::render('Vecinos');
     })->name('vecinos');
-
     
-    Route::get('/projects_crear', function () {
-        return Inertia::render('ProjectsCrear');
-    })->name('projects_crear');
+    Route::get('/projects/create', function () {
+        return Inertia::render('Project/CreateProject');
+    })->name('projects.create');
 });
 
 
