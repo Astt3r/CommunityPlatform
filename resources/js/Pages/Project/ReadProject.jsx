@@ -12,7 +12,7 @@ export default function Dashboard() {
                     </h2>
                     <div className="flex justify-end">
                         <Link
-                            href={route("projects_crear")}
+                            href={route("projects.create")}
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
                             ></Link>
                     </div>
