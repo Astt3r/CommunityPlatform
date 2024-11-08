@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/meetings', [ReunionController::class, 'index'])->name('meetings.index');
+Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
 Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meetings.create');
 Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting_store');
 

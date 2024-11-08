@@ -19,6 +19,7 @@ class ReunionController extends Controller
         return Inertia::render('Meeting/ReadMeeting', ['meetings' => $meetings]);
     }
 
+
     public function create()
     {
         return Inertia::render('createMeeting');
@@ -35,8 +36,10 @@ class ReunionController extends Controller
             'estado' => 'required|string|max:255',
         ]);
 
-        ReunionController::create($request->all());
+        // Crea la reunión
+        Reunion::create($request->all());
 
-        return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
+        // Redirige a la lista de reuniones después de crear una
+        return redirect()->route('meeting.index')->with('success', 'Reunión creada exitosamente.');
     }
 }
