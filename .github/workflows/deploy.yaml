@@ -51,12 +51,15 @@ jobs:
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'storage/framework/cache/data' \
+            --exclude 'vendor' \
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
+
 
           # Run deployment commands
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /var/www/html/juntatransparente
+            composer install --optimize-autoloader --no-dev
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
