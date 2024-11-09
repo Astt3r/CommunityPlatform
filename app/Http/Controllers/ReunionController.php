@@ -42,4 +42,37 @@ class ReunionController extends Controller
         // Redirige a la lista de reuniones después de crear una
         return redirect()->route('meeting.index')->with('success', 'Reunión creada exitosamente.');
     }
+
+    public function edit($id)
+    {
+        $meeting = Reunion::findOrFail($id);
+        return inertia('Meeting/EditMeeting', ['meeting' => $meeting]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $meeting = Reunion::findOrFail($id);
+
+        $request->validate([
+            'tema_principal' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'fecha_reunion' => 'required|date',
+            'lugar' => 'required|string|max:255',
+            'convocada_por' => 'required|string|max:255',
+            'estado' => 'required|string|max:50',
+        ]);
+
+        $meeting->update($request->all());
+
+        return redirect()->route('meeting.index')->with('success', 'Reunión actualizada correctamente');
+    }
+
+    public function destroy($id)
+    {
+        $meeting = Reunion::findOrFail($id);
+        $meeting->delete();
+
+        return redirect()->route('meeting.index')->with('success', 'Reunión eliminada correctamente');
+    }
+
 }

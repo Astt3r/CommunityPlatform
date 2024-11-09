@@ -24,7 +24,7 @@ class Reunion extends Model
     // protected $table = 'nombre_de_tu_tabla';
 
     // Opcional: Si tu clave primaria no es 'id', define el nombre de la clave primaria aquí.
-    // protected $primaryKey = 'id_reunion';
+    protected $primaryKey = 'id_reunion';
 
     // Opcional: Si no usas marcas de tiempo (created_at, updated_at), puedes desactivarlas.
     // public $timestamps = false;

@@ -39,6 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/create', function () {
         return Inertia::render('Project/CreateProject');
     })->name('projects.create');
+
+    Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
+    Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meeting.create');
+    Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting.store');
+    Route::get('/meetings/{id}/edit', [ReunionController::class, 'edit'])->name('meeting.edit');
+    Route::put('/meetings/{id}', [ReunionController::class, 'update'])->name('meeting.update');
+    Route::delete('/meetings/{id}', [ReunionController::class, 'destroy'])->name('meeting.destroy');
+
 });
 
 Route::get('/finanzas', function () {
@@ -51,9 +59,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
-Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meetings.create');
-Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting_store');
+// Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
+// Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meetings.create');
+// Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting_store');
+// Route::get('/meetings/{id}/edit', [ReunionController::class, 'edit'])->name('meeting.edit');
+// Route::put('/meetings/{id}', [ReunionController::class, 'update'])->name('meeting.update');
+// Route::put('/meetings/{id}', [ReunionController::class, 'update'])->name('meeting.id_reunion');
+
+
 
 
 require __DIR__ . '/auth.php';

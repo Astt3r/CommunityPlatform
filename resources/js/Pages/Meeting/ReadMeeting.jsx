@@ -1,7 +1,15 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Meetings({ meetings = [] }) {
+    const { delete: destroy } = useForm();
+
+    const handleDelete = (id) => {
+        if (confirm("¿Estás seguro de que deseas eliminar esta reunión?")) {
+            destroy(route("meeting.destroy", id));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -56,12 +64,27 @@ export default function Meetings({ meetings = [] }) {
                                             <strong>Estado:</strong>{" "}
                                             {meeting.estado}
                                         </p>
-                                        <a
-                                            href="#"
-                                            className="text-blue-500 mt-2 block"
-                                        >
-                                            Ver Detalles
-                                        </a>
+                                        <div className="flex space-x-2 mt-2">
+                                            <Link
+                                                href={route(
+                                                    "meeting.edit",
+                                                    meeting.id_reunion
+                                                )}
+                                                className="text-sky-500"
+                                            >
+                                                Editar
+                                            </Link>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        meeting.id_reunion
+                                                    )
+                                                }
+                                                className="text-red-500"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
