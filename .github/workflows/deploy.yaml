@@ -38,7 +38,7 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_USER: 'ec2-user'
-          EC2_HOST: '18.228.173.125'
+          EC2_HOST: '18.229.142.228'
           PROJECT_PATH: '/var/www/html/juntatransparente'
 
         run: |
