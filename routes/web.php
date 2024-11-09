@@ -41,7 +41,9 @@ Route::middleware('auth')->group(function () {
     })->name('projects.create');
 
     Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
-    Route::get('/meetings/create', [ReunionController::class, 'create'])->name('meeting.create');
+    Route::get('/meeting/create', function () {
+        return Inertia::render('Meeting/CreateMeeting'); // Nombre exacto del archivo y carpeta
+    })->name('meeting.create');
     Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting.store');
     Route::get('/meetings/{id}/edit', [ReunionController::class, 'edit'])->name('meeting.edit');
     Route::put('/meetings/{id}', [ReunionController::class, 'update'])->name('meeting.update');

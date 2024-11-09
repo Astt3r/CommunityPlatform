@@ -40,12 +40,12 @@ export default function Authenticated({ header, children }) {
                                     Proyectos
                                 </NavLink>
                                 <NavLink
-                                    href={route("meeting")}
+                                    href={route("meeting.index")}
                                     active={
                                         route().current("meeting") ||
-                                        route().current("meeting_create") 
+                                        route().current("meeting.index") ||
+                                        route().current("meeting.create")
                                     }
-
                                 >
                                     Reuniones
                                 </NavLink>
