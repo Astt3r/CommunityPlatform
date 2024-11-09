@@ -45,6 +45,9 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+          # Navigate to the correct directory (if required)
+          cd /home/runner/work/juntatransparente/juntatransparente
+
           # Copy files to EC2
           rsync -avr --delete-after --no-times --no-perms \
             --exclude 'node_modules' \
@@ -54,6 +57,7 @@ jobs:
             --exclude 'database' \  # Excluir carpeta database
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
+
 
           # Run deployment commands with necessary permissions
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
