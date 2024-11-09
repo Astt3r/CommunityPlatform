@@ -33,7 +33,6 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
-
       - name: Deploy to EC2
         env:
           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
@@ -45,11 +44,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-
-          # Adjust permissions temporarily
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            sudo chmod -R 777 /var/www/html/juntatransparente/database
-          EOF
 
           # Copy files to EC2
           rsync -avr --delete-after --no-times --no-perms \
@@ -63,14 +57,15 @@ jobs:
           # Run deployment commands with necessary permissions
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /var/www/html/juntatransparente
-            
-            # Configurar permisos para los directorios y archivos necesarios
-            sudo chown -R apache:apache /var/www/html/juntatransparente/database
-            sudo chmod -R 775 /var/www/html/juntatransparente/database
-            sudo chown apache:apache /var/www/html/juntatransparente/database/database.sqlite
-            sudo chmod 664 /var/www/html/juntatransparente/database/database.sqlite
 
-            sudo chown -R ec2-user:ec2-user /var/www/html/juntatransparente
+            # Crear database.sqlite si no existe
+            if [ ! -f /var/www/html/juntatransparente/database/database.sqlite ]; then
+              sudo touch /var/www/html/juntatransparente/database/database.sqlite
+              sudo chown apache:apache /var/www/html/juntatransparente/database/database.sqlite
+              sudo chmod 664 /var/www/html/juntatransparente/database/database.sqlite
+            fi
+
+            # Configurar permisos para directorios necesarios
             sudo chown -R apache:apache /var/www/html/juntatransparente/storage
             sudo chmod -R 775 /var/www/html/juntatransparente/storage
             sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
@@ -86,3 +81,4 @@ jobs:
             sudo systemctl restart httpd
             exit
           EOF
+
