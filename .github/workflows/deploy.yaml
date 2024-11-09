@@ -46,6 +46,11 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+          # Adjust permissions temporarily
+          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            sudo chmod -R 777 /var/www/html/juntatransparente/database
+          EOF
+
           # Copy files to EC2
           rsync -avr --delete-after \
             --exclude 'node_modules' \
