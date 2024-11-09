@@ -31,10 +31,11 @@ export default function Authenticated({ header, children }) {
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    href={route("projects")}
+                                    href={route("project.index")}
                                     active={
-                                        route().current("projects") ||
-                                        route().current("projects_crear")
+                                        route().current("project") ||
+                                        route().current("project.index") ||
+                                        route().current("project.create")
                                     }
                                 >
                                     Proyectos

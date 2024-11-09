@@ -1,17 +1,25 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 
-export default function Dashboard() {
+export default function Projects({ projects = [] }) {
+    const { delete: destroy } = useForm();
+
+    const handleDelete = (id) => {
+        if (confirm("¿Estás seguro de que deseas eliminar este proyecto?")) {
+            destroy(route("project.destroy", id));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             header={
                 <div className="">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Proyectos
+                        Proyectos Recientes
                     </h2>
                     <div className="flex justify-end">
                         <Link
-                            href={route("projects.create")}
+                            href={route("project.create")}
                             className="bg-blue-500 text-white px-4 py-2 rounded-md"
                         >
                             Crear Nuevo Proyecto
@@ -20,56 +28,61 @@ export default function Dashboard() {
                 </div>
             }
         >
-            <Head title="Dashboard" />
-
+            <Head title="Proyectos" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                            Vista Proyectos
-                            <div id="content-wrapper">
-                                <div className="section">
-                                    <h2 className="text-xl font-semibold">
-                                        Bienvenido a la Plataforma de Gestión de
-                                        Juntas de Vecinos
-                                    </h2>
-                                    <p>Panel de Proyectos.</p>
-                                </div>
-
-                                <div className="section my-6">
-                                    <h2 className="text-xl font-semibold">
-                                        Proyectos Actuales
-                                    </h2>
-                                    <div className="projects grid grid-cols-2 gap-4">
-                                        <div className="p-4 border">
-                                            <h3 className="font-bold">
-                                                Proyecto A
-                                            </h3>
-                                            <p>
-                                                Descripción breve del proyecto.
-                                            </p>
-                                            <p>
-                                                <strong>Estado:</strong> En
-                                                curso
-                                            </p>
-                                        </div>
-                                        <div className="p-4 border">
-                                            <h3 className="font-bold">
-                                                Proyecto B
-                                            </h3>
-                                            <p>
-                                                Descripción breve del proyecto.
-                                            </p>
-                                            <p>
-                                                <strong>Estado:</strong>{" "}
-                                                Finalizado
-                                            </p>
+                            <h2 className="text-xl font-semibold mb-4">
+                                Proyectos Realizados
+                            </h2>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                                {projects.map((project) => (
+                                    <div
+                                        key={project.id_proyecto}
+                                        className="p-4 border rounded-lg"
+                                    >
+                                        <h3 className="font-bold text-lg">
+                                            {project.nombre}
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            {project.descripcion}
+                                        </p>
+                                        <p>
+                                            <strong>Fecha de Inicio:</strong>{" "}
+                                            {project.fecha_inicio}
+                                        </p>
+                                        <p>
+                                            <strong>Fecha de Fin:</strong>{" "}
+                                            {project.fecha_fin}
+                                        </p>
+                                        <p>
+                                            <strong>Estado:</strong>{" "}
+                                            {project.estado}
+                                        </p>
+                                        <div className="mt-4">
+                                            <Link
+                                                href={route(
+                                                    "project.edit",
+                                                    project.id_proyecto
+                                                )}
+                                                className="text-sky-500"
+                                            >
+                                                Editar
+                                            </Link>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        project.id_proyecto
+                                                    )
+                                                }
+                                                className="text-red-500"
+                                            >
+                                                Eliminar
+                                            </button>
                                         </div>
                                     </div>
-                                    <a href="#" className="block mt-4">
-                                        Ver Todos los Proyectos
-                                    </a>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
