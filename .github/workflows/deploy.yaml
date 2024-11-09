@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master  # or whatever branch you want to trigger the deployment from
+      - master  # o la rama específica
 
 jobs:
   build-and-deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '22'  # or the version you're using
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install
@@ -32,7 +32,7 @@ jobs:
           ini-values: post_max_size=256M, upload_max_filesize=256M
 
       - name: Install Composer dependencies
-        run: composer install --optimize-autoloader --no-dev
+        run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
       - name: Deploy to EC2
         env:
@@ -43,7 +43,7 @@ jobs:
 
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
           # Copy files to EC2
@@ -51,6 +51,7 @@ jobs:
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'storage/framework/cache/data' \
+            --exclude '.env' \
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
 
@@ -61,5 +62,9 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            sudo chown -R ec2-user:apache /var/www/html/juntatransparente
+            sudo chmod -R 775 /var/www/html/juntatransparente/storage
+            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+            sudo systemctl restart httpd
             exit
           EOF
