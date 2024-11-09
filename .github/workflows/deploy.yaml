@@ -55,16 +55,29 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
 
-          # Run deployment commands
+          # Run deployment commands with necessary permissions
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd /var/www/html/juntatransparente
+            
+            # Configurar permisos para los directorios y archivos necesarios
+            sudo chown -R apache:apache /var/www/html/juntatransparente/database
+            sudo chmod -R 775 /var/www/html/juntatransparente/database
+            sudo chown apache:apache /var/www/html/juntatransparente/database/database.sqlite
+            sudo chmod 664 /var/www/html/juntatransparente/database/database.sqlite
+
+            sudo chown -R ec2-user:ec2-user /var/www/html/juntatransparente
+            sudo chown -R apache:apache /var/www/html/juntatransparente/storage
+            sudo chmod -R 775 /var/www/html/juntatransparente/storage
+            sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
+            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+
+            # Ejecutar comandos de Laravel
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            sudo chown -R ec2-user:apache /var/www/html/juntatransparente
-            sudo chmod -R 775 /var/www/html/juntatransparente/storage
-            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+
+            # Reiniciar Apache para aplicar cambios
             sudo systemctl restart httpd
             exit
           EOF
