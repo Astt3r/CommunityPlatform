@@ -52,11 +52,12 @@ jobs:
           EOF
 
           # Copy files to EC2
-          rsync -avr --delete-after --no-times \
+          rsync -avr --delete-after --no-times --no-perms \
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'storage/framework/cache/data' \
             --exclude '.env' \
+            --exclude 'database/database.sqlite' \
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
 
