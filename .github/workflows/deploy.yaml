@@ -52,7 +52,7 @@ jobs:
           EOF
 
           # Copy files to EC2
-          rsync -avr --delete-after \
+          rsync -avr --delete-after --no-times \
             --exclude 'node_modules' \
             --exclude '.git' \
             --exclude 'storage/framework/cache/data' \
