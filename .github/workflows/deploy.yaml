@@ -46,10 +46,12 @@ jobs:
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-          # Adjust permissions temporarily
+          # Ajuste temporal de permisos antes de ejecutar `rsync`
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            sudo chmod -R 777 /var/www/html/juntatransparente/database
+            sudo chmod -R 777 /var/www/html/juntatransparente/storage
+            sudo chmod -R 777 /var/www/html/juntatransparente/bootstrap/cache
           EOF
+
 
           # Copy files to EC2
           rsync -avr --delete-after --no-times --no-perms \
@@ -61,6 +63,15 @@ jobs:
             --exclude 'database/database.sqlite' \
             -e "ssh -o StrictHostKeyChecking=no" \
             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
+
+          # Restauración de permisos después de `rsync`
+          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            sudo chown -R apache:apache /var/www/html/juntatransparente/storage
+            sudo chmod -R 775 /var/www/html/juntatransparente/storage
+            sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
+            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+          EOF
+
 
           # Run deployment commands with necessary permissions
           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
