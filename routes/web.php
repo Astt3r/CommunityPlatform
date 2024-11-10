@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReunionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -69,6 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{id}', [ProjectController::class, 'update'])->name('project.update');
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('project.destroy');
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 });
 

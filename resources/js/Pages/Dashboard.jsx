@@ -1,13 +1,16 @@
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
 
-export default function Dashboard() {
+export default function Dashboard({ reunions = [], projects = [] }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
+    console.log("Reunions:", reunions); // Verificar los datos de reuniones
+    console.log("Projects:", projects);  // Verificar los datos de proyectos
 
     return (
         <AuthenticatedLayout
@@ -43,60 +46,38 @@ export default function Dashboard() {
                         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                             <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                                 <div className="p-6 text-gray-900">
-                                    {/* Main content from HTML */}
                                     <header>
                                         <h1 className="text-3xl font-bold">Gestión de Juntas de Vecinos</h1>
                                     </header>
-                                    
 
                                     <div id="content-wrapper">
-                                        <div className="section">
-                                            <h2 className="text-xl font-semibold">Bienvenido a la Plataforma de Gestión de Juntas de Vecinos</h2>
-                                            <p>Aquí puedes gestionar proyectos comunitarios, eventos, finanzas y mucho más.</p>
-                                            
-                                        </div>
-
                                         <div className="section my-6">
-                                            <h2 className="text-xl font-semibold">Proyectos Actuales</h2>
-                                            <div className="projects grid grid-cols-2 gap-4">
-                                                <div className="p-4 border">
-                                                    <h3 className="font-bold">Proyecto A</h3>
-                                                    <p>Descripción breve del proyecto.</p>
-                                                    <p><strong>Estado:</strong> En curso</p>
-                                                </div>
-                                                <div className="p-4 border">
-                                                    <h3 className="font-bold">Proyecto B</h3>
-                                                    <p>Descripción breve del proyecto.</p>
-                                                    <p><strong>Estado:</strong> Finalizado</p>
-                                                </div>
+                                            <h2 className="text-xl font-semibold">Reuniones Recientes</h2>
+                                            <div className="meetings grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {reunions.slice(0, 3).map((meeting, index) => (
+                                                    <div key={index} className="p-4 border">
+                                                        <h3 className="font-bold">{meeting.tema_principal}</h3>
+                                                        <p>{meeting.descripcion}</p>
+                                                        <p><strong>Fecha:</strong> {meeting.fecha_reunion}</p>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <a href="#" className="block mt-4">Ver Todos los Proyectos</a>
+                                            <a href="#" className="block mt-4">Ver Todas las Reuniones</a>
                                         </div>
 
                                         <div className="section my-6">
-                                            <h2 className="text-xl font-semibold">Últimos Ingresos y Gastos</h2>
-                                            <div className="finance grid grid-cols-2 gap-4">
-                                                <div className="p-4 border">
-                                                    <h3 className="font-bold">Ingreso 1</h3>
-                                                    <p>Descripción del ingreso.</p>
-                                                    <p><strong>Monto:</strong> $500</p>
-                                                </div>
-                                                <div className="p-4 border">
-                                                    <h3 className="font-bold">Gasto 1</h3>
-                                                    <p>Descripción del gasto.</p>
-                                                    <p><strong>Monto:</strong> $200</p>
-                                                </div>
-                                            </div>
-                                            <a href="#" className="block mt-4">Ver Todos los Reportes</a>
-                                        </div>
-
-                                        <div className="section my-6">
-                                            <h2 className="text-xl font-semibold">Noticias y Comunicaciones</h2>
-                                            <ul>
-                                                <li>Reunión del 20 de septiembre: Resultados y acuerdos.</li>
-                                                <li>Nueva normativa para la participación de vecinos en proyectos.</li>
-                                            </ul>
-                                        </div>
+    <h2 className="text-xl font-semibold">Proyectos Recientes</h2>
+    <div className="projects grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {projects.slice(0, 3).map((project, index) => (
+            <div key={index} className="p-4 border">
+                <h3 className="font-bold">{project.nombre}</h3>
+                <p>{project.descripcion}</p>
+                <p><strong>Estado:</strong> {project.estado}</p>
+            </div>
+        ))}
+    </div>
+    <a href="#" className="block mt-4">Ver Todos los Proyectos</a>
+</div>
                                     </div>
 
                                     <footer className="mt-6">
