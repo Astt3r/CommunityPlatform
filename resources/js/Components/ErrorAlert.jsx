@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { usePage } from "@inertiajs/react";
+import React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { usePage } from "@inertiajs/react"; // Importa la función usePage de Inertia
 
 export default function ErrorAlert() {
     const { error } = usePage().props;
-    const [visible, setVisible] = useState(!!error);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (error) {
-            setVisible(true);
-            const timer = setTimeout(() => {
-                setVisible(false); // Oculta el mensaje después de 5 segundos
-            }, 5000);
-
-            return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
+            toast.error(error); // Muestra el mensaje de error
         }
     }, [error]);
 
-    return <>{visible && <div className="alert alert-danger">{error}</div>}</>;
+    return <ToastContainer />;
 }

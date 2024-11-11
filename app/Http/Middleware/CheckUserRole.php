@@ -20,6 +20,6 @@ class CheckUserRole
             return $next($request);
         }
 
-        return redirect()->back()->with('error', 'You do not have permission to access this page.');
+        return redirect()->back()->with('error', 'No tienes permiso para acceder a esta página.');
     }
 }
