@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { formatDate } from "@/Components/formatDate";
 
 export default function Projects({ projects = [] }) {
     const { delete: destroy } = useForm();
@@ -50,11 +51,11 @@ export default function Projects({ projects = [] }) {
                                         </p>
                                         <p>
                                             <strong>Fecha de Inicio:</strong>{" "}
-                                            {project.fecha_inicio}
+                                            {formatDate(project.fecha_inicio)}
                                         </p>
                                         <p>
                                             <strong>Fecha de Fin:</strong>{" "}
-                                            {project.fecha_fin}
+                                            {formatDate(project.fecha_fin)}
                                         </p>
                                         <p>
                                             <strong>Estado:</strong>{" "}

@@ -1,5 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { formatDate } from "@/Components/formatDate";
+
 
 export default function Meetings({ meetings = [] }) {
     const { delete: destroy } = useForm();
@@ -50,7 +52,7 @@ export default function Meetings({ meetings = [] }) {
                                         </p>
                                         <p>
                                             <strong>Fecha:</strong>{" "}
-                                            {meeting.fecha_reunion}
+                                            {formatDate(meeting.fecha_reunion)}
                                         </p>
                                         <p>
                                             <strong>Lugar:</strong>{" "}
