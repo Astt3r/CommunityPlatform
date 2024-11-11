@@ -3,6 +3,7 @@ import { Head, Link } from "@inertiajs/react";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isInfoVisible, setIsInfoVisible] = useState(false);
     const [juntasDeVecinos, setJuntasDeVecinos] = useState(0);
     const [usuarios, setUsuarios] = useState(0);
     const [proyectos, setProyectos] = useState(0);
@@ -15,7 +16,17 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         setProyectos(randomInRange(200, 350));
     }, []);
 
-    const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+    const toggleMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    const showInfo = () => {
+        setIsInfoVisible(true);
+    };
+
+    const hideInfo = () => {
+        setIsInfoVisible(false);
+    };
 
     return (
         <>
@@ -110,7 +121,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             ≡
                         </span>
                     </div>
-                    <button onClick={toggleMenu} className="text-2xl md:hidden">≡</button>
                     {isMobileMenuOpen && (
                         <div className="mobile-menu open">
                             <Link
@@ -280,32 +290,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </div>
                 </footer>
             </div>
-
-            <style jsx>{`
-                .btn-primary {
-                    background-color: #006FB3;
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    font-weight: bold;
-                    border-radius: 8px;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-                    transition: background-color 0.3s;
-                }
-                .btn-primary:hover { background-color: #004a7f; }
-                
-                .btn-secondary {
-                    background-color: #FE6565;
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    font-weight: bold;
-                    border-radius: 8px;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-                    transition: background-color 0.3s;
-                }
-                .btn-secondary:hover { background-color: #cc5252; }
-                
-                .text-primary { color: #006FB3; }
-            `}</style>
         </>
     );
 }
