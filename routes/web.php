@@ -4,10 +4,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReunionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\BoardMemberController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Rutas públicas
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -15,76 +18,62 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
 
+Route::get('/finanzas', function () {
+    return Inertia::render('Finances/ReadFinances');
+})->name('finanzas');
+
+// Rutas autenticadas
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
 
+    // Dashboard general
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Rutas de proyectos
+    Route::prefix('projects')->name('project.')->group(function () {
+        Route::get('/', [ProjectController::class, 'index'])->name('index');
+        Route::get('/create', [ProjectController::class, 'create'])->name('create');
+        Route::post('/', [ProjectController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ProjectController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ProjectController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProjectController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::get('/project', function () {
-        return Inertia::render('Project/ReadProject');
-    })->name('project');
+    // Rutas de reuniones
+    Route::prefix('meetings')->name('meeting.')->group(function () {
+        Route::get('/', [ReunionController::class, 'index'])->name('index');
+        Route::get('/create', function () {
+            return Inertia::render('Meeting/CreateMeeting');
+        })->name('create');
+        Route::post('/', [ReunionController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ReunionController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ReunionController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ReunionController::class, 'destroy'])->name('destroy');
+    });
 
-    Route::get(uri: '/project/create', action: function () {
-        return Inertia::render(component: 'Project/CreateProject');
-    })->name(name: 'project.create');
-
-
-
-    Route::get(uri: '/meeting', action: function () {
-        return Inertia::render(component: 'Meeting/ReadMeeting');
-    })->name(name: 'meeting');
-
-    Route::get(uri: '/meeting/create', action: function () {
-        return Inertia::render(component: 'Meeting/CreateMeeting');
-    })->name(name: 'meeting.create');
-
-
-
+    // Ruta para la página de vecinos
     Route::get('/vecinos', function () {
         return Inertia::render('Vecinos');
     })->name('vecinos');
 
-    Route::get('/project/create', function () {
-        return Inertia::render('Project/CreateProject');
-    })->name('project.create');
-
-
-    Route::get('/meetings', [ReunionController::class, 'index'])->name('meeting.index');
-    Route::get('/meeting/create', function () {
-        return Inertia::render('Meeting/CreateMeeting'); // Nombre exacto del archivo y carpeta
-    })->name('meeting.create');
-    Route::post('/meetings', [ReunionController::class, 'store'])->name('meeting.store');
-    Route::get('/meetings/{id}/edit', [ReunionController::class, 'edit'])->name('meeting.edit');
-    Route::put('/meetings/{id}', [ReunionController::class, 'update'])->name('meeting.update');
-    Route::delete('/meetings/{id}', [ReunionController::class, 'destroy'])->name('meeting.destroy');
-
-
-    Route::get('/projects', [ProjectController::class, 'index'])->name('project.index');
-    Route::get('/projects/create', [ProjectController::class, 'create'])->name('project.create');
-    Route::post('/projects', [ProjectController::class, 'store'])->name('project.store');
-    Route::get('/projects/{id}/edit', [ProjectController::class, 'edit'])->name('project.edit');
-    Route::put('/projects/{id}', [ProjectController::class, 'update'])->name('project.update');
-    Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('project.destroy');
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-});
-
-Route::get('/finanzas', function () {
-    return Inertia::render('Finanzas');
-})->name('finanzas');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Rutas de perfil
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    });
 });
 
 
-
-
+// Autenticación
 require __DIR__ . '/auth.php';
+
+// Rutas específicas para roles
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'role:board_member'])->group(function () {
+    Route::get('board-member/dashboard', [BoardMemberController::class, 'index'])->name('board_member.dashboard');
+});
