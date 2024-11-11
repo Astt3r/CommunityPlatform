@@ -60,7 +60,7 @@ export default function Projects({ projects = [] }) {
                                             <strong>Estado:</strong>{" "}
                                             {project.estado}
                                         </p>
-                                        <div className="mt-4">
+                                        <div className="flex space-x-2 mt-2">
                                             <Link
                                                 href={route(
                                                     "project.edit",
