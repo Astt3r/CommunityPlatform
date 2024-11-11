@@ -9,4 +9,18 @@ class JuntaDeVecino extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'nombre',
+        'direccion',
+        'telefono',
+        'email',
+        'fecha_fundacion',
+        'estado',
+    ];
+
+    public function vecinos(): HasMany
+    {
+        return $this->hasMany(related: Vecino::class);
+    }
+
 }

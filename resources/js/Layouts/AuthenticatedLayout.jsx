@@ -4,6 +4,7 @@ import NavLink from "@/Components/NavLink";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
+import ErrorAlert from "@/Components/ErrorAlert";
 
 export default function Authenticated({ header, children }) {
     const user = usePage().props.auth.user;
@@ -208,7 +209,10 @@ export default function Authenticated({ header, children }) {
                 </header>
             )}
 
-            <main>{children}</main>
+            <main>
+                <ErrorAlert />
+                {children}
+            </main>
         </div>
     );
 }
