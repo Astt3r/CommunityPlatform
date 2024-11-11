@@ -17,7 +17,7 @@ class DashboardController extends Controller
 
         // Pasar los datos a la vista de Inertia
         return Inertia::render('Dashboard', [
-            'reunions' => $reunions, // asegúrate de que sea "reunions"
+            'reunions' => $reunions,
             'projects' => $projects,
         ]);
     }
