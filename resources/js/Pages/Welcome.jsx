@@ -30,7 +30,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     return (
         <>
-            <Head title="Junta " />
+            <Head title="Junta Transparente" />
             <link
                 href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
                 rel="stylesheet"
@@ -110,7 +110,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             href="/login"
                             className="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-md hover:bg-secondary"
                         >
-                            Log in
+                            Iniciar Sesión
                         </Link>
                     </div>
                     <div
