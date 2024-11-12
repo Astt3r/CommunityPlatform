@@ -20,7 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin',
+        'role',
     ];
 
     /**
@@ -46,8 +46,27 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Check if the user has an admin role.
+     */
     public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user has a board member role.
+     */
+    public function isBoardMember(): bool
+    {
+        return $this->role === 'board_member';
+    }
+
+    /**
+     * Check if the user has a resident role.
+     */
+    public function isResident(): bool
+    {
+        return $this->role === 'resident';
     }
 }
