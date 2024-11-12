@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\NeighborhoodAssociation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -35,5 +36,6 @@ class DatabaseSeeder extends Seeder
             'role' => 'resident',
             'password' => bcrypt('password'),
         ]);
+
     }
 }

@@ -85,9 +85,6 @@ Route::middleware(['auth', 'role:board_member'])->group(function () {
 //Rutas de ascociaciones nuevas
 
 
-Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
-
-Route::middleware(['auth', 'role:resident '])->group(function () {
-    Route::get('neighborhood-associations', [NeighborhoodAssociationController::class, 'index'])->name('neighborhood-associations.index');
-
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
 });

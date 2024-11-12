@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\NeighborhoodAssociation;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class NeighborhoodAssociationController extends Controller
 {
@@ -13,9 +16,18 @@ class NeighborhoodAssociationController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role == 'board_member' || $user->role == 'resident') {
-
+        // Verificar si el usuario tiene rol de 'board_member' o 'resident'
+        if ($user->role === 'board_member' || $user->role === 'resident') {
+            // Filtrar asociaciones que el usuario puede ver (asumiendo que está vinculado a una)
+            $associations = NeighborhoodAssociation::where('id', $user->neighborhood_association_id)->get();
+        } else {
+            // Mostrar todas las asociaciones si es un admin
+            $associations = NeighborhoodAssociation::all();
         }
+
+        return Inertia::render('NeighborhoodAssociations/Index', [
+            'associations' => $associations,
+        ]);
     }
 
     /**
@@ -23,7 +35,7 @@ class NeighborhoodAssociationController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('NeighborhoodAssociations/Create');
     }
 
     /**
@@ -31,7 +43,23 @@ class NeighborhoodAssociationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'website_url' => 'nullable|url|max:255',
+            'number_of_members' => 'nullable|integer',
+            'date_of_funding' => 'nullable|date',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['created_by'] = Auth::id();
+        $validated['updated_by'] = Auth::id();
+
+        NeighborhoodAssociation::create($validated);
+
+        return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación creada exitosamente.');
     }
 
     /**
@@ -39,7 +67,11 @@ class NeighborhoodAssociationController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $association = NeighborhoodAssociation::findOrFail($id);
+
+        return Inertia::render('NeighborhoodAssociations/Show', [
+            'association' => $association,
+        ]);
     }
 
     /**
@@ -47,7 +79,11 @@ class NeighborhoodAssociationController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $association = NeighborhoodAssociation::findOrFail($id);
+
+        return Inertia::render('NeighborhoodAssociations/Edit', [
+            'association' => $association,
+        ]);
     }
 
     /**
@@ -55,7 +91,24 @@ class NeighborhoodAssociationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $association = NeighborhoodAssociation::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'website_url' => 'nullable|url|max:255',
+            'number_of_members' => 'nullable|integer',
+            'date_of_funding' => 'nullable|date',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['updated_by'] = Auth::id();
+
+        $association->update($validated);
+
+        return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación actualizada exitosamente.');
     }
 
     /**
@@ -63,6 +116,11 @@ class NeighborhoodAssociationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $association = NeighborhoodAssociation::findOrFail($id);
+
+        $association->delete();
+
+        return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación eliminada exitosamente.');
     }
+
 }
