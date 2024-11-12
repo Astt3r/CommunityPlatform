@@ -72,6 +72,8 @@ require __DIR__ . '/auth.php';
 // Rutas específicas para roles
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('admin/juntas/create', [AdminDashboardController::class, 'createJuntaDeVecino'])->name('juntas.create');
+    Route::post('admin/juntas/store', [AdminDashboardController::class, 'storeJuntaDeVecino'])->name('juntas.store');
 });
 
 Route::middleware(['auth', 'role:board_member'])->group(function () {

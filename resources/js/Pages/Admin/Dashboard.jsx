@@ -1,26 +1,29 @@
-import AdminLayout from "@/Layouts/AdminLayout";
-import { Head } from "@inertiajs/react";
+import React from 'react';
+import { Link } from "@inertiajs/react";
 
-export default function AdminDashboard() {
+export default function Dashboard({ juntas }) {
     return (
-        <AdminLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Admin Dashboard
-                </h2>
-            }
-        >
-            <Head title="Admin Dashboard" />
+        <div className="p-6 bg-white shadow-sm sm:rounded-lg">
+            <h2 className="text-2xl font-semibold mb-6">Juntas de Vecinos</h2>
+            <Link href={route("juntas.create")} className="text-blue-500 hover:underline">
+                Crear Nueva Junta de Vecinos
+            </Link>
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            Welcome to the Admin Dashboard!
-                        </div>
-                    </div>
-                </div>
+            <div className="mt-6">
+                <h3 className="text-xl font-semibold">Listado de Juntas</h3>
+                <ul>
+                    {juntas.map((junta) => (
+                        <li key={junta.id_junta_de_vecino} className="mt-2 border-b pb-2"> {/* Usa una clave única aquí */}
+                            <h4 className="font-bold">{junta.nombre}</h4>
+                            <p>Dirección: {junta.direccion_sede}</p>
+                            <p>Teléfono: {junta.telefono_contacto}</p>
+                            <p>Email: {junta.email_contacto}</p>
+                            <p>Fecha de Fundación: {junta.fecha_fundacion}</p>
+                            <p>Estado: {junta.estado}</p>
+                        </li>
+                    ))}
+                </ul>
             </div>
-        </AdminLayout>
+        </div>
     );
 }

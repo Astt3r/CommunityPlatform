@@ -10,7 +10,8 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        return Inertia::render("Admin/Dashboard");
+        $juntas = JuntaDeVecino::all();
+        return Inertia::render("Admin/Dashboard", ['juntas' => $juntas]);
     }
 
     public function createJuntaDeVecino()

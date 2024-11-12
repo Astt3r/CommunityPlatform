@@ -12,20 +12,16 @@ return new class extends Migration {
     {
         Schema::create('junta_de_vecino', function (Blueprint $table) {
             $table->increments('id_junta_de_vecino');
-            //id vs increments 4bit vs 8bit
             $table->string('nombre', 50);
-            $table->string('direccion_sede', 255);
-            $table->string('telefono_contacto', 255);
-            $table->string('email_contacto', 255);
-            $table->dateTime('fecha_fundacion');
+            $table->string('direccion', 255); // Cambiado a direccion
+            $table->string('telefono', 255); // Cambiado a telefono
+            $table->string('email', 255); // Cambiado a email
+            $table->date('fecha_fundacion'); // Mantener como date si no necesitas tiempo
             $table->string('estado', 50);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('junta_de_vecino');

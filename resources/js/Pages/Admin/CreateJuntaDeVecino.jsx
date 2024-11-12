@@ -3,9 +3,9 @@ import { useForm } from "@inertiajs/react";
 export default function CreateJuntaDeVecino() {
     const { data, setData, post, errors } = useForm({
         nombre: "",
-        direccion: "",
-        telefono: "",
-        email: "",
+        direccion: "", // Cambiado a direccion_sede
+        telefono: "", // Cambiado a telefono_contacto
+        email: "", // Cambiado a email_contacto
         fecha_fundacion: "",
         estado: "",
     });
@@ -33,17 +33,17 @@ export default function CreateJuntaDeVecino() {
                     <label>Dirección</label>
                     <input
                         type="text"
-                        value={data.direccion}
+                        value={data.direccion} // Cambiado a direccion_sede
                         onChange={(e) => setData("direccion", e.target.value)}
                         className="w-full p-2 border rounded"
                     />
-                    {errors.direccion && <p className="text-red-500">{errors.direccion}</p>}
+                    {errors.direccion_sede && <p className="text-red-500">{errors.direccion}</p>}
                 </div>
                 <div>
                     <label>Teléfono</label>
                     <input
-                        type="tel"
-                        value={data.telefono}
+                        type="text"
+                        value={data.telefono} // Cambiado a telefono_contacto
                         onChange={(e) => setData("telefono", e.target.value)}
                         className="w-full p-2 border rounded"
                     />
@@ -53,7 +53,7 @@ export default function CreateJuntaDeVecino() {
                     <label>Email</label>
                     <input
                         type="email"
-                        value={data.email}
+                        value={data.email} // Cambiado a email_contacto
                         onChange={(e) => setData("email", e.target.value)}
                         className="w-full p-2 border rounded"
                     />
@@ -63,7 +63,7 @@ export default function CreateJuntaDeVecino() {
                     <label>Fecha de Fundación</label>
                     <input
                         type="date"
-                        value={data.fecha_fundacion}
+                        value={data.fecha}
                         onChange={(e) => setData("fecha_fundacion", e.target.value)}
                         className="w-full p-2 border rounded"
                     />
