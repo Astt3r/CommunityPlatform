@@ -11,7 +11,11 @@ class NeighborhoodAssociationController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+
+        if ($user->role == 'board_member' || $user->role == 'resident') {
+
+        }
     }
 
     /**

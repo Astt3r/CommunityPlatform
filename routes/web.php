@@ -6,6 +6,7 @@ use App\Http\Controllers\ReunionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BoardMemberController;
+use App\Http\Controllers\NeighborhoodAssociationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -78,4 +79,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:board_member'])->group(function () {
     Route::get('board-member/dashboard', [BoardMemberController::class, 'index'])->name('board_member.dashboard');
+});
+
+
+//Rutas de ascociaciones nuevas
+
+
+Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
+
+Route::middleware(['auth', 'role:resident '])->group(function () {
+    Route::get('neighborhood-associations', [NeighborhoodAssociationController::class, 'index'])->name('neighborhood-associations.index');
+
 });
