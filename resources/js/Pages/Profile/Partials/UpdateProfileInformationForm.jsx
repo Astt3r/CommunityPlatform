@@ -103,7 +103,7 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">Gaurdado.</p>
+                        <p className="text-sm text-gray-600">Guardado.</p>
                     </Transition>
                 </div>
             </form>
