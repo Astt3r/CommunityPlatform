@@ -12,8 +12,8 @@ export default function CreateResident() {
         birth_date: "",
         status: "",
         last_participation_date: "",
-        neighborhood_association_id: "",
         user_id: "",
+        neighborhood_association_id: "",
     });
 
     const submit = (e) => {
