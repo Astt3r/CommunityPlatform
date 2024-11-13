@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Inertia\Inertia;
 use App\Models\Project;
+use App\Models\File; // Cambia a `App\Models\File` con la A en mayúscula
 
 class ProjectController extends Controller
 {
@@ -25,20 +26,39 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
+        $data = $request->validate([
+            'nombre' => 'required|string',
             'descripcion' => 'required|string',
-            'problema' => 'required|string',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'required|date',
-            'estado' => 'required|string|max:255',
-            'responsable' => 'required|string|max:255',
-            'presupuesto' => 'required|string|max:255',
+            'problema' => 'nullable|string',
+            'fecha_inicio' => 'nullable|date',
+            'fecha_fin' => 'nullable|date',
+            'estado' => 'nullable|string',
+            'responsable' => 'nullable|string',
+            'presupuesto' => 'nullable|numeric',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
         ]);
+        // Crear el proyecto
+        $project = Project::create($data);
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('project_files');
+
+            // Guardar el archivo en la base de datos
+            File::create([
+                'project_id' => $project->id_proyecto, // Usar `id_proyecto` como clave primaria
+                'file_path' => $path,
+            ]);
+        }
 
         Project::create($request->all());
 
         return redirect()->route('project.index')->with('success', 'Proyecto creado exitosamente.');
+    }
+
+    public function show($id)
+    {
+        $project = Project::with('files')->findOrFail($id);
+        return view('projects.show', compact('project'));
     }
 
     public function edit($id)

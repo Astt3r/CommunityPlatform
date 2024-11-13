@@ -20,5 +20,9 @@ class Project extends Model
         'presupuesto',
     ];
 
+    public function files()
+    {
+        return $this->hasMany(File::class, 'project_id', 'id_proyecto'); // Relación basada en `id_proyecto`
+    }
     protected $primaryKey = 'id_proyecto';
 }
