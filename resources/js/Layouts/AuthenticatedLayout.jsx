@@ -7,7 +7,7 @@ import { useState } from "react";
 import ErrorAlert from "@/Components/ErrorAlert";
 
 export default function Authenticated({ header, children }) {
-    const user = usePage().props.auth.user;
+    const { auth, navLinks } = usePage().props;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -24,51 +24,17 @@ export default function Authenticated({ header, children }) {
                                 </Link>
                             </div>
 
+                            {/* Genera los enlaces de navegación según el rol del usuario */}
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route("dashboard")}
-                                    active={route().current("dashboard")}
-                                >
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    href={route("project.index")}
-                                    active={
-                                        route().current("project") ||
-                                        route().current("project.index") ||
-                                        route().current("project.create")
-                                    }
-                                >
-                                    Proyectos
-                                </NavLink>
-                                <NavLink
-                                    href={route("meeting.index")}
-                                    active={
-                                        route().current("meeting") ||
-                                        route().current("meeting.index") ||
-                                        route().current("meeting.create")
-                                    }
-                                >
-                                    Reuniones
-                                </NavLink>
-                                <NavLink
-                                    href={route("vecinos")}
-                                    active={route().current("vecinos")}
-                                >
-                                    Vecinos
-                                </NavLink>
-                                <NavLink
-                                    href={route("dashboard")}
-                                    active={route().current("reportes")}
-                                >
-                                    Reportes
-                                </NavLink>
-                                <NavLink
-                                    href={route("finanzas")}
-                                    active={route().current("finanzas")}
-                                >
-                                    Finanzas
-                                </NavLink>
+                                {navLinks.map((link, index) => (
+                                    <NavLink
+                                        key={index}
+                                        href={route(link.route)}
+                                        active={route().current(link.route)}
+                                    >
+                                        {link.name}
+                                    </NavLink>
+                                ))}
                             </div>
                         </div>
 
@@ -81,8 +47,7 @@ export default function Authenticated({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
-                                                {user.name}
-
+                                                {auth.user.name}
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -167,36 +132,15 @@ export default function Authenticated({ header, children }) {
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route("dashboard")}
-                            active={route().current("dashboard")}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route("profile.edit")}>
-                                Profile
-                            </ResponsiveNavLink>
+                        {navLinks.map((link, index) => (
                             <ResponsiveNavLink
-                                method="post"
-                                href={route("logout")}
-                                as="button"
+                                key={index}
+                                href={route(link.route)}
+                                active={route().current(link.route)}
                             >
-                                Log Out
+                                {link.name}
                             </ResponsiveNavLink>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </nav>

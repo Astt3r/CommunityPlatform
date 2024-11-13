@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BoardMemberController;
 use App\Http\Controllers\NeighborhoodAssociationController;
+use App\Http\Middleware\CheckUserRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,11 +26,15 @@ Route::get('/finanzas', function () {
     return Inertia::render('Finances/ReadFinances');
 })->name('finanzas');
 
+
+
+// Rutas específicas de dashboard según el rol
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 // Rutas autenticadas
 Route::middleware('auth')->group(function () {
 
-    // Dashboard general
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Rutas de proyectos
     Route::prefix('projects')->name('project.')->group(function () {

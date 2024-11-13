@@ -6,27 +6,35 @@ use Illuminate\Http\Request;
 use App\Models\NeighborhoodAssociation;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class NeighborhoodAssociationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $query = NeighborhoodAssociation::query();
 
-        // Verificar si el usuario tiene rol de 'board_member' o 'resident'
-        if ($user->role === 'board_member' || $user->role === 'resident') {
-            // Filtrar asociaciones que el usuario puede ver (asumiendo que está vinculado a una)
-            $associations = NeighborhoodAssociation::where('id', $user->neighborhood_association_id)->get();
-        } else {
-            // Mostrar todas las asociaciones si es un admin
-            $associations = NeighborhoodAssociation::all();
+        // Aplicar filtro de nombre si se proporciona
+        if ($request->has('name')) {
+            $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
+
+        // Verificar rol y ajustar query
+        if ($user->role === 'board_member' || $user->role === 'resident') {
+            $query->where('id', $user->neighborhood_association_id);
+        }
+
+        // Paginación con 10 registros por página
+        $associations = $query->paginate(10)->withQueryString();
 
         return Inertia::render('NeighborhoodAssociations/Index', [
             'associations' => $associations,
+            'filters' => $request->only('name'),
+            'userRole' => $user->role,
         ]);
     }
 
@@ -65,9 +73,13 @@ class NeighborhoodAssociationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
+
+        // Formatear la fecha en español
+        Carbon::setLocale('es');
+        $association->date_of_funding = Carbon::parse($association->date_of_funding)->translatedFormat('d \d\e F \d\e Y');
 
         return Inertia::render('NeighborhoodAssociations/Show', [
             'association' => $association,
