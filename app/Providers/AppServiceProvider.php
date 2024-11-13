@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
                         return [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
                             ['name' => 'Junta de Vecinos', 'route' => 'neighborhood-associations.index'],
+                            ['name' => 'Vecinos', 'route' => 'residents.index'],
                         ];
                     case 'board_member':
                         return [

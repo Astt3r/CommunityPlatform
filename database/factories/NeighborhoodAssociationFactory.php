@@ -25,4 +25,12 @@ class NeighborhoodAssociationFactory extends Factory
             'updated_by' => User::inRandomOrder()->first()->id ?? User::factory(),
         ];
     }
+
+    public function withCreator(int $userId): static
+    {
+        return $this->state([
+            'created_by' => $userId,
+            'updated_by' => $userId,
+        ]);
+    }
 }

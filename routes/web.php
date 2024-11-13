@@ -6,6 +6,7 @@ use App\Http\Controllers\ReunionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\BoardMemberController;
+use App\Http\Controllers\ResidentController;
 use App\Http\Controllers\NeighborhoodAssociationController;
 use App\Http\Middleware\CheckUserRole;
 use Illuminate\Foundation\Application;
@@ -82,14 +83,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('admin/juntas/store', [AdminDashboardController::class, 'storeJuntaDeVecino'])->name('juntas.store');
 });
 
-Route::middleware(['auth', 'role:board_member'])->group(function () {
-    Route::get('board-member/dashboard', [BoardMemberController::class, 'index'])->name('board_member.dashboard');
-});
-
 
 //Rutas de ascociaciones nuevas
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('residents', ResidentController::class);
 });
