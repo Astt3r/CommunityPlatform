@@ -14,6 +14,7 @@ export default function CreateProject() {
         estado: "",
         responsable: "",
         presupuesto: "",
+        file: null, // Campo para el archivo
     });
 
     const submit = (e) => {
@@ -34,112 +35,78 @@ export default function CreateProject() {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={submit} className="space-y-4">
+                        <form onSubmit={submit} className="space-y-4" encType="multipart/form-data">
+                            {/* Campo Nombre del Proyecto */}
                             <div>
-                                <InputLabel
-                                    htmlFor="nombre"
-                                    value="Nombre del Proyecto"
-                                />
+                                <InputLabel htmlFor="nombre" value="Nombre del Proyecto" />
                                 <TextInput
                                     id="nombre"
                                     type="text"
                                     name="nombre"
                                     value={data.nombre}
-                                    onChange={(e) =>
-                                        setData("nombre", e.target.value)
-                                    }
+                                    onChange={(e) => setData("nombre", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.nombre}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.nombre} className="mt-2" />
                             </div>
 
+                            {/* Campo Descripción */}
                             <div>
-                                <InputLabel
-                                    htmlFor="descripcion"
-                                    value="Descripción"
-                                />
+                                <InputLabel htmlFor="descripcion" value="Descripción" />
                                 <TextInput
                                     id="descripcion"
                                     type="text"
                                     name="descripcion"
                                     value={data.descripcion}
-                                    onChange={(e) =>
-                                        setData("descripcion", e.target.value)
-                                    }
+                                    onChange={(e) => setData("descripcion", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.descripcion}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.descripcion} className="mt-2" />
                             </div>
 
+                            {/* Campo Problema */}
                             <div>
-                                <InputLabel
-                                    htmlFor="problema"
-                                    value="Problema"
-                                />
+                                <InputLabel htmlFor="problema" value="Problema" />
                                 <TextInput
                                     id="problema"
                                     type="text"
                                     name="problema"
                                     value={data.problema}
-                                    onChange={(e) =>
-                                        setData("problema", e.target.value)
-                                    }
+                                    onChange={(e) => setData("problema", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.problema}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.problema} className="mt-2" />
                             </div>
 
+                            {/* Campo Fecha Inicio */}
                             <div>
-                                <InputLabel
-                                    htmlFor="fecha_inicio"
-                                    value="Fecha Inicio"
-                                />
+                                <InputLabel htmlFor="fecha_inicio" value="Fecha de Inicio" />
                                 <TextInput
                                     id="fecha_inicio"
                                     type="date"
                                     name="fecha_inicio"
                                     value={data.fecha_inicio}
-                                    onChange={(e) =>
-                                        setData("fecha_inicio", e.target.value)
-                                    }
+                                    onChange={(e) => setData("fecha_inicio", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.fecha_inicio}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.fecha_inicio} className="mt-2" />
                             </div>
 
+                            {/* Campo Fecha Fin */}
                             <div>
-                                <InputLabel
-                                    htmlFor="fecha_fin"
-                                    value="fecha_fin"
-                                />
+                                <InputLabel htmlFor="fecha_fin" value="Fecha de Fin" />
                                 <TextInput
                                     id="fecha_fin"
                                     type="date"
                                     name="fecha_fin"
                                     value={data.fecha_fin}
-                                    onChange={(e) =>
-                                        setData("fecha_fin", e.target.value)
-                                    }
+                                    onChange={(e) => setData("fecha_fin", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.fecha_fin}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.fecha_fin} className="mt-2" />
                             </div>
 
+                            {/* Campo Estado */}
                             <div>
                                 <InputLabel htmlFor="estado" value="Estado" />
                                 <TextInput
@@ -147,59 +114,54 @@ export default function CreateProject() {
                                     type="text"
                                     name="estado"
                                     value={data.estado}
-                                    onChange={(e) =>
-                                        setData("estado", e.target.value)
-                                    }
+                                    onChange={(e) => setData("estado", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.estado}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.estado} className="mt-2" />
                             </div>
 
+                            {/* Campo Responsable */}
                             <div>
-                                <InputLabel
-                                    htmlFor="responsable"
-                                    value="Responsable"
-                                />
+                                <InputLabel htmlFor="responsable" value="Responsable" />
                                 <TextInput
                                     id="responsable"
                                     type="text"
                                     name="responsable"
                                     value={data.responsable}
-                                    onChange={(e) =>
-                                        setData("responsable", e.target.value)
-                                    }
+                                    onChange={(e) => setData("responsable", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.responsable}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.responsable} className="mt-2" />
                             </div>
 
+                            {/* Campo Presupuesto */}
                             <div>
-                                <InputLabel
-                                    htmlFor="presupuesto"
-                                    value="Presupuesto"
-                                />
+                                <InputLabel htmlFor="presupuesto" value="Presupuesto" />
                                 <TextInput
                                     id="presupuesto"
                                     type="number"
                                     name="presupuesto"
                                     value={data.presupuesto}
-                                    onChange={(e) =>
-                                        setData("presupuesto", e.target.value)
-                                    }
+                                    onChange={(e) => setData("presupuesto", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError
-                                    message={errors.presupuesto}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.presupuesto} className="mt-2" />
                             </div>
 
+                            {/* Campo de Archivo */}
+                            <div>
+                                <InputLabel htmlFor="file" value="Archivo del Proyecto" />
+                                <input
+                                    id="file"
+                                    type="file"
+                                    name="file"
+                                    onChange={(e) => setData("file", e.target.files[0])}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.file} className="mt-2" />
+                            </div>
+
+                            {/* Botones de Enviar y Cancelar */}
                             <div className="flex justify-end space-x-4 mt-4">
                                 <button
                                     type="button"
