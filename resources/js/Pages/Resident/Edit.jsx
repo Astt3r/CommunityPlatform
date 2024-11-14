@@ -2,7 +2,7 @@ import React from "react";
 import { usePage, useForm, Link } from "@inertiajs/react";
 
 export default function ResidentEdit() {
-    const { resident } = usePage().props;
+    const { resident, associations = [] } = usePage().props; // Default empty array for associations
     const { data, setData, put, processing, errors } = useForm({
         address: resident.address || "",
         identification_number: resident.identification_number || "",
@@ -10,6 +10,7 @@ export default function ResidentEdit() {
         birth_date: resident.birth_date || "",
         status: resident.status || "",
         last_participation_date: resident.last_participation_date || "",
+        neighborhood_association_id: resident.neighborhood_association_id || "",
     });
 
     const handleSubmit = (e) => {
@@ -119,6 +120,30 @@ export default function ResidentEdit() {
                     {errors.last_participation_date && (
                         <div className="text-red-500 text-sm">
                             {errors.last_participation_date}
+                        </div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Asociación Vecinal
+                    </label>
+                    <select
+                        value={data.neighborhood_association_id}
+                        onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                    >
+                        <option value="">Seleccione una asociación</option>
+                        {associations.map((association) => (
+                            <option key={association.id} value={association.id}>
+                                {association.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    {errors.neighborhood_association_id && (
+                        <div className="text-red-500 text-sm">
+                            {errors.neighborhood_association_id}
                         </div>
                     )}
                 </div>

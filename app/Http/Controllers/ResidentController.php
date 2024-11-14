@@ -79,6 +79,7 @@ class ResidentController extends Controller
     public function edit($id)
     {
         $resident = Resident::with('user', 'neighborhoodAssociation')->findOrFail($id);
+        $associations = NeighborhoodAssociation::all(['id', 'name']); // Asegúrate de obtener las asociaciones
 
         return Inertia::render('Resident/Edit', [
             'resident' => [
@@ -89,11 +90,13 @@ class ResidentController extends Controller
                 'birth_date' => $resident->birth_date,
                 'status' => $resident->status,
                 'last_participation_date' => $resident->last_participation_date,
+                'neighborhood_association_id' => $resident->neighborhood_association_id,
                 'user_name' => $resident->user ? $resident->user->name : null,
-                'neighborhood_association_name' => $resident->neighborhoodAssociation ? $resident->neighborhoodAssociation->name : null,
             ],
+            'associations' => $associations, // Enviamos las asociaciones vecinales
         ]);
     }
+
 
 
 
