@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         if ($request->user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('dashboard');
         }
 
         if ($request->user()->role === 'resident') {
@@ -42,7 +42,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         if ($request->user()->role === 'board_member') {
-            return redirect()->route('board-member  .dashboard');
+            return redirect()->route('dashboard');
         }
 
     }

@@ -9,7 +9,6 @@ export default function Dashboard({ reunions = [], projects = [] }) {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    console.log("Reunions:", reunions); // Verificar los datos de reuniones
     console.log("Projects:", projects); // Verificar los datos de proyectosfff
 
     return (

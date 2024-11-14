@@ -11,15 +11,16 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id('id_proyecto');
-            $table->string('nombre');
-            $table->string('descripcion');
-            $table->text('problema');
-            $table->date('fecha_inicio');
-            $table->date('fecha_fin');
-            $table->string('estado')->nullable();
-            $table->string('responsable')->nullable();
-            $table->string('presupuesto');
+            $table->id('project_id');
+            $table->string('name');
+            $table->string('description');
+            $table->text('issue');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->string('status')->nullable();
+            $table->string('responsible')->nullable();
+            $table->string('budget');
+            $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
             $table->timestamps();
         });
     }

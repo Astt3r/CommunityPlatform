@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('birth_date');
             $table->string('status');
             $table->date('last_participation_date');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constraiwned('users')->onDelete('cascade');
             $table->foreignId('neighborhood_association_id')->nullable()->constrained('neighborhood_associations')->onDelete('set null');
             $table->timestamps();
         });
