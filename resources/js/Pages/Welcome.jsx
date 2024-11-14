@@ -129,12 +129,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             >
                                 Log in
                             </Link>
-                            <Link
-                                href="/register"
-                                className="block px-4 py-2 text-sm font-semibold text-black rounded-md hover:bg-gray-200"
-                            >
-                                Register
-                            </Link>
+                            
                         </div>
                     )}
                 </nav>
