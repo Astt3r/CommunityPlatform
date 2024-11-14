@@ -1,8 +1,11 @@
-import React from "react";
-import { useForm, Link } from "@inertiajs/react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useForm } from "@inertiajs/react";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import InputError from "@/Components/InputError";
 
 export default function NeighborhoodAssociationCreate() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         address: "",
         phone: "",
@@ -15,149 +18,150 @@ export default function NeighborhoodAssociationCreate() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("neighborhood-associations.store"));
+        post(route("neighborhood-associations.store"), {
+            onError: (error) => console.error("Error al crear la asociación:", error),
+            onFinish: () => {
+                if (Object.keys(errors).length === 0) reset();
+            },
+        });
     };
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Crear Asociación</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Nombre
-                    </label>
-                    <input
-                        type="text"
-                        value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.name && (
-                        <div className="text-red-500 text-sm">{errors.name}</div>
-                    )}
-                </div>
+        <AuthenticatedLayout
+            header={
+                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    Crear Junta de Vecinos
+                </h2>
+            }
+        >
+            <div className="py-12">
+                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <InputLabel htmlFor="name" value="Nombre" />
+                                <TextInput
+                                    id="name"
+                                    type="text"
+                                    name="name"
+                                    value={data.name}
+                                    onChange={(e) => setData("name", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.name} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Dirección
-                    </label>
-                    <input
-                        type="text"
-                        value={data.address}
-                        onChange={(e) => setData("address", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.address && (
-                        <div className="text-red-500 text-sm">{errors.address}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="address" value="Dirección" />
+                                <TextInput
+                                    id="address"
+                                    type="text"
+                                    name="address"
+                                    value={data.address}
+                                    onChange={(e) => setData("address", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.address} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Teléfono
-                    </label>
-                    <input
-                        type="text"
-                        value={data.phone}
-                        onChange={(e) => setData("phone", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.phone && (
-                        <div className="text-red-500 text-sm">{errors.phone}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="phone" value="Teléfono" />
+                                <TextInput
+                                    id="phone"
+                                    type="text"
+                                    name="phone"
+                                    value={data.phone}
+                                    onChange={(e) => setData("phone", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.phone} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        value={data.email}
-                        onChange={(e) => setData("email", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.email && (
-                        <div className="text-red-500 text-sm">{errors.email}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="email" value="Email" />
+                                <TextInput
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    onChange={(e) => setData("email", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.email} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        URL del sitio web
-                    </label>
-                    <input
-                        type="url"
-                        value={data.website_url}
-                        onChange={(e) => setData("website_url", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.website_url && (
-                        <div className="text-red-500 text-sm">{errors.website_url}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="website_url" value="URL del Sitio Web" />
+                                <TextInput
+                                    id="website_url"
+                                    type="url"
+                                    name="website_url"
+                                    value={data.website_url}
+                                    onChange={(e) => setData("website_url", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.website_url} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Número de miembros
-                    </label>
-                    <input
-                        type="number"
-                        value={data.number_of_members}
-                        onChange={(e) => setData("number_of_members", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.number_of_members && (
-                        <div className="text-red-500 text-sm">{errors.number_of_members}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="number_of_members" value="Número de Miembros" />
+                                <TextInput
+                                    id="number_of_members"
+                                    type="number"
+                                    name="number_of_members"
+                                    value={data.number_of_members}
+                                    onChange={(e) => setData("number_of_members", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.number_of_members} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Fecha de Fundación
-                    </label>
-                    <input
-                        type="date"
-                        value={data.date_of_funding}
-                        onChange={(e) => setData("date_of_funding", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.date_of_funding && (
-                        <div className="text-red-500 text-sm">{errors.date_of_funding}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="date_of_funding" value="Fecha de Fundación" />
+                                <TextInput
+                                    id="date_of_funding"
+                                    type="date"
+                                    name="date_of_funding"
+                                    value={data.date_of_funding}
+                                    onChange={(e) => setData("date_of_funding", e.target.value)}
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.date_of_funding} className="mt-2" />
+                            </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        ¿Está activa?
-                    </label>
-                    <input
-                        type="checkbox"
-                        checked={data.is_active}
-                        onChange={(e) => setData("is_active", e.target.checked)}
-                        className="mr-2"
-                    />
-                    {errors.is_active && (
-                        <div className="text-red-500 text-sm">{errors.is_active}</div>
-                    )}
-                </div>
+                            <div>
+                                <InputLabel htmlFor="is_active" value="¿Está activa?" />
+                                <input
+                                    id="is_active"
+                                    type="checkbox"
+                                    name="is_active"
+                                    checked={data.is_active}
+                                    onChange={(e) => setData("is_active", e.target.checked)}
+                                    className="mt-1 block"
+                                />
+                                <InputError message={errors.is_active} className="mt-2" />
+                            </div>
 
-                <div className="flex items-center space-x-4">
-                    <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                        disabled={processing}
-                    >
-                        Crear Asociación
-                    </button>
-                    <Link
-                        href={route("neighborhood-associations.index")}
-                        className="text-gray-600 hover:text-gray-800"
-                    >
-                        Cancelar
-                    </Link>
+                            <div className="flex justify-end space-x-4 mt-4">
+                                <button
+                                    type="button"
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                                    onClick={() => reset()}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                                    disabled={processing}
+                                >
+                                    Crear Asociación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </AuthenticatedLayout>
     );
 }
