@@ -32,7 +32,7 @@ export default function NeighborhoodAssociationsIndex() {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Asociaciones de Vecinos
+                    Junta de Vecinos
                 </h2>
             }
         >
