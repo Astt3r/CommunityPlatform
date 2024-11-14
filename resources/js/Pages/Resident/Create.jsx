@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CreateResident() {
+export default function CreateResident({ associations }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         address: "",
         identification_number: "",
@@ -12,14 +12,19 @@ export default function CreateResident() {
         birth_date: "",
         status: "",
         last_participation_date: "",
-        neighborhood_association_id: "",
         user_id: "",
+        neighborhood_association_id: "", // Se mantiene como clave foránea
     });
 
     const submit = (e) => {
         e.preventDefault();
         post(route("resident.store"), {
-            onFinish: () => reset(),
+            onError: (error) => {
+                console.error("Error al guardar el residente:", error);
+            },
+            onFinish: () => {
+                if (Object.keys(errors).length === 0) reset();
+            },
         });
     };
 
@@ -138,22 +143,22 @@ export default function CreateResident() {
                             </div>
 
                             <div>
-                                <InputLabel
-                                    htmlFor="neighborhood_association_id"
-                                    value="ID de Asociación Vecinal"
-                                />
-                                <TextInput
+                                <InputLabel htmlFor="neighborhood_association_id" value="Asociación Vecinal" />
+                                <select
                                     id="neighborhood_association_id"
-                                    type="number"
                                     name="neighborhood_association_id"
                                     value={data.neighborhood_association_id}
                                     onChange={(e) => setData("neighborhood_association_id", e.target.value)}
                                     className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.neighborhood_association_id}
-                                    className="mt-2"
-                                />
+                                >
+                                    <option value="">Seleccione una Asociación</option>
+                                    {associations.map((association) => (
+                                        <option key={association.id} value={association.id}>
+                                            {association.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.neighborhood_association_id} className="mt-2" />
                             </div>
 
                             <div>

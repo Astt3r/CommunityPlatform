@@ -94,4 +94,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('residents/create', [ResidentController::class, 'createResident'])->name('residents.create');
     Route::resource('residents', ResidentController::class);
+    Route::post('/resident', [ResidentController::class, 'store'])->name('resident.store');
+
 });
