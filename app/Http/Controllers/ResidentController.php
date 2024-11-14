@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Resident;
+use App\Models\NeighborhoodAssociation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -41,19 +42,20 @@ class ResidentController extends Controller
     {
         $validated = $request->validate([
             'address' => 'required|string|max:255',
-            'identification_number' => 'required|string|max:255|unique:Residents',
+            'identification_number' => 'required|string|max:255|unique:residents',
             'registration_date' => 'required|date',
             'birth_date' => 'required|date',
             'status' => 'required|string|max:50',
             'last_participation_date' => 'required|date',
-            'Residenthood_association_id' => 'required|exists:NeighborhoodAssociations,id',
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id', // Validación de clave foránea
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $Resident = Resident::create($validated);
+        $resident = Resident::create($validated);
 
-        return response()->json($Resident, 201);
+        return response()->json($resident, 201);
     }
+
 
     public function update(Request $request, Resident $Resident)
     {
@@ -82,6 +84,10 @@ class ResidentController extends Controller
     
     public function create()
     {
-        return Inertia::render('Resident/Create');
+        $associations = NeighborhoodAssociation::all(['id', 'name']);
+        return Inertia::render('Resident/Create', [
+            'associations' => $associations,
+        ]);
     }
+
 }
