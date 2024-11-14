@@ -47,13 +47,14 @@ class ResidentController extends Controller
             'birth_date' => 'required|date',
             'status' => 'required|string|max:50',
             'last_participation_date' => 'required|date',
-            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id', // Validación de clave foránea
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $resident = Resident::create($validated);
+        Resident::create($validated);
 
-        return response()->json($resident, 201);
+        // Redirige a la lista de residentes con un mensaje de éxito
+        return redirect()->route('/residents')->with('success', 'Residente creado exitosamente.');
     }
 
 
