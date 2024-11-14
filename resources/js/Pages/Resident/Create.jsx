@@ -12,7 +12,7 @@ export default function CreateResident({ associations }) {
         birth_date: "",
         status: "",
         last_participation_date: "",
-        user_id: "",
+        user_id: "", // Mantener user_id opcional
         neighborhood_association_id: "", // Se mantiene como clave foránea
     });
 
@@ -162,7 +162,7 @@ export default function CreateResident({ associations }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="user_id" value="ID de Usuario" />
+                                <InputLabel htmlFor="user_id" value="ID de Usuario (Opcional)" />
                                 <TextInput
                                     id="user_id"
                                     type="number"
