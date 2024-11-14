@@ -54,7 +54,7 @@ class ResidentController extends Controller
         Resident::create($validated);
 
         // Redirige a la lista de residentes con un mensaje de éxito
-        return redirect()->route('/residents')->with('success', 'Residente creado exitosamente.');
+        return redirect()->route('residents.index')->with('success', 'Residente creado exitosamente.');
     }
 
     public function show($id)
@@ -98,23 +98,25 @@ class ResidentController extends Controller
 
 
 
-    public function update(Request $request, Resident $Resident)
+    public function update(Request $request, Resident $resident)
     {
         $validated = $request->validate([
             'address' => 'sometimes|string|max:255',
-            'identification_number' => 'sometimes|string|max:255|unique:Residents,identification_number,' . $Resident->id,
+            'identification_number' => 'sometimes|string|max:255|unique:residents,identification_number,' . $resident->id,
             'registration_date' => 'sometimes|date',
             'birth_date' => 'sometimes|date',
             'status' => 'sometimes|string|max:50',
             'last_participation_date' => 'sometimes|date',
-            'Residenthood_association_id' => 'sometimes|exists:NeighborhoodAssociations,id',
+            'neighborhood_association_id' => 'sometimes|exists:neighborhood_associations,id',
             'user_id' => 'sometimes|exists:users,id',
         ]);
 
-        $Resident->update($validated);
+        $resident->update($validated);
 
-        return response()->json($Resident);
+        // Redirige a la lista de residentes con un mensaje de éxito
+        return redirect()->route('residents.index')->with('success', 'Residente actualizado exitosamente.');
     }
+
 
     public function destroy(Resident $Resident)
     {
