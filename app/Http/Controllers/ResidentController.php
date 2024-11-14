@@ -57,6 +57,46 @@ class ResidentController extends Controller
         return redirect()->route('/residents')->with('success', 'Residente creado exitosamente.');
     }
 
+    public function show($id)
+    {
+        $resident = Resident::with('user', 'neighborhoodAssociation')->findOrFail($id);
+
+        return Inertia::render('Resident/Show', [
+            'resident' => [
+                'id' => $resident->id,
+                'user_name' => $resident->user ? $resident->user->name : 'N/A',
+                'address' => $resident->address,
+                'identification_number' => $resident->identification_number,
+                'registration_date' => $resident->registration_date,
+                'birth_date' => $resident->birth_date,
+                'status' => $resident->status,
+                'last_participation_date' => $resident->last_participation_date,
+                'neighborhood_association_name' => $resident->neighborhoodAssociation ? $resident->neighborhoodAssociation->name : 'N/A',
+            ],
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $resident = Resident::with('user', 'neighborhoodAssociation')->findOrFail($id);
+
+        return Inertia::render('Resident/Edit', [
+            'resident' => [
+                'id' => $resident->id,
+                'address' => $resident->address,
+                'identification_number' => $resident->identification_number,
+                'registration_date' => $resident->registration_date,
+                'birth_date' => $resident->birth_date,
+                'status' => $resident->status,
+                'last_participation_date' => $resident->last_participation_date,
+                'user_name' => $resident->user ? $resident->user->name : null,
+                'neighborhood_association_name' => $resident->neighborhoodAssociation ? $resident->neighborhoodAssociation->name : null,
+            ],
+        ]);
+    }
+
+
+
 
     public function update(Request $request, Resident $Resident)
     {
