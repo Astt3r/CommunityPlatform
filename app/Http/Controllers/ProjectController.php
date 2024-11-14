@@ -41,12 +41,12 @@ class ProjectController extends Controller
         $project = Project::create($data);
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('project_files');
+            $path = $request->file('file')->store('project_files', 'local');
 
             // Guardar el archivo en la base de datos
             File::create([
-                'project_id' => $project->id_proyecto, // Usar `id_proyecto` como clave primaria
-                'file_path' => $path,
+                'project_id' => $project->id_proyecto,
+                'file_path' => $path, // Almacena la ruta relativa
             ]);
         }
 
