@@ -1,6 +1,5 @@
-export default function SecondaryButton({
-    type = 'button',
-    className = '',
+export default function PrimaryButton({
+    className = "",
     disabled,
     children,
     ...props
@@ -8,10 +7,11 @@ export default function SecondaryButton({
     return (
         <button
             {...props}
-            type={type}
             className={
-                `inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 ${
-                    disabled && 'opacity-25'
+                `inline-flex items-center squared border px-4 py-2 text-sm font-bold leading-relaxed transition duration-150 ease-in-out ${
+                    disabled
+                        ? "text-gob-black-26 bg-gob-black-12 border-gob-black-26 pointer-events-none"
+                        : `bg-gob-white text-gob-primary-darken-1 border-gob-primary-darken-1 hover:bg-go-white hover:text-gob-hover hover:border-gob-hover-primary-darken-1 focus:bg-gob-white focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-gob-focus-base active:bg-gob-white active:text-gob-active active:border-gob-active-primary-darken-1`
                 } ` + className
             }
             disabled={disabled}
