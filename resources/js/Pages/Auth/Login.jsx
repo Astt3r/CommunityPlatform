@@ -33,7 +33,13 @@ export default function Login({ status, canResetPassword }) {
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Correo" />
+                    <InputLabel
+                        value="Correo"
+                        size="md"
+                        color="black"
+                        weight="bold"
+                        className="mb-2"
+                    />
 
                     <TextInput
                         id="email"
@@ -50,7 +56,13 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Contraseña" />
+                    <InputLabel
+                        value="Contraseña"
+                        size="md"
+                        color="Black"
+                        weight="bold"
+                        className="mb-2"
+                    />
 
                     <TextInput
                         id="password"
@@ -66,25 +78,23 @@ export default function Login({ status, canResetPassword }) {
                 </div>
 
                 <div className="mt-4 block">
-                    <label className="flex items-center">
+                    <div className="flex items-center">
                         <Checkbox
                             name="remember"
+                            label="Recordarme"
                             checked={data.remember}
                             onChange={(e) =>
                                 setData("remember", e.target.checked)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Recordarme
-                        </span>
-                    </label>
+                    </div>
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">
                     {canResetPassword && (
                         <Link
                             href={route("password.request")}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="rounded-md text-sm leading-relaxed font-bold text-gob-link-default underline hover:text-gob-link-hover focus:outline-none focus:ring-2 focus:text-gob-link-active focus:ring-offset-2"
                         >
                             Olvidaste tu contraseña?
                         </Link>

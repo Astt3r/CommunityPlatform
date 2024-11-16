@@ -87,11 +87,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('meeting-attendances', MeetingAttendanceController::class);
 });
 
-Route::middleware(['auth', 'roles:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('minutes', MinutesController::class);
 });
 
-Route::middleware(['auth', 'roles:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('neighbors', NeighborController::class);
 });
 
