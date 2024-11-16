@@ -72,6 +72,12 @@ export default {
                     // **Buttons Palette:** Usado para botones y enlaces.
                     "hover-primary-darken-1": "#003c7c", // Usado para hover en botones principales.
                     "active-primary-darken-1": "#00254d", // Usado para estados presionados.
+
+                    // **Links Palette:** Usado para enlaces y botones.
+                    "link-default": "#1D70B8", // Usado para enlaces y botones.
+                    "link-hover": "#003078", // Usado para hover en enlaces y botones.
+                    "link-visited": "#4C2C92", // Usado para enlaces y botones visitados.
+                    "link-active": "#373737", // Usado para estados presionados en enlaces y botones.
                 },
             },
             fontSize: {
@@ -130,6 +136,9 @@ export default {
             },
             opacity: {
                 26: "0.26",
+            },
+            ringWidth: {
+                3: "3px", // Adds a `ring-3` utility class for a 3px ring width
             },
         },
     },

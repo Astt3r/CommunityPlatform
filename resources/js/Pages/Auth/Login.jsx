@@ -2,6 +2,7 @@ import Checkbox from "@/Components/Checkbox";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
+import SmallLink from "@/Components/SmallLink";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
@@ -23,7 +24,22 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <GuestLayout>
-            <Head title="Iniciar Sesión" />
+            <Head>
+                <title>Iniciar Sesión</title>
+                <link
+                    rel="preconnect"
+                    href="https://fonts.googleapis.com"
+                ></link>
+                <link
+                    rel="preconnect"
+                    href="https://fonts.gstatic.com"
+                    crossorigin
+                ></link>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+                    rel="stylesheet"
+                ></link>
+            </Head>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -31,16 +47,18 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
+            <form
+                onSubmit={submit}
+                className="grid grid-cols-1 gap-4 max-w-md mx-auto p-4"
+            >
+                <div className="grid gap-2">
                     <InputLabel
                         value="Correo"
-                        size="md"
+                        size="sm"
                         color="black"
                         weight="bold"
                         className="mb-2"
                     />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -50,20 +68,21 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData("email", e.target.value)}
+                        error={!!errors.email}
+                        disabled={processing}
+                        isProcessing={processing}
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div className="grid gap-2">
                     <InputLabel
                         value="Contraseña"
-                        size="md"
-                        color="Black"
+                        size="sm"
+                        color="gob-black"
                         weight="bold"
                         className="mb-2"
                     />
-
                     <TextInput
                         id="password"
                         type="password"
@@ -72,35 +91,36 @@ export default function Login({ status, canResetPassword }) {
                         className="mt-1 block w-full"
                         autoComplete="current-password"
                         onChange={(e) => setData("password", e.target.value)}
+                        disabled={processing}
+                        isProcessing={processing}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
-                    <div className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            label="Recordarme"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData("remember", e.target.checked)
-                            }
-                        />
-                    </div>
+                <div className="flex items-center">
+                    <Checkbox
+                        name="remember"
+                        label="Recordarme"
+                        checked={data.remember}
+                        onChange={(e) => setData("remember", e.target.checked)}
+                        state={data.remember ? "on" : "off"}
+                    />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="grid grid-cols-2 items-center justify-end gap-4">
                     {canResetPassword && (
-                        <Link
+                        <SmallLink
                             href={route("password.request")}
-                            className="rounded-md text-sm leading-relaxed font-bold text-gob-link-default underline hover:text-gob-link-hover focus:outline-none focus:ring-2 focus:text-gob-link-active focus:ring-offset-2"
+                            visited={false}
+                            className="text-right"
                         >
                             Olvidaste tu contraseña?
-                        </Link>
+                        </SmallLink>
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton
+                        className="justify-self-end"
+                        disabled={processing}
+                    >
                         Iniciar Sesión
                     </PrimaryButton>
                 </div>
