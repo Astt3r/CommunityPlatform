@@ -13,24 +13,26 @@ export default function Authenticated({ header, children }) {
         useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
+        <div className="min-h-screen bg-gob-grey-5">
+            <nav className="border-b border-gob-grey-20 bg-white shadow-lg">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
+                    <div className="flex h-16 justify-between items-center">
                         <div className="flex">
+                            {/* Logo */}
                             <div className="flex shrink-0 items-center">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                    <ApplicationLogo className="font-slab text-gob-black text-heading-mobile-s font-weight-bold line-height-normal" />
                                 </Link>
                             </div>
 
-                            {/* Genera los enlaces de navegación según el rol del usuario */}
+                            {/* Navigation Links */}
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 {navLinks.map((link, index) => (
                                     <NavLink
                                         key={index}
                                         href={route(link.route)}
                                         active={route().current(link.route)}
+                                        className="text-gob-grey-70 hover:text-gob-primary-base"
                                     >
                                         {link.name}
                                     </NavLink>
@@ -38,6 +40,7 @@ export default function Authenticated({ header, children }) {
                             </div>
                         </div>
 
+                        {/* Dropdown Menu */}
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
                             <div className="relative ms-3">
                                 <Dropdown>
@@ -45,7 +48,7 @@ export default function Authenticated({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gob-grey-70 transition duration-150 ease-in-out hover:text-gob-primary-base focus:outline-none"
                                             >
                                                 {auth.user.name}
                                                 <svg
@@ -67,6 +70,7 @@ export default function Authenticated({ header, children }) {
                                     <Dropdown.Content>
                                         <Dropdown.Link
                                             href={route("profile.edit")}
+                                            className="hover:bg-gob-grey-10"
                                         >
                                             Perfil
                                         </Dropdown.Link>
@@ -74,6 +78,7 @@ export default function Authenticated({ header, children }) {
                                             href={route("logout")}
                                             method="post"
                                             as="button"
+                                            className="hover:bg-gob-accent-lighten-5"
                                         >
                                             Cerrar Sesión
                                         </Dropdown.Link>
@@ -82,6 +87,7 @@ export default function Authenticated({ header, children }) {
                             </div>
                         </div>
 
+                        {/* Hamburger Menu */}
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
@@ -89,7 +95,7 @@ export default function Authenticated({ header, children }) {
                                         (previousState) => !previousState
                                     )
                                 }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                className="inline-flex items-center justify-center rounded-md p-2 text-gob-grey-70 transition duration-150 ease-in-out hover:bg-gob-grey-10 hover:text-gob-primary-base focus:bg-gob-grey-10 focus:text-gob-primary-base focus:outline-none"
                             >
                                 <svg
                                     className="h-6 w-6"
@@ -125,6 +131,7 @@ export default function Authenticated({ header, children }) {
                     </div>
                 </div>
 
+                {/* Responsive Navigation Menu */}
                 <div
                     className={
                         (showingNavigationDropdown ? "block" : "hidden") +
@@ -137,6 +144,7 @@ export default function Authenticated({ header, children }) {
                                 key={index}
                                 href={route(link.route)}
                                 active={route().current(link.route)}
+                                className="text-gob-grey-70 hover:text-gob-primary-base"
                             >
                                 {link.name}
                             </ResponsiveNavLink>
@@ -145,17 +153,21 @@ export default function Authenticated({ header, children }) {
                 </div>
             </nav>
 
+            {/* Page Header */}
             {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <header className="bg-gob-grey-5 shadow">
+                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 text-gob-primary-darken-4">
                         {header}
                     </div>
                 </header>
             )}
 
+            {/* Page Content */}
             <main>
                 <ErrorAlert />
-                {children}
+                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    {children}
+                </div>
             </main>
         </div>
     );
