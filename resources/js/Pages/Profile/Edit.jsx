@@ -6,32 +6,50 @@ import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationFor
 
 export default function Edit({ mustVerifyEmail, status }) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Perfil
-                </h2>
-            }
-        >
-            <Head title="Profile" />
+        <AuthenticatedLayout>
+            <Head title="Perfil" />
 
-            <div className="py-12">
+            <div className="py-6 bg-gob-grey-5">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
+                    {/* Profile Information Section */}
+                    <section className="bg-white p-6 shadow-lg squared">
+                        <div className="border-b border-gob-grey-10 pb-4">
+                            <h2 className="text-xl font-medium text-gob-primary-base">
+                                Información del Perfil
+                            </h2>
+                        </div>
+                        <div className="pt-6">
+                            <UpdateProfileInformationForm
+                                mustVerifyEmail={mustVerifyEmail}
+                                status={status}
+                                className="max-w-xl"
+                            />
+                        </div>
+                    </section>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+                    {/* Update Password Section */}
+                    <section className="bg-white p-6 shadow-lg squared">
+                        <div className="border-b border-gob-grey-10 pb-4">
+                            <h2 className="text-xl font-medium text-gob-primary-base">
+                                Cambiar Contraseña
+                            </h2>
+                        </div>
+                        <div className="pt-6">
+                            <UpdatePasswordForm className="max-w-xl" />
+                        </div>
+                    </section>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <DeleteUserForm className="max-w-xl" />
-                    </div>
+                    {/* Delete User Section */}
+                    <section className="bg-white p-6 shadow-lg squared">
+                        <div className="border-b border-gob-grey-10 pb-4">
+                            <h2 className="text-xl font-medium text-gob-accent-darken-1">
+                                Eliminar Cuenta
+                            </h2>
+                        </div>
+                        <div className="pt-6">
+                            <DeleteUserForm className="max-w-xl" />
+                        </div>
+                    </section>
                 </div>
             </div>
         </AuthenticatedLayout>

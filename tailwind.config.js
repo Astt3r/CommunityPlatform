@@ -82,10 +82,14 @@ export default {
             },
             fontSize: {
                 // Tamaños de fuente según jerarquía tipográfica.
-                "3xl": "3rem", // Heading XL (Títulos grandes).
-                "2xl": "2.25rem", // Heading L (Títulos principales).
-                xl: "2rem", // Heading M (Subtítulos o títulos secundarios).
-                lg: "1.6rem", // Heading S (Texto resaltado o mayor énfasis).
+                "heading-3xl": "3rem", // 48px - Heading XL (Títulos grandes).
+                "heading-2xl": "2.25rem", // 36px - Heading L (Títulos principales).
+                "heading-xl": "2rem", // 32px - Heading M (Subtítulos o títulos secundarios).
+                "heading-lg": "1.6rem", // 24px - Heading S (Texto resaltado o mayor énfasis).
+                "heading-mobile-3xl": "2rem", // 32px - Heading XL (Títulos grandes).
+                "heading-mobile-l": "2.25rem", // 36px - Heading L (Títulos principales).
+                "heading-mobile-m": "2rem", // 32px - Heading M (Subtítulos o títulos secundarios).
+                "heading-mobile-s": "1.6rem", // 24px - Heading S (Texto resaltado o mayor énfasis).
             },
             lineHeight: {
                 // Altura de línea estándar para mantener legibilidad.
@@ -93,6 +97,7 @@ export default {
             },
             fontWeight: {
                 // Pesos de fuente utilizados en todo el diseño.
+                regular: "400", // Para subtítulos o texto de peso regular.
                 medium: "500", // Para subtítulos o texto de peso medio.
                 bold: "700", // Para títulos o texto en énfasis fuerte.
             },
@@ -107,7 +112,7 @@ export default {
                 xxl: "3.875rem", // 62px - Espaciado muy grande.
             },
             borderRadius: {
-                // Bordes redondeados para tarjetas, botones y otros elementos.
+                // Bordes redondeados para tarjetas, botones y otros elementos
                 none: "0rem", // Sin redondeo.
                 sm: "0.25rem", // 4px - Bordes ligeramente redondeados.
                 md: "0.5rem", // 8px - Bordes moderadamente redondeados.
@@ -115,7 +120,7 @@ export default {
                 xl: "1.5rem", // 24px - Bordes extra redondeados.
             },
             width: {
-                // Anchuras predefinidas para elementos.
+                // Anchuras predefinidas para elementos Uso: width-xxs width-xs width-s width-m width-l width-xl width-xxl
                 xxs: "0.25rem", // 4px
                 xs: "0.5rem", // 8px
                 s: "1rem", // 16px
@@ -125,7 +130,7 @@ export default {
                 xxl: "4rem", // 64px
             },
             height: {
-                // Alturas predefinidas para elementos.
+                // Alturas predefinidas para elementos Uso: height-xxs height-xs height-s height-m height-l height-xl height-xxl
                 xxs: "0.25rem", // 4px
                 xs: "0.5rem", // 8px
                 s: "1rem", // 16px
@@ -133,9 +138,6 @@ export default {
                 l: "2.25rem", // 36px
                 xl: "3rem", // 48px
                 xxl: "4rem", // 64px
-            },
-            opacity: {
-                26: "0.26",
             },
             ringWidth: {
                 3: "3px", // Adds a `ring-3` utility class for a 3px ring width

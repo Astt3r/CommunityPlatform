@@ -54,9 +54,9 @@ export default function Login({ status, canResetPassword }) {
                 <div className="grid gap-2">
                     <InputLabel
                         value="Correo"
-                        size="sm"
-                        color="black"
-                        weight="bold"
+                        size="lg"
+                        color="gob-black"
+                        weight="medium"
                         className="mb-2"
                     />
                     <TextInput
@@ -78,9 +78,9 @@ export default function Login({ status, canResetPassword }) {
                 <div className="grid gap-2">
                     <InputLabel
                         value="Contraseña"
-                        size="sm"
+                        size="lg"
                         color="gob-black"
-                        weight="bold"
+                        weight="medium"
                         className="mb-2"
                     />
                     <TextInput

@@ -2,15 +2,7 @@ import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
-export default function Dashboard({ reunions = [], projects = [] }) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    console.log("Projects:", projects); // Verificar los datos de proyectosfff
-
+export default function Dashboard() {
     return (
         <AuthenticatedLayout
             header={
