@@ -9,20 +9,26 @@ class Project extends Model
 {
     use HasFactory;
 
+    /**
+     * Campos que pueden ser llenados en masa.
+     */
     protected $fillable = [
-        'nombre',
-        'descripcion',
-        'problema',
-        'fecha_inicio',
-        'fecha_fin',
-        'estado',
-        'responsable',
-        'presupuesto',
+        'description',  // Descripción del proyecto
+        'name',         // Nombre del proyecto
+        'issue',        // Problema abordado por el proyecto
+        'start_date',   // Fecha de inicio
+        'end_date',     // Fecha de finalización
+        'status',       // Estado del proyecto (por ejemplo, activo, completado)
+        'responsible',  // Responsable del proyecto
+        'budget',       // Presupuesto
+        'association_id', // Relación con la tabla 'neighborhood_associations'
     ];
 
+    /**
+     * Relación con los archivos asociados al proyecto.
+     */
     public function files()
     {
-        return $this->hasMany(File::class, 'project_id', 'id_proyecto'); // Relación basada en `id_proyecto`
+        return $this->hasMany(File::class, 'project_id', 'id'); // Relación basada en la clave 'id'
     }
-    protected $primaryKey = 'id_proyecto';
 }
