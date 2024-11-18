@@ -26,7 +26,7 @@ export default forwardRef(function TextInput(
     }, [isFocused]);
 
     const computedClassName = `
-        font-sans squared shadow-sm border-1 border-gob-black-87 
+        squared shadow-sm border-1 border-gob-black-87 
         ${disabled ? "border-gob-grey-30 cursor-not-allowed" : ""}
         ${
             isProcessing

@@ -22,7 +22,7 @@ export default function InputLabel({
     return (
         <label
             {...props}
-            className={`block font-sans leading-normal ${sizeClasses[size]} ${weightClasses[weight]} text-${color} ${className}`}
+            className={`block leading-normal ${sizeClasses[size]} ${weightClasses[weight]} text-${color} ${className}`}
         >
             {value || children}
         </label>

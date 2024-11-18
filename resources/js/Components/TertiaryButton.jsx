@@ -1,4 +1,4 @@
-export default function PrimaryButton({
+export default function TertiaryButton({
     className = "",
     disabled,
     children,

@@ -15,7 +15,7 @@ export default function Checkbox({ className = "", state = "off", ...props }) {
             {props.label && (
                 <label
                     htmlFor={props.id}
-                    className="ml-2 font-sans text-xs font-bold leading-relaxed text-gob-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="ml-2 text-base font-medium leading-relaxed text-gob-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                     {props.label}
                 </label>

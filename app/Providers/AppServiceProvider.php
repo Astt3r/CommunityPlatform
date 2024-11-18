@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
                     case 'admin':
                         return [
                             ['name' => 'Dashboard', 'route' => 'dashboard'],
-                            ['name' => 'Junta de Vecinos', 'route' => 'neighborhood-associations.index'],
+                            ['name' => 'Juntas', 'route' => 'neighborhood-associations.index'],
                             ['name' => 'Vecinos', 'route' => 'neighbors.index'],
                             ['name' => 'Directivas', 'route' => 'committees.index'],
                             ['name' => 'Proyectos', 'route' => 'projects.index'],
