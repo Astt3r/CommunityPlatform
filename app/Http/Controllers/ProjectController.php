@@ -2,97 +2,93 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Inertia\Inertia;
 use App\Models\Project;
-use App\Models\File; // Cambia a `App\Models\File` con la A en mayúscula
+use App\Models\File;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::all();
-        return Inertia::render('Project/ReadProject', ['projects' => $projects]);
+        $projects = Project::with('files')->orderBy('created_at', 'desc')->paginate(10);
+
+        return Inertia::render('Projects/Index', [
+            'projects' => $projects,
+        ]);
     }
 
     public function create()
     {
-        return Inertia::render('Project/CreateProject');
-
+        return Inertia::render('Projects/Create');
     }
-
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nombre' => 'required|string',
-            'descripcion' => 'required|string',
-            'problema' => 'nullable|string',
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date',
-            'estado' => 'nullable|string',
-            'responsable' => 'nullable|string',
-            'presupuesto' => 'nullable|numeric',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
-        ]);
-        // Crear el proyecto
-        $project = Project::create($data);
+        $validated = $this->validateProject($request);
+
+        $project = Project::create($validated);
 
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('project_files', 'local');
-
-            // Guardar el archivo en la base de datos
             File::create([
-                'project_id' => $project->id_proyecto,
-                'file_path' => $path, // Almacena la ruta relativa
+                'project_id' => $project->id,
+                'file_path' => $path,
             ]);
         }
 
-        Project::create($request->all());
-
-        return redirect()->route('project.index')->with('success', 'Proyecto creado exitosamente.');
+        return redirect()->route('projects.index')->with('success', __('messages.project.created'));
     }
 
-    public function show($id)
+    public function show(Project $project)
     {
-        $project = Project::with('files')->findOrFail($id);
-        return view('projects.show', compact('project'));
-    }
+        $project->load('files');
 
-    public function edit($id)
-    {
-        $project = Project::findOrFail($id);
-        return inertia('Project/EditProject', ['project' => $project]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $project = Project::findOrFail($id);
-
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'problema' => 'required|string',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'required|date',
-            'estado' => 'required|string|max:255',
-            'responsable' => 'required|string|max:255',
-            'presupuesto' => 'required|string|max:255',
+        return Inertia::render('Projects/Show', [
+            'project' => $project,
         ]);
-
-        $project->update($request->all());
-
-        return redirect()->route('project.index')->with('success', 'Proyecto actualizada correctamente');
     }
 
-    public function destroy($id)
+    public function edit(Project $project)
     {
-        $project = Project::findOrFail($id);
+        return Inertia::render('Projects/Edit', [
+            'project' => $project,
+        ]);
+    }
+
+    public function update(Request $request, Project $project)
+    {
+        $validated = $this->validateProject($request);
+
+        $project->update($validated);
+
+        return redirect()->route('projects.index')->with('success', __('messages.project.updated'));
+    }
+
+    public function destroy(Project $project)
+    {
+        foreach ($project->files as $file) {
+            \Storage::delete($file->file_path);
+        }
+
+        $project->files()->delete();
         $project->delete();
 
-        return redirect()->route('project.index')->with('success', 'Proyecto eliminado correctamente');
+        return redirect()->route('projects.index')->with('success', __('messages.project.deleted'));
     }
 
+    private function validateProject(Request $request)
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
+            'issue' => 'nullable|string|max:1000',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'status' => 'required|string|max:100',
+            'responsible' => 'nullable|string|max:255',
+            'budget' => 'required|numeric',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
+        ]);
+    }
 }

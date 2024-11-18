@@ -14,11 +14,13 @@ class MeetingController extends Controller
      */
     public function index()
     {
-        $meetings = Meeting::orderBy("created_at","desc")->paginate(10);
+        $meetings = Meeting::orderBy("created_at", "desc")->paginate(10);
+
         return Inertia::render("Meetings/Index", [
-            'meetings' => $meetings,
+            'meetings' => $meetings, // Devuelve todo el objeto de paginación
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -33,6 +35,7 @@ class MeetingController extends Controller
      */
     public function store(Request $request)
     {
+        // Validar los datos recibidos
         $validated = $request->validate([
             'meeting_date' => 'required|date',
             'main_topic' => 'required|string|max:100',
@@ -40,12 +43,15 @@ class MeetingController extends Controller
             'location' => 'nullable|string|max:255',
             'organized_by' => 'nullable|string|max:100',
             'result' => 'nullable|string|max:255',
+            'status' => 'required|in:scheduled,completed,canceled', // Validar el estado
         ]);
 
+        // Crear la reunión con los datos validados
         Meeting::create($validated);
 
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
+
 
     /**
      * Display the specified resource.
@@ -67,18 +73,18 @@ class MeetingController extends Controller
      */
     public function edit(Meeting $meeting)
     {
-        $meeting = Meeting::findOrFail(intval($meeting->id));
-        
         return Inertia::render('Meetings/Edit', [
-            'meeting' => $meeting,
+            'meeting' => $meeting, // Se pasa directamente al componente Edit.jsx
         ]);
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Meeting $meeting)
     {
+        // Validar los datos del formulario
         $validated = $request->validate([
             'meeting_date' => 'required|date',
             'main_topic' => 'required|string|max:100',
@@ -86,12 +92,15 @@ class MeetingController extends Controller
             'location' => 'nullable|string|max:255',
             'organized_by' => 'nullable|string|max:100',
             'result' => 'nullable|string|max:255',
+            'status' => 'required|in:scheduled,completed,canceled', // Incluir el estado
         ]);
 
+        // Actualizar la reunión con los datos validados
         $meeting->update($validated);
 
         return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
+
 
     /**
      * Remove the specified resource from storage.
