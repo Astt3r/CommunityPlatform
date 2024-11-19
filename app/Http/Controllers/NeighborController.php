@@ -101,6 +101,8 @@ class NeighborController extends Controller
         ]);
     }
 
+
+
     public function edit($id)
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
