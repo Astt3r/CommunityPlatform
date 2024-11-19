@@ -63,21 +63,29 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('expenses', ExpenseController::class);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::resource('expense-types', ExpenseTypeController::class);
-});
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::resource('expense-types', ExpenseTypeController::class);
+// });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('fees', FeeController::class);
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::resource('incomes', IncomeController::class);
-});
+    Route::get('finance', function () {
+        return Inertia::render('Finance/Index'); // Renderiza la vista central de Finanzas
+    })->name('finance.index');
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('expenses', ExpenseController::class);
+    Route::resource('expense-types', ExpenseTypeController::class);
+    Route::resource('incomes', IncomeController::class);
     Route::resource('income-types', IncomeTypeController::class);
 });
+
+
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::resource('income-types', IncomeTypeController::class);
+// });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('meetings', MeetingController::class);

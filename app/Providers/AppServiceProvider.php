@@ -22,7 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Prefetch Vite assets for better performance
         Vite::prefetch(concurrency: 3);
+
+        // Share navigation links globally via Inertia
         Inertia::share([
             'navLinks' => function () {
                 $user = Auth::user();
@@ -31,31 +34,25 @@ class AppServiceProvider extends ServiceProvider
                     return [];
                 }
 
-                switch ($user->role) {
-                    case 'admin':
-                        return [
-                            ['name' => 'Dashboard', 'route' => 'dashboard'],
-                            ['name' => 'Juntas', 'route' => 'neighborhood-associations.index'],
-                            ['name' => 'Vecinos', 'route' => 'neighbors.index'],
-                            ['name' => 'Directivas', 'route' => 'committees.index'],
-                            ['name' => 'Proyectos', 'route' => 'projects.index'],
-                            ['name' => 'Reuniones', 'route' => 'meetings.index'],
-                            ['name' => 'Finanzas', 'route' => 'expenses.index'],
-
-                        ];
-                    case 'board_member':
-                        return [
-
-                        ];
-                    case 'resident':
-                        return [
-                            ['name' => 'Dashboard', 'route' => 'dashboard'],
-                            ['name' => 'Junta de Vecinos', 'route' => 'neighborhood-associations.index'],
-                        ];
-                    default:
-                        return [];
-                }
+                return match ($user->role) {
+                    'admin' => [
+                        ['name' => 'Dashboard', 'route' => 'dashboard'],
+                        ['name' => 'Juntas', 'route' => 'neighborhood-associations.index'],
+                        ['name' => 'Vecinos', 'route' => 'neighbors.index'],
+                        ['name' => 'Directivas', 'route' => 'committees.index'],
+                        ['name' => 'Proyectos', 'route' => 'projects.index'],
+                        ['name' => 'Reuniones', 'route' => 'meetings.index'],
+                        ['name' => 'Finanzas', 'route' => 'finance.index'], // Actualizado para redirigir a Finanzas
+                    ],
+                    'board_member' => [],
+                    'resident' => [
+                        ['name' => 'Dashboard', 'route' => 'dashboard'],
+                        ['name' => 'Junta de Vecinos', 'route' => 'neighborhood-associations.index'],
+                    ],
+                    default => [],
+                };
             },
         ]);
+
     }
 }

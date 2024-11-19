@@ -8,9 +8,7 @@ import ErrorAlert from "@/Components/ErrorAlert";
 
 export default function Authenticated({ header, children }) {
     const { auth, navLinks } = usePage().props;
-
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
         <div className="min-h-screen bg-gob-grey-5">
@@ -165,9 +163,7 @@ export default function Authenticated({ header, children }) {
             {/* Page Content */}
             <main>
                 <ErrorAlert />
-                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    {children}
-                </div>
+                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
             </main>
         </div>
     );

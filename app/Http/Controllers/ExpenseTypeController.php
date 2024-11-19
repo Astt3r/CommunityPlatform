@@ -28,8 +28,18 @@ class ExpenseTypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'code' => 'required|string|max:20|unique:expense_types,code',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        ExpenseType::create($request->all());
+
+        return redirect()->route('expense-types.index')->with('success', 'Tipo de gasto creado correctamente.');
     }
+
 
     /**
      * Display the specified resource.

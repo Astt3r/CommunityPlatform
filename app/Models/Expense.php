@@ -28,10 +28,14 @@ class Expense extends Model
     /**
      * Get the type of this income.
      */
+    /**
+     * Get the type of this expense.
+     */
     public function type()
     {
-        return $this->belongsTo(IncomeType::class, 'type_id');
+        return $this->belongsTo(ExpenseType::class, 'type_id');
     }
+
 
     /**
      * Get the association that this income belongs to.

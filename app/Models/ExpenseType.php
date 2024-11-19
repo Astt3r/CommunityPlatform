@@ -30,4 +30,9 @@ class ExpenseType extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class, 'type_id');
+    }
 }
