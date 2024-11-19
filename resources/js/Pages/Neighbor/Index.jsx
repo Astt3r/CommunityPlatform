@@ -107,8 +107,9 @@ export default function NeighborIndex() {
                                         : "Usuario por asignar"}
                                 </td>
                                 <td className="px-4 py-2">
-                                    {neighbor.is_active ? "Activo" : "Inactivo"}
+                                    {neighbor.status === "active" ? "Activo" : "Inactivo"}
                                 </td>
+
                                 <td className="px-4 py-2">
                                     {neighbor.address}
                                 </td>
