@@ -137,11 +137,10 @@ class NeighborController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Neighbor $neighbor)
     {
-        $neighbor = Neighbor::findOrFail($id);
-
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'nullable|unique:neighbors,user_id,' . $neighbor->id,
             'address' => 'required|string|max:255',
             'identification_number' => 'required|string|max:255',
             'registration_date' => 'required|date',
@@ -149,14 +148,17 @@ class NeighborController extends Controller
             'status' => 'required|string',
             'last_participation_date' => 'nullable|date',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
-            'user_id' => 'nullable|exists:users,id',
         ]);
 
-        // Actualizar los campos del modelo Neighbor
-        $neighbor->update($validatedData);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-        return redirect()->route('neighbors.index')->with('success', 'Vecino actualizado con éxito.');
+        $neighbor->update($request->all());
+
+        return redirect()->route('neighbors.index')->with('success', 'Vecino actualizado exitosamente.');
     }
+
 
 
     public function destroy(Neighbor $neighbor)
