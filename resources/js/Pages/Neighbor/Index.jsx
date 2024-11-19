@@ -89,7 +89,7 @@ export default function NeighborIndex() {
                 <table className="table-auto w-full mt-4 text-sm md:text-base">
                     <thead>
                         <tr>
-                            <th className="px-4 py-2">ID Vecino</th>
+                            
                             <th className="px-4 py-2">Usuario Asignado</th>
                             <th className="px-4 py-2">Estado</th>
                             <th className="px-4 py-2">Dirección</th>
@@ -100,7 +100,7 @@ export default function NeighborIndex() {
                     <tbody>
                         {neighbors.data.map((neighbor) => (
                             <tr key={neighbor.id} className="border-t">
-                                <td className="px-4 py-2">{neighbor.id}</td>
+                                
                                 <td className="px-4 py-2">
                                     {neighbor.user
                                         ? neighbor.user.name
