@@ -89,7 +89,7 @@ export default function NeighborIndex() {
                 <table className="table-auto w-full mt-4 text-sm md:text-base">
                     <thead>
                         <tr>
-                            
+                            <th className="px-4 py-2">Rut</th>
                             <th className="px-4 py-2">Usuario Asignado</th>
                             <th className="px-4 py-2">Estado</th>
                             <th className="px-4 py-2">Dirección</th>
@@ -102,10 +102,14 @@ export default function NeighborIndex() {
                             <tr key={neighbor.id} className="border-t">
                                 
                                 <td className="px-4 py-2">
+                                    {neighbor.identification_number}
+                                </td>
+                                <td className="px-4 py-2">
                                     {neighbor.user
                                         ? neighbor.user.name
-                                        : "Usuario por asignar"}
+                                        : "--USUARIO POR ASIGNAR--"}
                                 </td>
+
                                 <td className="px-4 py-2">
                                     {neighbor.status === "active" ? "Activo" : "Inactivo"}
                                 </td>

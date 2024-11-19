@@ -211,7 +211,7 @@ export default function CreateNeighbor({ associations, users = [] }) {
                             <div>
                                 <InputLabel
                                     htmlFor="user_id"
-                                    value="Usuario Asignado (Opcional)"
+                                    value="Usuario Asignado (Opcional si el usuario aún no ha sido creado)"
                                 />
                                 <select
                                     id="user_id"
@@ -220,13 +220,14 @@ export default function CreateNeighbor({ associations, users = [] }) {
                                     onChange={(e) => setData("user_id", e.target.value)}
                                     className="mt-1 block w-full"
                                 >
-                                    <option value="">Seleccione un Usuario</option> // Opción en blanco
+                                    <option value="">Seleccione un Usuario (Opcional)</option> {/* Opción para valor null */}
                                     {users.map((user) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name} - {user.email}
                                         </option>
                                     ))}
                                 </select>
+
 
                                 <InputError
                                     message={errors.user_id}
