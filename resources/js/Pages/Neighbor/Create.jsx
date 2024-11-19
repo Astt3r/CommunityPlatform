@@ -31,7 +31,45 @@ export default function CreateNeighbor({ associations, users = [] }) {
     const toggleStatus = () => {
         setData("status", data.status === "active" ? "inactive" : "active");
     };
-
+    const validateRut = (rut) => {
+        // Remueve puntos y guión
+        rut = rut.replace(/[.-]/g, "");
+        
+        if (rut.length < 8 || rut.length > 9) {
+            return false;
+        }
+    
+        // Cálculo del dígito verificador
+        let total = 0;
+        let multiplier = 2;
+    
+        for (let i = rut.length - 2; i >= 0; i--) {
+            total += parseInt(rut[i]) * multiplier;
+            multiplier = multiplier === 7 ? 2 : multiplier + 1;
+        }
+    
+        const remainder = 11 - (total % 11);
+        const dv = remainder === 11 ? "0" : remainder === 10 ? "K" : remainder.toString();
+    
+        return dv === rut[rut.length - 1].toUpperCase();
+    };
+    
+    // Dentro del `TextInput`, puedes agregar el evento `onBlur`:
+    <TextInput
+        id="identification_number"
+        type="text"
+        name="identification_number"
+        value={data.identification_number}
+        onChange={(e) => setData("identification_number", e.target.value)}
+        onBlur={() => {
+            if (!validateRut(data.identification_number)) {
+                alert("El RUT ingresado no es válido.");
+            }
+        }}
+        placeholder="Ej: 12.345.678-9"
+        className="mt-1 block w-full"
+    />
+    
     return (
         <AuthenticatedLayout
             header={
@@ -75,14 +113,14 @@ export default function CreateNeighbor({ associations, users = [] }) {
                                     type="text"
                                     name="identification_number"
                                     value={data.identification_number}
-                                    onChange={(e) =>
-                                        setData(
-                                            "identification_number",
-                                            e.target.value
-                                        )
-                                    }
+                                    onChange={(e) => setData("identification_number", e.target.value)}
+                                    onBlur={() => {
+                                        // Lógica para validar el formato RUT, si deseas implementarla aquí
+                                    }}
+                                    placeholder="Ej: 12.345.678-9"
                                     className="mt-1 block w-full"
                                 />
+
                                 <InputError
                                     message={errors.identification_number}
                                     className="mt-2"

@@ -13,9 +13,14 @@ export default function NeighborIndex() {
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este vecino?")) {
-            router.delete(route("neighbors.destroy", id));
+            router.delete(route("neighbors.destroy", id), {
+                onSuccess: () => {
+                    setShowAlert(true); // Mostrar alerta de éxito
+                },
+            });
         }
     };
+    
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -147,6 +152,8 @@ export default function NeighborIndex() {
                     </tbody>
                 </table>
             </div>
+
+            
 
             {/* Paginación */}
             <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">

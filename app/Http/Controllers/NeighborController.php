@@ -165,7 +165,8 @@ class NeighborController extends Controller
     {
         $neighbor->delete();
 
-        return response()->json(null, 204);
+        return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado exitosamente');
+
     }
 
     
