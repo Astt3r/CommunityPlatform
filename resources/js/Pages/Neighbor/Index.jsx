@@ -90,6 +90,8 @@ export default function NeighborIndex() {
                     <thead>
                         <tr>
                             <th className="px-4 py-2">Nombre</th>
+                            <th className="px-4 py-2">Usuario Asignado</th>
+                            <th className="px-4 py-2">Estado</th>
                             <th className="px-4 py-2">Dirección</th>
                             <th className="px-4 py-2">Fecha de Registro</th>
                             <th className="px-4 py-2">Acciones</th>
@@ -99,6 +101,14 @@ export default function NeighborIndex() {
                         {neighbors.data.map((neighbor) => (
                             <tr key={neighbor.id} className="border-t">
                                 <td className="px-4 py-2">{neighbor.name}</td>
+                                <td className="px-4 py-2">
+                                    {neighbor.user
+                                        ? neighbor.user.name
+                                        : "Usuario por asignar"}
+                                </td>
+                                <td className="px-4 py-2">
+                                    {neighbor.is_active ? "Activo" : "Inactivo"}
+                                </td>
                                 <td className="px-4 py-2">
                                     {neighbor.address}
                                 </td>
