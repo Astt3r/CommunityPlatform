@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Inertia\Inertia;
 
 class NeighborController extends Controller
@@ -31,14 +32,21 @@ class NeighborController extends Controller
                 'identification_number' => $neighbor->identification_number,
                 'registration_date' => $neighbor->registration_date,
                 'birth_date' => $neighbor->birth_date,
-                'status' => $neighbor->status,
+                'status' => $neighbor->status, // Enviar el estado directamente
                 'last_participation_date' => $neighbor->last_participation_date,
                 'neighborhood_association_id' => $neighbor->neighborhood_association_id,
-                'user_name' => $neighbor->user ? $neighbor->user->name : null,
+                'user' => $neighbor->user ? [
+                    'id' => $neighbor->user->id,
+                    'name' => $neighbor->user->name,
+                    'email' => $neighbor->user->email,
+                ] : null,
             ]),
             'filters' => $request->only('name'),
         ]);
     }
+
+
+
 
     public function store(Request $request)
     {
@@ -50,13 +58,29 @@ class NeighborController extends Controller
             'status' => 'required|string|max:50',
             'last_participation_date' => 'required|date',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'nullable|exists:users,id', // Hacemos que user_id sea opcional
         ]);
 
         Neighbor::create($validated);
 
         return redirect()->route('neighbors.index')->with('success', 'Neighbor created successfully.');
     }
+
+
+
+    public function create()
+    {
+        $associations = NeighborhoodAssociation::all(['id', 'name']);
+        $users = User::all(['id', 'name', 'email']); // Obtenemos todos los usuarios con su ID, nombre y correo electrónico
+
+        return Inertia::render('Neighbor/Create', [
+            'associations' => $associations,
+            'users' => $users, // Enviamos los usuarios para el dropdown
+        ]);
+    }
+
+
+    
 
     public function show($id)
     {
@@ -81,6 +105,7 @@ class NeighborController extends Controller
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
         $associations = NeighborhoodAssociation::all(['id', 'name']);
+        $users = User::all(['id', 'name', 'email']); // Obtenemos todos los usuarios con su ID, nombre y correo electrónico
 
         return Inertia::render('Neighbor/Edit', [
             'neighbor' => [
@@ -93,28 +118,35 @@ class NeighborController extends Controller
                 'last_participation_date' => $neighbor->last_participation_date,
                 'neighborhood_association_id' => $neighbor->neighborhood_association_id,
                 'user_name' => $neighbor->user ? $neighbor->user->name : null,
+                'user_id' => $neighbor->user_id, // Aseguramos incluir la ID del usuario asignado
             ],
             'associations' => $associations,
+            'users' => $users, // Enviamos los usuarios para el dropdown
         ]);
     }
 
-    public function update(Request $request, Neighbor $neighbor)
+
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'address' => 'sometimes|string|max:255',
-            'identification_number' => 'sometimes|string|max:255|unique:neighbors,identification_number,' . $neighbor->id,
-            'registration_date' => 'sometimes|date',
-            'birth_date' => 'sometimes|date',
-            'status' => 'sometimes|string|max:50',
-            'last_participation_date' => 'sometimes|date',
-            'neighborhood_association_id' => 'sometimes|exists:neighborhood_associations,id',
+        $neighbor = Neighbor::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'address' => 'required|string|max:255',
+            'identification_number' => 'required|string|max:255',
+            'registration_date' => 'required|date',
+            'birth_date' => 'required|date',
+            'status' => 'required|string',
+            'last_participation_date' => 'nullable|date',
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
             'user_id' => 'nullable|exists:users,id',
         ]);
 
-        $neighbor->update($validated);
+        // Actualizar los campos del modelo Neighbor
+        $neighbor->update($validatedData);
 
-        return redirect()->route('neighbors.index')->with('success', 'Neighbor updated successfully.');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino actualizado con éxito.');
     }
+
 
     public function destroy(Neighbor $neighbor)
     {
@@ -123,11 +155,5 @@ class NeighborController extends Controller
         return response()->json(null, 204);
     }
 
-    public function create()
-    {
-        $associations = NeighborhoodAssociation::all(['id', 'name']);
-        return Inertia::render('Neighbor/Create', [
-            'associations' => $associations,
-        ]);
-    }
+    
 }

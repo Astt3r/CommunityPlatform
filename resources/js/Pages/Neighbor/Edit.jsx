@@ -1,26 +1,31 @@
 import React from "react";
 import { usePage, useForm, Link } from "@inertiajs/react";
 
-export default function ResidentEdit() {
-    const { resident, associations = [] } = usePage().props; // Default empty array for associations
+export default function NeighborEdit() {
+    const { neighbor, associations = [], users = [] } = usePage().props; // Default empty array for associations and users
     const { data, setData, put, processing, errors } = useForm({
-        address: resident.address || "",
-        identification_number: resident.identification_number || "",
-        registration_date: resident.registration_date || "",
-        birth_date: resident.birth_date || "",
-        status: resident.status || "",
-        last_participation_date: resident.last_participation_date || "",
-        neighborhood_association_id: resident.neighborhood_association_id || "",
+        address: neighbor.address || "",
+        identification_number: neighbor.identification_number || "",
+        registration_date: neighbor.registration_date || "",
+        birth_date: neighbor.birth_date || "",
+        status: neighbor.status || "",
+        last_participation_date: neighbor.last_participation_date || "",
+        neighborhood_association_id: neighbor.neighborhood_association_id || "",
+        user_id: neighbor.user_id || "", // New field for user ID
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route("residents.update", resident.id));
+        put(route("neighbors.update", neighbor.id));
+    };
+
+    const toggleStatus = () => {
+        setData("status", data.status === "active" ? "inactive" : "active");
     };
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Editar Residente</h1>
+            <h1 className="text-2xl font-bold mb-4">Editar Vecino</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -94,12 +99,13 @@ export default function ResidentEdit() {
                     <label className="block text-sm font-medium text-gray-700">
                         Estado
                     </label>
-                    <input
-                        type="text"
-                        value={data.status}
-                        onChange={(e) => setData("status", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
+                    <button
+                        type="button"
+                        onClick={toggleStatus}
+                        className={`px-4 py-2 rounded ${data.status === "active" ? "bg-green-500" : "bg-red-500"} text-white hover:opacity-80`}
+                    >
+                        {data.status === "active" ? "Activo" : "Inactivo"}
+                    </button>
                     {errors.status && (
                         <div className="text-red-500 text-sm">
                             {errors.status}
@@ -140,10 +146,32 @@ export default function ResidentEdit() {
                             </option>
                         ))}
                     </select>
-
                     {errors.neighborhood_association_id && (
                         <div className="text-red-500 text-sm">
                             {errors.neighborhood_association_id}
+                        </div>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Usuario Asignado
+                    </label>
+                    <select
+                        value={data.user_id}
+                        onChange={(e) => setData("user_id", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                    >
+                        <option value="">Seleccione un usuario</option>
+                        {users.map((user) => (
+                            <option key={user.id} value={user.id}>
+                                {user.name} - {user.email}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.user_id && (
+                        <div className="text-red-500 text-sm">
+                            {errors.user_id}
                         </div>
                     )}
                 </div>
@@ -157,7 +185,7 @@ export default function ResidentEdit() {
                         Guardar Cambios
                     </button>
                     <Link
-                        href={route("residents.index")}
+                        href={route("neighbors.index")}
                         className="text-gray-600 hover:text-gray-800"
                     >
                         Cancelar

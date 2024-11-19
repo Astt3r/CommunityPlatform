@@ -4,13 +4,13 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CreateNeighbor({ associations }) {
+export default function CreateNeighbor({ associations, users = [] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         address: "",
         identification_number: "",
         registration_date: "",
         birth_date: "",
-        status: "",
+        status: "inactive", // Default to inactive
         last_participation_date: "",
         user_id: "", // Keep user_id optional
         neighborhood_association_id: "", // Remains a foreign key
@@ -26,6 +26,10 @@ export default function CreateNeighbor({ associations }) {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
+    };
+
+    const toggleStatus = () => {
+        setData("status", data.status === "active" ? "inactive" : "active");
     };
 
     return (
@@ -132,16 +136,13 @@ export default function CreateNeighbor({ associations }) {
 
                             <div>
                                 <InputLabel htmlFor="status" value="Estado" />
-                                <TextInput
-                                    id="status"
-                                    type="text"
-                                    name="status"
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        setData("status", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
+                                <button
+                                    type="button"
+                                    onClick={toggleStatus}
+                                    className={`px-4 py-2 rounded ${data.status === "active" ? "bg-green-500" : "bg-red-500"} text-white hover:opacity-80`}
+                                >
+                                    {data.status === "active" ? "Activo" : "Inactivo"}
+                                </button>
                                 <InputError
                                     message={errors.status}
                                     className="mt-2"
@@ -210,18 +211,23 @@ export default function CreateNeighbor({ associations }) {
                             <div>
                                 <InputLabel
                                     htmlFor="user_id"
-                                    value="ID de Usuario (Opcional)"
+                                    value="Usuario Asignado (Opcional)"
                                 />
-                                <TextInput
+                                <select
                                     id="user_id"
-                                    type="number"
                                     name="user_id"
                                     value={data.user_id}
-                                    onChange={(e) =>
-                                        setData("user_id", e.target.value)
-                                    }
+                                    onChange={(e) => setData("user_id", e.target.value)}
                                     className="mt-1 block w-full"
-                                />
+                                >
+                                    <option value="">Seleccione un Usuario</option> // Opción en blanco
+                                    {users.map((user) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.name} - {user.email}
+                                        </option>
+                                    ))}
+                                </select>
+
                                 <InputError
                                     message={errors.user_id}
                                     className="mt-2"

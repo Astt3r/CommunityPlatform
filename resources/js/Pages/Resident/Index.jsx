@@ -4,22 +4,22 @@ import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
-export default function ResidentIndex() {
-    const { residents, filters, flash, userRole } = usePage().props;
+export default function NeighborIndex() {
+    const { neighbors, filters, flash, userRole } = usePage().props;
     const { data, setData, get } = useForm({
         name: filters.name || "",
     });
     const [showAlert, setShowAlert] = useState(!!flash.success);
 
     const handleDelete = (id) => {
-        if (confirm("¿Estás seguro de que deseas eliminar este residente?")) {
-            router.delete(route("residents.destroy", id));
+        if (confirm("¿Estás seguro de que deseas eliminar este vecino?")) {
+            router.delete(route("neighbors.destroy", id));
         }
     };
 
     const handleSearch = (e) => {
         e.preventDefault();
-        get(route("residents.index"));
+        get(route("neighbors.index"));
     };
 
     useEffect(() => {
@@ -32,11 +32,11 @@ export default function ResidentIndex() {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Residentes
+                    Vecinos
                 </h2>
             }
         >
-            <Head title="Residentes" />
+            <Head title="Vecinos" />
 
             {/* Alerta de éxito */}
             {showAlert && (
@@ -57,10 +57,10 @@ export default function ResidentIndex() {
 
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
                 <Link
-                    href="/residents/create"
+                    href="/neighbors/create"
                     className="text-blue-500 hover:text-blue-700 mb-4 md:mb-0"
                 >
-                    Crear Nuevo Residente
+                    Crear Nuevo Vecino
                 </Link>
 
                 {/* Filtro de búsqueda */}
@@ -71,7 +71,7 @@ export default function ResidentIndex() {
                     <input
                         type="text"
                         placeholder="Buscar por nombre"
-                        value={data.user_name}
+                        value={data.name}
                         onChange={(e) => setData("name", e.target.value)}
                         className="border rounded px-2 py-1 mb-2 md:mb-0 md:mr-2 w-full md:w-auto"
                     />
@@ -90,38 +90,46 @@ export default function ResidentIndex() {
                     <thead>
                         <tr>
                             <th className="px-4 py-2">Nombre</th>
+                            <th className="px-4 py-2">Usuario Asignado</th>
+                            <th className="px-4 py-2">Estado</th>
                             <th className="px-4 py-2">Dirección</th>
                             <th className="px-4 py-2">Fecha de Registro</th>
                             <th className="px-4 py-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {residents.data.map((resident) => (
-                            <tr key={resident.id} className="border-t">
-                                <td className="px-4 py-2">{resident.name}</td>
+                        {neighbors.data.map((neighbor) => (
+                            <tr key={neighbor.id} className="border-t">
                                 <td className="px-4 py-2">
-                                    {resident.address}
+                                    {neighbor.user ? neighbor.user.name : "Usuario por asignar"}
                                 </td>
                                 <td className="px-4 py-2">
-                                    {resident.registration_date}
+                                    {neighbor.user ? neighbor.user.name : "Usuario por asignar"}
+                                </td>
+                                <td className="px-4 py-2">
+                                    {neighbor.status === "active" ? "Activo" : (neighbor.status === "inactive" ? "Inactivo" : "Inactivo")}
+                                </td>
+                                <td className="px-4 py-2">
+                                    {neighbor.address}
+                                </td>
+                                <td className="px-4 py-2">
+                                    {neighbor.registration_date}
                                 </td>
                                 <td className="px-4 py-2 flex flex-col md:flex-row gap-2">
                                     <Link
-                                        href={`/residents/${resident.id}`}
+                                        href={`/neighbors/${neighbor.id}`}
                                         className="text-blue-500 hover:text-blue-700"
                                     >
                                         Ver
                                     </Link>
                                     <Link
-                                        href={`/residents/${resident.id}/edit`}
+                                        href={`/neighbors/${neighbor.id}/edit`}
                                         className="text-yellow-500 hover:text-yellow-700"
                                     >
                                         Editar
                                     </Link>
                                     <button
-                                        onClick={() =>
-                                            handleDelete(resident.id)
-                                        }
+                                        onClick={() => handleDelete(neighbor.id)}
                                         className="text-red-500 hover:text-red-700"
                                     >
                                         Eliminar
@@ -130,12 +138,13 @@ export default function ResidentIndex() {
                             </tr>
                         ))}
                     </tbody>
+
                 </table>
             </div>
 
             {/* Paginación */}
             <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
-                {residents.links.map((link, index) => (
+                {neighbors.links.map((link, index) => (
                     <Link
                         key={index}
                         href={link.url || ""}
