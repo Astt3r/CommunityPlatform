@@ -21,11 +21,11 @@ export default function ExpensesIndex({ expenses }) {
                         Lista de Gastos
                     </h2>
                     <Link
-                        href={route("expenses.create")}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                    >
-                        Crear Nuevo Gasto
-                    </Link>
+    href={route("expenses.create")}
+    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+>
+    Crear Nuevo Gasto
+</Link>
                 </div>
             }
         >

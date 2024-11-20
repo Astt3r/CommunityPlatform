@@ -71,7 +71,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('fees', FeeController::class);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::get('finance', function () {
         return Inertia::render('Finance/Index'); // Renderiza la vista central de Finanzas
     })->name('finance.index');
@@ -110,6 +110,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('projects', ProjectController::class);
 });
+
 
 
 

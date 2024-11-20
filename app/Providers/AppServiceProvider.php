@@ -44,10 +44,11 @@ class AppServiceProvider extends ServiceProvider
                         ['name' => 'Reuniones', 'route' => 'meetings.index'],
                         ['name' => 'Finanzas', 'route' => 'finance.index'], // Actualizado para redirigir a Finanzas
                     ],
-                    'board_member' => [],
+                    'board_member' => [
+                        ['name' => 'Finanzas', 'route' => 'finance.index'],
+                    ],
                     'resident' => [
                         ['name' => 'Dashboard', 'route' => 'dashboard'],
-                        ['name' => 'Junta de Vecinos', 'route' => 'neighborhood-associations.index'],
                     ],
                     default => [],
                 };
