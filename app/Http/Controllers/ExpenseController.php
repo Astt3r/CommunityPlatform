@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\NeighborhoodAssociation; // Asegúrate de importar este modelo
+use App\Models\ExpenseType; // Asegúrate de importar este modelo
+use App\Models\Neighbor; // Asegúrate de importar este modelo
+use App\Models\User; // Asegúrate de importar este modelo
+
+
 
 
 
@@ -19,7 +24,7 @@ class ExpenseController extends Controller
 
     public function index()
     {
-        $expenses = Expense::paginate(10); // 10 por página
+        $expenses = Expense::with('type')->paginate(10); // Carga relación 'type' y paginación
         return Inertia::render('Finance/Expenses/Index', [
             'expenses' => $expenses,
         ]);
@@ -32,11 +37,21 @@ class ExpenseController extends Controller
      */
     public function create()
     {
+        // Obtener el vecino asociado al usuario autenticado
+        $neighbor = Neighbor::where('user_id', auth()->id())->first();
+
+        // Validar si existe un vecino asociado a una junta
+        if (!$neighbor || !$neighbor->neighborhood_association_id) {
+            return redirect()->route('expenses.index')
+                ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
+        }
+
         return Inertia::render('Finance/Expenses/Create', [
-            // 'expenseTypes' => ExpenseType::all(),
-            'associations' => NeighborhoodAssociation::all(),
+            'expenseTypes' => ExpenseType::all(),
         ]);
     }
+
+
 
 
     /**
@@ -44,7 +59,38 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Obtener el vecino asociado al usuario autenticado
+        $neighbor = Neighbor::where('user_id', auth()->id())->first();
+
+        // Validar que el vecino exista y esté asociado a una junta
+        if (!$neighbor || !$neighbor->neighborhood_association_id) {
+            return redirect()->route('expenses.index')
+                ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
+        }
+
+        // Validar los datos del formulario
+        $validated = $request->validate([
+            'concept' => 'required|string|max:255',
+            'responsible' => 'required|string|max:100',
+            'date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'type_id' => 'required|exists:expense_types,id',
+            'receipt' => 'nullable|file',
+            'status' => 'required|in:approved,pending,rejected',
+        ]);
+
+        // Manejar archivo de recibo (opcional)
+        if ($request->hasFile('receipt')) {
+            $validated['receipt'] = $request->file('receipt')->store('receipts', 'public');
+        }
+
+        // Asignar automáticamente la asociación
+        $validated['association_id'] = $neighbor->neighborhood_association_id;
+
+        // Crear el gasto
+        Expense::create($validated);
+
+        return redirect()->route('expenses.index')->with('message', 'Gasto creado exitosamente.');
     }
 
     /**
@@ -52,31 +98,8 @@ class ExpenseController extends Controller
      */
     public function show(Expense $expense)
     {
-        $expense = Expense::with('type', 'association')->findOrFail($id);
-        return Inertia::render('finance/expenses/Show', ['expense' => $expense]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Expense $expense)
-    {
-        // $expense = Expense::findOrFail($id);
-        // $types = ExpenseType::all();
-        // $associations = NeighborhoodAssociation::all();
-        // return Inertia::render('finance/expenses/Edit', [
-        //     'expense' => $expense,
-        //     'types' => $types,
-        //     'associations' => $associations,
-        // ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Expense $expense)
-    {
-        //
+        $expense = Expense::with('type', 'association')->findOrFail($expense->id);
+        return Inertia::render('Finance/Expenses/Show', ['expense' => $expense]);
     }
 
     /**
@@ -84,11 +107,10 @@ class ExpenseController extends Controller
      */
     public function destroy($id)
     {
-        $expense = Expense::findOrFail($id); // Aquí `$id` debe ser proporcionado por la ruta
-
+        $expense = Expense::findOrFail($id);
         $expense->delete();
 
-        return redirect()->route('expenses.index')->with('success', 'Gasto eliminado correctamente.');
+        return redirect()->route('expenses.index')->with('message', 'Gasto eliminado correctamente.');
     }
 
 }

@@ -69,4 +69,18 @@ class User extends Authenticatable
     {
         return $this->role === 'resident';
     }
+
+    public function association()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class, 'association_id');
+    }
+    public function neighbor()
+    {
+        return $this->hasOne(Neighbor::class, 'user_id');
+    }
+
+
+
+
+
 }

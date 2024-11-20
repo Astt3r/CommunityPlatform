@@ -34,4 +34,11 @@ class Neighbor extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function association()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class, 'association_id'); // Ajusta 'association_id' si la clave foránea tiene otro nombre
+    }
+
+
 }

@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\IncomeType;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class IncomeTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $incomeTypes = IncomeType::paginate(10); // Paginación de tipos de ingresos
+        return Inertia::render('Finance/IncomeTypes/Index', [
+            'incomeTypes' => $incomeTypes,
+        ]);
     }
 
     /**
@@ -20,7 +21,7 @@ class IncomeTypeController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Finance/IncomeTypes/Create');
     }
 
     /**
@@ -28,15 +29,27 @@ class IncomeTypeController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'code' => 'required|string|max:20|unique:income_types,code',
+            'status' => 'required|in:active,inactive',
+        ]);
 
+        $validated['created_by'] = auth()->id(); // Usuario autenticado
+
+        IncomeType::create($validated);
+
+        return redirect()->route('income-types.index')->with('message', 'Tipo de ingreso creado exitosamente.');
+    }
     /**
      * Display the specified resource.
      */
     public function show(IncomeType $incomeType)
     {
-        //
+        return Inertia::render('Finance/IncomeTypes/Show', [
+            'incomeType' => $incomeType,
+        ]);
     }
 
     /**
@@ -44,7 +57,9 @@ class IncomeTypeController extends Controller
      */
     public function edit(IncomeType $incomeType)
     {
-        //
+        return Inertia::render('Finance/IncomeTypes/Edit', [
+            'incomeType' => $incomeType,
+        ]);
     }
 
     /**
@@ -52,14 +67,26 @@ class IncomeTypeController extends Controller
      */
     public function update(Request $request, IncomeType $incomeType)
     {
-        //
-    }
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'code' => 'required|string|max:20|unique:income_types,code,' . $incomeType->id,
+            'status' => 'required|in:active,inactive',
+        ]);
 
+        $validated['updated_by'] = auth()->id(); // Usuario autenticado
+
+        $incomeType->update($validated);
+
+        return redirect()->route('income-types.index')->with('message', 'Tipo de ingreso actualizado exitosamente.');
+    }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(IncomeType $incomeType)
     {
-        //
+        $incomeType->delete();
+
+        return redirect()->route('income-types.index')->with('message', 'Tipo de ingreso eliminado exitosamente.');
     }
 }
