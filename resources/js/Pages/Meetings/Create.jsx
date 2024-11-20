@@ -12,8 +12,9 @@ export default function CreateMeeting() {
         location: "",
         organized_by: "",
         result: "",
-        status: "", // Valor predeterminado
+        status: "scheduled", // Valor predeterminado explícito
     });
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -159,20 +160,21 @@ export default function CreateMeeting() {
                             </div>
 
                             <div>
-    <InputLabel htmlFor="status" value="Estado" />
-    <select
-        id="status"
-        name="status"
-        value={data.status} // Se enlaza con el estado del formulario
-        onChange={(e) => setData("status", e.target.value)} // Actualiza el estado
-        className="mt-1 block w-full"
-    >
-        <option value="scheduled">Programada</option>
-        <option value="completed">Completada</option>
-        <option value="canceled">Cancelada</option>
-    </select>
-    <InputError message={errors.status} className="mt-2" />
-</div>
+                                <InputLabel htmlFor="status" value="Estado" />
+                                <select
+                                    id="status"
+                                    name="status"
+                                    value={data.status}
+                                    onChange={(e) => setData("status", e.target.value)}
+                                    className="mt-1 block w-full"
+                                >
+                                    <option value="scheduled">Programada</option>
+                                    <option value="completed">Completada</option>
+                                    <option value="canceled">Cancelada</option>
+                                </select>
+
+                                <InputError message={errors.status} className="mt-2" />
+                            </div>
 
 
                             <div className="flex justify-end space-x-4 mt-4">

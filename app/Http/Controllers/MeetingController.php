@@ -12,12 +12,21 @@ class MeetingController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $meetings = Meeting::orderBy("created_at", "desc")->paginate(10);
+        $filters = $request->only('main_topic', 'status');
+        $meetings = Meeting::query()
+            ->when($filters['main_topic'] ?? null, function ($query, $main_topic) {
+                $query->where('main_topic', 'like', "%$main_topic%");
+            })
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->paginate(10);
 
-        return Inertia::render("Meetings/Index", [
-            'meetings' => $meetings, // Devuelve todo el objeto de paginación
+        return inertia('Meetings/Index', [
+            'meetings' => $meetings,
+            'filters' => $filters,
         ]);
     }
 
@@ -35,22 +44,25 @@ class MeetingController extends Controller
      */
     public function store(Request $request)
     {
-        // Validar los datos recibidos
+        // Registra el valor recibido
+        logger()->info('Valor de status:', ['status' => $request->input('status')]);
+
         $validated = $request->validate([
             'meeting_date' => 'required|date',
             'main_topic' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
             'organized_by' => 'nullable|string|max:100',
             'result' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,completed,canceled', // Validar el estado
+            'status' => 'required|in:scheduled,completed,canceled',
         ]);
 
-        // Crear la reunión con los datos validados
         Meeting::create($validated);
 
-        return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
+        return redirect()->route('meetings.index')->with('success', 'Reunión creada correctamente.');
     }
+
+
 
 
     /**
@@ -63,7 +75,7 @@ class MeetingController extends Controller
         Carbon::setLocale('es');
         $meeting->meeting_date = Carbon::parse($meeting->meeting_date)->translatedFormat('d \d\e F \d\e Y');
 
-        return Inertia::render('Meetings/Show', [
+        return Inertia::render('Meetings/ShowMeeting', [
             'meeting' => $meeting,
         ]);
     }
@@ -105,10 +117,11 @@ class MeetingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Meeting $meeting)
+    public function destroy($id)
     {
+        $meeting = Meeting::findOrFail($id);
         $meeting->delete();
 
-        return redirect()->route('meetings.index')->with('success', 'Reunión eliminada exitosamente.');
+        return back()->with('success', 'La reunión fue eliminada correctamente.');
     }
 }

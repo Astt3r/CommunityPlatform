@@ -1,132 +1,172 @@
+import React, { useState, useEffect } from "react";
+import { usePage, Link, useForm } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
-import { formatDate } from "@/Components/formatDate";
+import { Head } from "@inertiajs/react";
 
-// Función para traducir el estado al español
-const translateStatus = (status) => {
-    const translations = {
-        scheduled: "Programada",
-        completed: "Completada",
-        canceled: "Cancelada",
-    };
-
-    return translations[status] || "Desconocido";
-};
-
-export default function MeetingsIndex({ meetings }) {
-    const { delete: destroy } = useForm();
+export default function MeetingIndex() {
+    const { meetings, filters, flash } = usePage().props;
+    const { data, setData, get } = useForm({
+        main_topic: filters.main_topic || "",
+        status: filters.status || "",
+    });
+    const [showAlert, setShowAlert] = useState(!!flash.success);
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta reunión?")) {
-            destroy(route("meetings.destroy", id), {
-                onError: (error) => console.error("Error al eliminar la reunión:", error),
+            router.delete(route("meetings.destroy", id), {
+                onSuccess: () => {
+                    setShowAlert(true);
+                },
             });
         }
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        get(route("meetings.index"));
+    };
+
+    useEffect(() => {
+        if (flash.success) {
+            setShowAlert(true);
+        }
+    }, [flash.success]);
+
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Reuniones Recientes
-                    </h2>
-                    <Link
-                        href={route("meetings.create")}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                    >
-                        Crear Nueva Reunión
-                    </Link>
-                </div>
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Reuniones
+                </h2>
             }
         >
             <Head title="Reuniones" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h2 className="text-lg font-semibold mb-4">
-                                Listado de Reuniones
-                            </h2>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                {(meetings.data || []).map((meeting) => (
-                                    <div
-                                        key={meeting.id}
-                                        className="p-4 border rounded-lg shadow-sm"
-                                    >
-                                        <h3 className="font-bold text-lg">
-                                            {meeting.main_topic}
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {meeting.description || "Sin descripción"}
-                                        </p>
-                                        <p>
-                                            <strong>Fecha:</strong>{" "}
-                                            {formatDate(meeting.meeting_date)}
-                                        </p>
-                                        <p>
-                                            <strong>Lugar:</strong>{" "}
-                                            {meeting.location || "Sin lugar"}
-                                        </p>
-                                        <p>
-                                            <strong>Convocada por:</strong>{" "}
-                                            {meeting.organized_by || "No especificado"}
-                                        </p>
-                                        <p>
-                                            <strong>Estado:</strong>{" "}
-                                            {translateStatus(meeting.status)}
-                                        </p>
-                                        <div className="flex space-x-4 mt-2">
-                                            <Link
-                                                href={route(
-                                                    "meetings.edit",
-                                                    meeting.id
-                                                )}
-                                                className="text-blue-500 hover:underline"
-                                            >
-                                                Editar
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(meeting.id)}
-                                                className="text-red-500 hover:underline"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {meetings.data.length === 0 && (
-                                <p className="text-center text-gray-600 mt-6">
-                                    No hay reuniones registradas.
-                                </p>
-                            )}
-
-                            <div className="mt-6">
-                                <div className="flex justify-between">
-                                    {meetings.prev_page_url && (
-                                        <Link
-                                            href={meetings.prev_page_url}
-                                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
-                                        >
-                                            Anterior
-                                        </Link>
-                                    )}
-                                    {meetings.next_page_url && (
-                                        <Link
-                                            href={meetings.next_page_url}
-                                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
-                                        >
-                                            Siguiente
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {/* Alerta de éxito */}
+            {showAlert && (
+                <div className="alert alert-success flex items-center justify-between p-4 mb-4 text-green-700 bg-green-100 rounded-lg">
+                    <span>{flash.success}</span>
+                    <button
+                        type="button"
+                        className="text-green-700 hover:text-green-900"
+                        onClick={() => setShowAlert(false)}
+                    >
+                        ✖
+                    </button>
                 </div>
+            )}
+
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+                <Link
+                    href="/meetings/create"
+                    className="text-blue-500 hover:text-blue-700 mb-4 md:mb-0"
+                >
+                    Crear Nueva Reunión
+                </Link>
+
+                <form
+                    onSubmit={handleSearch}
+                    className="flex flex-col md:flex-row"
+                >
+                    <input
+                        type="text"
+                        placeholder="Buscar por tema principal"
+                        value={data.main_topic}
+                        onChange={(e) => setData("main_topic", e.target.value)}
+                        className="border rounded px-2 py-1 mb-2 md:mb-0 md:mr-2 w-full md:w-auto"
+                    />
+                    <select
+                        value={data.status}
+                        onChange={(e) => setData("status", e.target.value)}
+                        className="border rounded px-2 py-1 mb-2 md:mb-0 md:mr-2 w-full md:w-auto"
+                    >
+                        <option value="">Todos</option>
+                        <option value="scheduled">Programada</option>
+                        <option value="completed">Completada</option>
+                        <option value="canceled">Cancelada</option>
+                    </select>
+                    <button
+                        type="submit"
+                        className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 w-full md:w-auto"
+                    >
+                        Buscar
+                    </button>
+                </form>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="table-auto w-full mt-4 text-sm md:text-base">
+                    <thead>
+                        <tr>
+                            <th className="px-4 py-2">Fecha</th>
+                            <th className="px-4 py-2">Tema Principal</th>
+                            <th className="px-4 py-2">Organizador</th>
+                            <th className="px-4 py-2">Estado</th>
+                            <th className="px-4 py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {meetings.data.map((meeting) => (
+                            <tr key={meeting.id} className="border-t">
+                                <td className="px-4 py-2">
+                                    {new Date(meeting.meeting_date).toLocaleString()}
+                                </td>
+                                <td className="px-4 py-2">{meeting.main_topic}</td>
+                                <td className="px-4 py-2">{meeting.organized_by || "N/A"}</td>
+                                <td
+                                    className={`px-4 py-2 ${
+                                        meeting.status === "scheduled"
+                                            ? "text-blue-500"
+                                            : meeting.status === "completed"
+                                            ? "text-green-500"
+                                            : "text-red-500"
+                                    }`}
+                                >
+                                    {meeting.status}
+                                </td>
+                                <td className="px-4 py-2 flex flex-col md:flex-row gap-2">
+                                <Link
+                                    href={route("meetings.show", meeting.id)} // Usa la ruta generada por Laravel
+                                    className="text-blue-500 hover:text-blue-700"
+                                >
+                                    Ver
+                                </Link>
+
+                                    <Link
+                                        href={`/meetings/${meeting.id}/edit`}
+                                        className="text-yellow-500 hover:text-yellow-700"
+                                    >
+                                        Editar
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(meeting.id)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                {meetings.links.map((link, index) => (
+                    <Link
+                        key={index}
+                        href={link.url || ""}
+                        className={`px-4 py-2 border rounded ${
+                            link.active ? "font-bold" : ""
+                        } ${
+                            link.url
+                                ? "text-blue-500 hover:text-blue-700"
+                                : "text-gray-400"
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                    ></Link>
+                ))}
             </div>
         </AuthenticatedLayout>
     );
