@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,6 +15,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('description', 255);
             $table->string('code', 20)->unique()->nullable();
+            $table->enum('type', ['president', 'treasurer', 'secretary']); // Nuevo campo
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreignId('parent_committee_id')->nullable()->constrained('committees');
             $table->timestamps();
         });
+
     }
 
     /**

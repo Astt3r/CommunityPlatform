@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
                         ['name' => 'Dashboard', 'route' => 'dashboard'],
                         ['name' => 'Juntas', 'route' => 'neighborhood-associations.index'],
                         ['name' => 'Vecinos', 'route' => 'neighbors.index'],
-                        ['name' => 'Directivas', 'route' => 'committees.index'],
+                        ['name' => 'Directivas', 'route' => 'committee-members.index'],
                         ['name' => 'Proyectos', 'route' => 'projects.index'],
                         ['name' => 'Reuniones', 'route' => 'meetings.index'],
                         ['name' => 'Finanzas', 'route' => 'finance.index'], // Actualizado para redirigir a Finanzas

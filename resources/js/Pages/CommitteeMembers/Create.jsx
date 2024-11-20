@@ -5,21 +5,19 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CommitteesCreate({ types }) {
+export default function CommitteeMemberCreate({ committees, users }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-        description: "",
-        code: "",
-        type: "",
+        committee_id: "",
+        user_id: "",
         status: "active",
-        effective_date: "",
-        end_date: "",
+        joined_date: "",
+        left_date: "",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("committees.store"), {
-            onError: (error) => console.error("Error al crear el comité:", error),
+        post(route("committee-members.store"), {
+            onError: (error) => console.error("Error al agregar el miembro:", error),
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
@@ -30,7 +28,7 @@ export default function CommitteesCreate({ types }) {
         <AuthenticatedLayout
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Nuevo Comité
+                    Agregar Miembro al Comité
                 </h2>
             }
         >
@@ -39,57 +37,39 @@ export default function CommitteesCreate({ types }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <InputLabel htmlFor="name" value="Nombre del Comité" />
-                                <TextInput
-                                    id="name"
-                                    type="text"
-                                    value={data.name}
-                                    onChange={(e) => setData("name", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.name} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="description" value="Descripción" />
-                                <TextInput
-                                    id="description"
-                                    type="text"
-                                    value={data.description}
-                                    onChange={(e) => setData("description", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.description} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="code" value="Código" />
-                                <TextInput
-                                    id="code"
-                                    type="text"
-                                    value={data.code}
-                                    onChange={(e) => setData("code", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.code} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="type" value="Tipo" />
+                                <InputLabel htmlFor="committee_id" value="Comité" />
                                 <select
-                                    id="type"
-                                    value={data.type}
-                                    onChange={(e) => setData("type", e.target.value)}
+                                    id="committee_id"
+                                    value={data.committee_id}
+                                    onChange={(e) => setData("committee_id", e.target.value)}
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
-                                    <option value="">Seleccione un tipo</option>
-                                    {types.map((type) => (
-                                        <option key={type} value={type}>
-                                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    <option value="">Seleccione un comité</option>
+                                    {committees.map((committee) => (
+                                        <option key={committee.id} value={committee.id}>
+                                            {committee.name}
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.type} className="mt-2" />
+                                <InputError message={errors.committee_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="user_id" value="Usuario" />
+                                <select
+                                    id="user_id"
+                                    value={data.user_id}
+                                    onChange={(e) => setData("user_id", e.target.value)}
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                >
+                                    <option value="">Seleccione un usuario</option>
+                                    {users.map((user) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.user_id} className="mt-2" />
                             </div>
 
                             <div>
@@ -107,27 +87,27 @@ export default function CommitteesCreate({ types }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="effective_date" value="Fecha de Inicio" />
+                                <InputLabel htmlFor="joined_date" value="Fecha de Ingreso" />
                                 <TextInput
-                                    id="effective_date"
+                                    id="joined_date"
                                     type="date"
-                                    value={data.effective_date}
-                                    onChange={(e) => setData("effective_date", e.target.value)}
+                                    value={data.joined_date}
+                                    onChange={(e) => setData("joined_date", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.effective_date} className="mt-2" />
+                                <InputError message={errors.joined_date} className="mt-2" />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="end_date" value="Fecha de Fin (Opcional)" />
+                                <InputLabel htmlFor="left_date" value="Fecha de Salida (Opcional)" />
                                 <TextInput
-                                    id="end_date"
+                                    id="left_date"
                                     type="date"
-                                    value={data.end_date}
-                                    onChange={(e) => setData("end_date", e.target.value)}
+                                    value={data.left_date}
+                                    onChange={(e) => setData("left_date", e.target.value)}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.end_date} className="mt-2" />
+                                <InputError message={errors.left_date} className="mt-2" />
                             </div>
 
                             <div className="flex justify-end space-x-4">
@@ -143,7 +123,7 @@ export default function CommitteesCreate({ types }) {
                                     className="bg-blue-600 text-white px-4 py-2 rounded-md"
                                     disabled={processing}
                                 >
-                                    Crear Comité
+                                    Agregar Miembro
                                 </button>
                             </div>
                         </form>

@@ -4,62 +4,102 @@ namespace App\Http\Controllers;
 
 use App\Models\Committee;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class CommitteeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $type = $request->get('type'); // Filtro opcional por tipo de comité
+
+        $committees = Committee::query()
+            ->when($type, fn($query) => $query->byType($type))
+            ->get();
+
+        return Inertia::render('Committees/Index', [
+            'committees' => $committees,
+            'filterType' => $type,
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Muestra el formulario para crear un nuevo comité.
      */
     public function create()
     {
-        //
+        $types = ['president', 'treasurer', 'secretary']; // Tipos disponibles
+
+        return Inertia::render('Committees/Create', [
+            'types' => $types,
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Almacena un comité recién creado en la base de datos.
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'description' => 'required|string|max:255',
+            'code' => 'nullable|string|max:20|unique:committees',
+            'type' => 'required|in:president,treasurer,secretary',
+            'status' => 'required|in:active,inactive',
+            'effective_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:effective_date',
+        ]);
+
+        $validated['created_by'] = auth()->id();
+
+        Committee::create($validated);
+
+        return redirect()->route('committees.index')->with('message', 'Comité creado exitosamente.');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Committee $committee)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Muestra el formulario para editar un comité existente.
      */
     public function edit(Committee $committee)
     {
-        //
+        $types = ['president', 'treasurer', 'secretary'];
+
+        return Inertia::render('Committees/Edit', [
+            'committee' => $committee,
+            'types' => $types,
+        ]);
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Actualiza la información de un comité existente.
      */
     public function update(Request $request, Committee $committee)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'description' => 'required|string|max:255',
+            'code' => 'nullable|string|max:20|unique:committees,code,' . $committee->id,
+            'type' => 'required|in:president,treasurer,secretary',
+            'status' => 'required|in:active,inactive',
+            'effective_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:effective_date',
+        ]);
+
+        $validated['updated_by'] = auth()->id();
+
+        $committee->update($validated);
+
+        return redirect()->route('committees.index')->with('message', 'Comité actualizado exitosamente.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina un comité existente.
      */
     public function destroy(Committee $committee)
     {
-        //
+        $committee->delete();
+
+        return redirect()->route('committees.index')->with('message', 'Comité eliminado exitosamente.');
     }
 }

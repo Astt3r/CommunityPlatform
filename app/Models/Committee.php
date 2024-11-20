@@ -10,15 +10,16 @@ class Committee extends Model
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "description",
-        "code",
-        "status",
-        "created_by",
-        "updated_by",
-        "effective_date",
-        "end_date",
-        "parent_committee_id",
+        'name',
+        'description',
+        'code',
+        'type', // Nuevo campo
+        'status',
+        'created_by',
+        'updated_by',
+        'effective_date',
+        'end_date',
+        'parent_committee_id',
     ];
 
     public function user()
@@ -30,5 +31,37 @@ class Committee extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope para filtrar por tipo de comité.
+     */
+    public function scopeByType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope para filtrar presidentes.
+     */
+    public function scopePresidents($query)
+    {
+        return $query->byType('president');
+    }
+
+    /**
+     * Scope para filtrar tesoreros.
+     */
+    public function scopeTreasurers($query)
+    {
+        return $query->byType('treasurer');
+    }
+
+    /**
+     * Scope para filtrar secretarios.
+     */
+    public function scopeSecretaries($query)
+    {
+        return $query->byType('secretary');
     }
 }
