@@ -1,5 +1,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useForm } from "@inertiajs/react";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import InputError from "@/Components/InputError";
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
@@ -23,105 +26,97 @@ export default function Create() {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Nombre */}
                             <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                                    Nombre del Tipo de Gasto
-                                </label>
-                                <input
-                                    type="text"
+                                <InputLabel htmlFor="name" value="Nombre del Tipo de Gasto" />
+                                <TextInput
                                     id="name"
+                                    type="text"
+                                    name="name"
                                     value={data.name}
                                     onChange={(e) => setData("name", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full"
                                 />
-                                {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
+                                <InputError message={errors.name} className="mt-2" />
                             </div>
 
                             {/* Descripción */}
                             <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                                    Descripción
-                                </label>
+                                <InputLabel htmlFor="description" value="Descripción" />
                                 <textarea
                                     id="description"
+                                    name="description"
                                     value={data.description}
                                     onChange={(e) => setData("description", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
                                 ></textarea>
-                                {errors.description && <span className="text-red-500 text-sm">{errors.description}</span>}
+                                <InputError message={errors.description} className="mt-2" />
                             </div>
 
                             {/* Código */}
                             <div>
-                                <label htmlFor="code" className="block text-sm font-medium text-gray-700">
-                                    Código
-                                </label>
-                                <input
-                                    type="text"
+                                <InputLabel htmlFor="code" value="Código" />
+                                <TextInput
                                     id="code"
+                                    type="text"
+                                    name="code"
                                     value={data.code}
                                     onChange={(e) => setData("code", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full"
                                 />
-                                {errors.code && <span className="text-red-500 text-sm">{errors.code}</span>}
+                                <InputError message={errors.code} className="mt-2" />
                             </div>
 
                             {/* Estado */}
                             <div>
-                                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                                    Estado
-                                </label>
+                                <InputLabel htmlFor="status" value="Estado" />
                                 <select
                                     id="status"
+                                    name="status"
                                     value={data.status}
                                     onChange={(e) => setData("status", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
-                                {errors.status && <span className="text-red-500 text-sm">{errors.status}</span>}
+                                <InputError message={errors.status} className="mt-2" />
                             </div>
 
                             {/* Fecha de Inicio */}
                             <div>
-                                <label htmlFor="effective_date" className="block text-sm font-medium text-gray-700">
-                                    Fecha de Inicio
-                                </label>
-                                <input
-                                    type="date"
+                                <InputLabel htmlFor="effective_date" value="Fecha de Inicio" />
+                                <TextInput
                                     id="effective_date"
+                                    type="date"
+                                    name="effective_date"
                                     value={data.effective_date}
                                     onChange={(e) => setData("effective_date", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full"
                                 />
-                                {errors.effective_date && (
-                                    <span className="text-red-500 text-sm">{errors.effective_date}</span>
-                                )}
+                                <InputError message={errors.effective_date} className="mt-2" />
                             </div>
 
                             {/* Fecha de Fin */}
                             <div>
-                                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700">
-                                    Fecha de Fin (Opcional)
-                                </label>
-                                <input
-                                    type="date"
+                                <InputLabel htmlFor="end_date" value="Fecha de Fin (Opcional)" />
+                                <TextInput
                                     id="end_date"
+                                    type="date"
+                                    name="end_date"
                                     value={data.end_date}
                                     onChange={(e) => setData("end_date", e.target.value)}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="mt-1 block w-full"
                                 />
-                                {errors.end_date && <span className="text-red-500 text-sm">{errors.end_date}</span>}
+                                <InputError message={errors.end_date} className="mt-2" />
                             </div>
 
-                            <div className="flex justify-end">
+                            <div className="flex justify-end space-x-4">
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
                                 >
                                     Crear
                                 </button>
