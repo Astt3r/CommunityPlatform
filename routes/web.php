@@ -89,6 +89,7 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('meetings', MeetingController::class);
+    Route::get('/meetings/{meeting}/generate-pdf', [MinutesController::class, 'generatePdf']);
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

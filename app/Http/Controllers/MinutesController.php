@@ -14,7 +14,17 @@ class MinutesController extends Controller
     {
         //
     }
+    public function generatePdf($meetingId)
+    {
+        // Obtener la reunión según su ID
+        $meeting = Meeting::findOrFail($meetingId);
 
+        // Cargar la vista de acta de reunión y pasarle los datos
+        $pdf = Pdf::loadView('minutes.template', compact('meeting'));
+
+        // Descargar el PDF
+        return $pdf->download('Acta_Reunion_' . $meeting->main_topic . '.pdf');
+    }
     /**
      * Show the form for creating a new resource.
      */
