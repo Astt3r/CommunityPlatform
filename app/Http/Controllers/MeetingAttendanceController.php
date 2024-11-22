@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\MeetingAttendance;
+use App\Models\Neighbor;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class MeetingAttendanceController extends Controller
@@ -31,6 +34,36 @@ class MeetingAttendanceController extends Controller
         //
     }
 
+    public function storeAttendance(Request $request, $meetingId)
+    {
+        Log::info($request->all()); // Registrar los datos recibidos para depuración
+
+        $validated = $request->validate([
+            'attendance' => 'required|array',
+            'attendance.*' => 'boolean', // Cada valor debe ser booleano
+        ]);
+
+        // Eliminar los registros anteriores para la reunión actual
+        MeetingAttendance::where('meeting_id', $meetingId)->delete();
+
+        // Guardar los nuevos registros de asistencia
+        foreach ($validated['attendance'] as $neighborId => $attended) {
+            MeetingAttendance::create([
+                'meeting_id' => $meetingId,
+                'neighbor_id' => $neighborId,
+                'attended' => $attended ? 1 : 0, // Guardar como 1 (asistió) o 0 (no asistió)
+            ]);
+        }
+
+        return redirect()->route('meetings.attendance', $meetingId)
+            ->with('message', 'Asistencias registradas correctamente.');
+    }
+
+
+
+
+
+
     /**
      * Display the specified resource.
      */
@@ -38,6 +71,33 @@ class MeetingAttendanceController extends Controller
     {
         //
     }
+    public function showAttendance($meetingId)
+    {
+        // Obtener vecinos activos con sus usuarios
+        $neighbors = Neighbor::where('status', 'active')
+                            ->with('user:id,name') // Cargar el usuario relacionado
+                            ->get();
+
+        return inertia('MeetingAttendance/ShowAttendance', [
+            'meetingId' => $meetingId,
+            'neighbors' => $neighbors,
+        ]);
+        
+    }
+    public function showSummary($meetingId)
+    {
+        // Obtener las asistencias y sus razones para la reunión especificada
+        $attendances = MeetingAttendance::with('neighbor.user')
+            ->where('meeting_id', $meetingId)
+            ->get();
+
+        return inertia('MeetingAttendance/ShowAttendanceSummary', [
+            'meetingId' => $meetingId,
+            'attendances' => $attendances,
+        ]);
+    }
+
+
 
     /**
      * Show the form for editing the specified resource.

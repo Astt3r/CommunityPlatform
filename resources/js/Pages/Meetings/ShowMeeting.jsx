@@ -200,6 +200,15 @@ export default function ShowMeeting({ meeting }) {
               </a>
             </div>
             <div className="mt-4">
+                <a
+                    href={`/meetings/${meeting.id}/attendance`}
+                    className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                    Registrar Asistencias
+                </a>
+            </div>
+
+            <div className="mt-4">
               <PDFDownloadLink
                 document={<MeetingPdfDocument meeting={meeting} />}
                 fileName={`Acta_Reunion_${meeting.main_topic}.pdf`}

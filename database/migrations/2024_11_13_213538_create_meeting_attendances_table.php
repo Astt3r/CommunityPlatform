@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('meeting_attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('meeting_id')->constrained('meetings')->onDelete('cascade');
-            $table->foreignId('neighbor_id')->constrained('neighbors')->onDelete('cascade');
-            $table->boolean('attended')->default(false);
-            $table->text('absence_reason')->nullable();
+            $table->foreignId('meeting_id')->constrained()->onDelete('cascade'); // Eliminar registros de asistencia al borrar la reunión
+            $table->foreignId('neighbor_id')->constrained()->onDelete('cascade'); // También puedes querer borrar las asistencias si se elimina al vecino
+            $table->tinyInteger('attended')->default(0);
+            $table->string('absence_reason')->nullable();
             $table->timestamps();
         });
+        
+        
     }
 
     /**

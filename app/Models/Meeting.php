@@ -23,6 +23,21 @@ class Meeting extends Model
         'result',
         'status',
     ];
+    public function attendances()
+    {
+        return $this->hasMany(MeetingAttendance::class);
+    }
+    
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($meeting) {
+            $meeting->attendances()->delete(); // Eliminar asistencias asociadas antes de eliminar la reunión
+        });
+    }
+
+
 
     // Define any relationships, if needed, such as with attendees or minutes
 }
