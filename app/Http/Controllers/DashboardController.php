@@ -12,24 +12,31 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // // Obtener las últimas tres reuniones y proyectos
-        // $reunions = Reunion::latest()->take(3)->get();
-        // $projects = Project::latest()->take(3)->get();
+        $meetings = Meeting::latest()->take(10)->get();
+        $projects = Project::latest()->take(10)->get();
 
-        // // Pasar los datos a la vista de Inertia
-        // return Inertia::render('Dashboard', [
-        //     'reunions' => $reunions,
-        //     'projects' => $projects,
-        // ]);
+        // Datos para gráficos
+        $meetingsData = $meetings->groupBy(fn($item) => $item->created_at->format('F'))
+            ->map(fn($group) => $group->count())
+            ->toArray();
 
-        $user = Auth::user();
-        $dashboardData = [
-            // 'reunions' => Reunion::latest()->take(3)->get(),
-            'projects' => Project::latest()->take(3)->get(),
-        ];
+        $projectsData = $projects->groupBy(fn($item) => $item->created_at->format('F'))
+            ->map(fn($group) => [
+                'completed' => $group->where('status', 'completed')->count(),
+                'inProgress' => $group->where('status', 'in_progress')->count(),
+            ])
+            ->toArray();
 
-        return Inertia::render('Dashboard');
+        return Inertia::render('Dashboard', [
+            'meetings' => $meetings,
+            'projects' => $projects,
+            'meetingsData' => $meetingsData,
+            'projectsData' => $projectsData,
+        ]);
     }
+
+
+
     // public function admin()
     // {
     //     return Inertia::render('AdminDashboard', [
