@@ -1,135 +1,94 @@
+import React from "react";
+import { usePage, Link } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
-import { formatDate } from "@/Components/formatDate";
+import { Head } from "@inertiajs/react";
 
-export default function Projects({ projects }) {
-    const { delete: destroy } = useForm();
+export default function ProjectsIndex() {
+    const { projects = { data: [], links: [] } } = usePage().props;
 
     const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this project?")) {
-            destroy(route("projects.destroy", id), {
-                onError: (error) =>
-                    console.error("Error deleting the project:", error),
-            });
+        if (confirm("¿Estás seguro de que deseas eliminar este proyecto?")) {
+            router.delete(route("projects.destroy", id));
         }
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                        Recent Projects
-                    </h2>
-                    <Link
-                        href={route("projects.create")}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                    >
-                        Create New Project
-                    </Link>
-                </div>
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Proyectos
+                </h2>
             }
         >
-            <Head title="Projects" />
+            <Head title="Proyectos" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h2 className="text-lg font-semibold mb-4">
-                                Completed Projects
-                            </h2>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                                {(projects?.data || []).map((project) => (
-                                    <div
-                                        key={project.id}
-                                        className="p-4 border rounded-lg shadow-md"
-                                    >
-                                        <h3 className="font-bold text-lg">
-                                            {project.name}
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {project.description}
-                                        </p>
-                                        <p>
-                                            <strong>Start Date:</strong>{" "}
-                                            {formatDate(project.start_date)}
-                                        </p>
-                                        <p>
-                                            <strong>End Date:</strong>{" "}
-                                            {formatDate(project.end_date)}
-                                        </p>
-                                        <p>
-                                            <strong>Status:</strong>{" "}
-                                            <span
-                                                className={`px-2 py-1 rounded ${
-                                                    project.status === "Active"
-                                                        ? "bg-green-200 text-green-800"
-                                                        : project.status === "Completed"
-                                                        ? "bg-blue-200 text-blue-800"
-                                                        : "bg-gray-200 text-gray-800"
-                                                }`}
-                                            >
-                                                {project.status ||
-                                                    "Not specified"}
-                                            </span>
-                                        </p>
-                                        <div className="flex space-x-2 mt-2">
-                                            <Link
-                                                href={route(
-                                                    "projects.edit",
-                                                    project.id
-                                                )}
-                                                className="text-sky-500 hover:underline"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(project.id)
-                                                }
-                                                className="text-red-500 hover:underline"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+            <div className="flex justify-end mb-4">
+            <Link
+    href={route("projects.create")}
+    className="text-blue-500 hover:text-blue-700"
+>
+    Crear Nuevo Proyecto
+</Link>
+            </div>
 
-                            {projects.data?.length === 0 && (
-                                <p className="text-center text-gray-600 mt-6">
-                                    No projects found.
-                                </p>
-                            )}
-
-                            <div className="mt-6">
-                                <div className="flex justify-between">
+            <div className="overflow-x-auto">
+                <table className="table-auto w-full mt-4 text-sm md:text-base">
+                    <thead>
+                        <tr>
+                            <th className="px-4 py-2">Nombre</th>
+                            <th className="px-4 py-2">Descripción</th>
+                            <th className="px-4 py-2">Estado</th>
+                            <th className="px-4 py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {projects.data.map((project) => (
+                            <tr key={project.id} className="border-t">
+                                <td className="px-4 py-2">{project.name}</td>
+                                <td className="px-4 py-2">{project.description}</td>
+                                <td className="px-4 py-2">{project.status}</td>
+                                <td className="px-4 py-2 flex flex-col md:flex-row gap-2">
                                     <Link
-                                        href={projects.prev_page_url || "#"}
-                                        className={`px-4 py-2 rounded-md ${
-                                            projects.prev_page_url
-                                                ? "bg-gray-200 text-gray-700"
-                                                : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        }`}
+                                        href={route("projects.show", project.id)}
+                                        className="text-blue-500 hover:text-blue-700"
                                     >
-                                        Previous
+                                        Ver
                                     </Link>
                                     <Link
-                                        href={projects.next_page_url || "#"}
-                                        className={`px-4 py-2 rounded-md ${
-                                            projects.next_page_url
-                                                ? "bg-gray-200 text-gray-700"
-                                                : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        }`}
+                                        href={route("projects.edit", project.id)}
+                                        className="text-yellow-500 hover:text-yellow-700"
                                     >
-                                        Next
+                                        Editar
                                     </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                    <button
+                                        onClick={() => handleDelete(project.id)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+                {projects.links.map((link, index) => (
+                    <Link
+                        key={index}
+                        href={link.url || ""}
+                        className={`px-4 py-2 border rounded ${
+                            link.active ? "font-bold" : ""
+                        } ${
+                            link.url
+                                ? "text-blue-500 hover:text-blue-700"
+                                : "text-gray-400 cursor-not-allowed"
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                    ></Link>
+                ))}
             </div>
         </AuthenticatedLayout>
     );

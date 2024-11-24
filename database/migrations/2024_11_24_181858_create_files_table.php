@@ -12,13 +12,16 @@ return new class extends Migration {
     {
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('project_id'); // Definir project_id como unsignedBigInteger
-            $table->foreign('project_id')->references('id_proyecto')->on('projects')->onDelete('cascade'); // Clave foránea a `projects.id_proyecto`
+            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade'); // Clave foránea a `projects.id`
             $table->string('file_path');
             $table->timestamps();
         });
+
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('files');

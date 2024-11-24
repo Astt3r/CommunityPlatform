@@ -81,6 +81,7 @@ class User extends Authenticatable
         return $this->hasOne(Neighbor::class, 'user_id');
     }
 
+    
 
 
 

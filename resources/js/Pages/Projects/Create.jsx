@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CreateProject() {
+export default function ProjectCreate() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         description: "",
@@ -14,31 +14,55 @@ export default function CreateProject() {
         status: "",
         responsible: "",
         budget: "",
-        file: null, // Field for the file
+        file: null,
     });
+    
+    
 
-    const submit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
+    
+        // Validar fechas en el frontend
+        if (data.start_date && data.end_date && data.end_date < data.start_date) {
+            alert("La fecha de finalización debe ser igual o posterior a la fecha de inicio.");
+            return; // Detenemos el envío si las fechas no son válidas
+        }
+    
+        const formData = new FormData();
+        for (const key in data) {
+            if (data[key] !== null) {
+                formData.append(key, data[key]);
+            }
+        }
+    
         post(route("projects.store"), {
-            onFinish: () => reset(),
+            data: formData,
+            forceFormData: true,
+            onError: (error) =>
+                console.error("Error al crear el proyecto:", error),
+            onFinish: () => {
+                if (Object.keys(errors).length === 0) reset(); // Asegúrate de incluir reset() en useForm
+            },
         });
     };
+    
+    
+    
 
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Create Project
+                    Crear Proyecto
                 </h2>
             }
         >
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={submit} className="space-y-4" encType="multipart/form-data">
-                            {/* Project Name */}
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <InputLabel htmlFor="name" value="Project Name" />
+                                <InputLabel htmlFor="name" value="Nombre del Proyecto" />
                                 <TextInput
                                     id="name"
                                     type="text"
@@ -50,9 +74,8 @@ export default function CreateProject() {
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
-                            {/* Description */}
                             <div>
-                                <InputLabel htmlFor="description" value="Description" />
+                                <InputLabel htmlFor="description" value="Descripción" />
                                 <TextInput
                                     id="description"
                                     type="text"
@@ -64,9 +87,8 @@ export default function CreateProject() {
                                 <InputError message={errors.description} className="mt-2" />
                             </div>
 
-                            {/* Issue */}
                             <div>
-                                <InputLabel htmlFor="issue" value="Issue" />
+                                <InputLabel htmlFor="issue" value="Problema que aborda" />
                                 <TextInput
                                     id="issue"
                                     type="text"
@@ -78,9 +100,8 @@ export default function CreateProject() {
                                 <InputError message={errors.issue} className="mt-2" />
                             </div>
 
-                            {/* Start Date */}
                             <div>
-                                <InputLabel htmlFor="start_date" value="Start Date" />
+                                <InputLabel htmlFor="start_date" value="Fecha de Inicio" />
                                 <TextInput
                                     id="start_date"
                                     type="date"
@@ -92,9 +113,8 @@ export default function CreateProject() {
                                 <InputError message={errors.start_date} className="mt-2" />
                             </div>
 
-                            {/* End Date */}
                             <div>
-                                <InputLabel htmlFor="end_date" value="End Date" />
+                                <InputLabel htmlFor="end_date" value="Fecha de Finalización" />
                                 <TextInput
                                     id="end_date"
                                     type="date"
@@ -106,9 +126,8 @@ export default function CreateProject() {
                                 <InputError message={errors.end_date} className="mt-2" />
                             </div>
 
-                            {/* Status */}
                             <div>
-                                <InputLabel htmlFor="status" value="Status" />
+                                <InputLabel htmlFor="status" value="Estado del Proyecto" />
                                 <TextInput
                                     id="status"
                                     type="text"
@@ -120,9 +139,8 @@ export default function CreateProject() {
                                 <InputError message={errors.status} className="mt-2" />
                             </div>
 
-                            {/* Responsible */}
                             <div>
-                                <InputLabel htmlFor="responsible" value="Responsible" />
+                                <InputLabel htmlFor="responsible" value="Responsable" />
                                 <TextInput
                                     id="responsible"
                                     type="text"
@@ -134,9 +152,8 @@ export default function CreateProject() {
                                 <InputError message={errors.responsible} className="mt-2" />
                             </div>
 
-                            {/* Budget */}
                             <div>
-                                <InputLabel htmlFor="budget" value="Budget" />
+                                <InputLabel htmlFor="budget" value="Presupuesto" />
                                 <TextInput
                                     id="budget"
                                     type="number"
@@ -148,9 +165,8 @@ export default function CreateProject() {
                                 <InputError message={errors.budget} className="mt-2" />
                             </div>
 
-                            {/* File Upload */}
                             <div>
-                                <InputLabel htmlFor="file" value="Project File" />
+                                <InputLabel htmlFor="file" value="Archivo del Proyecto" />
                                 <input
                                     id="file"
                                     type="file"
@@ -161,21 +177,20 @@ export default function CreateProject() {
                                 <InputError message={errors.file} className="mt-2" />
                             </div>
 
-                            {/* Submit and Cancel Buttons */}
                             <div className="flex justify-end space-x-4 mt-4">
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
                                     onClick={() => reset()}
                                 >
-                                    Cancel
+                                    Cancelar
                                 </button>
                                 <button
                                     type="submit"
                                     className="bg-blue-600 text-white px-4 py-2 rounded-md"
                                     disabled={processing}
                                 >
-                                    Add Project
+                                    Crear Proyecto
                                 </button>
                             </div>
                         </form>

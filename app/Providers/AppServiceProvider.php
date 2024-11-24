@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
                     ],
                     'board_member' => [
                         ['name' => 'Finanzas', 'route' => 'finance.index'],
+                        ['name' => 'Proyectos', 'route' => 'projects.index'],
                     ],
                     'resident' => [
                         ['name' => 'Dashboard', 'route' => 'dashboard'],

@@ -93,10 +93,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'showAttendance'])->name('meetings.attendance');
     Route::post('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'storeAttendance'])->name('meetings.attendance.store');
     Route::get('/meetings/{meeting}/attendance-summary', [MeetingAttendanceController::class, 'showSummary'])
-    ->name('meetings.attendance.summary');
+        ->name('meetings.attendance.summary');
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
 
-    
+
 
 
 });
@@ -117,7 +117,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('projects', ProjectController::class);
 });
 
