@@ -7,6 +7,14 @@ use App\Models\Project;
 use App\Models\Reunion;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
+use App\Models\User;
+use App\Models\Neighbor;
+use App\Models\CommitteeMember;
+use App\Models\NeighborhoodAssociation;
+
+
+
 
 class DashboardController extends Controller
 {
@@ -14,26 +22,19 @@ class DashboardController extends Controller
     {
         $meetings = Meeting::latest()->take(10)->get();
         $projects = Project::latest()->take(10)->get();
-
-        // Datos para gráficos
-        $meetingsData = $meetings->groupBy(fn($item) => $item->created_at->format('F'))
-            ->map(fn($group) => $group->count())
-            ->toArray();
-
-        $projectsData = $projects->groupBy(fn($item) => $item->created_at->format('F'))
-            ->map(fn($group) => [
-                'completed' => $group->where('status', 'completed')->count(),
-                'inProgress' => $group->where('status', 'in_progress')->count(),
-            ])
-            ->toArray();
+        $neighbors = Neighbor::count();
+        $boardMembers = CommitteeMember::count();
+        $associations = NeighborhoodAssociation::count();
 
         return Inertia::render('Dashboard', [
             'meetings' => $meetings,
             'projects' => $projects,
-            'meetingsData' => $meetingsData,
-            'projectsData' => $projectsData,
+            'neighbors' => $neighbors,
+            'boardMembers' => $boardMembers,
+            'associations' => $associations,
         ]);
     }
+
 
 
 
