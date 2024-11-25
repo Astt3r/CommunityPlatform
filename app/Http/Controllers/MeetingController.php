@@ -70,15 +70,24 @@ class MeetingController extends Controller
      */
     public function show(Meeting $meeting)
     {
-        $meeting = Meeting::findOrFail(intval($meeting->id));
-
-        Carbon::setLocale('es');
-        $meeting->meeting_date = Carbon::parse($meeting->meeting_date)->translatedFormat('d \d\e F \d\e Y');
-
         return Inertia::render('Meetings/ShowMeeting', [
-            'meeting' => $meeting,
+            'meeting' => [
+                'id' => $meeting->id,
+                'main_topic' => $meeting->main_topic,
+                'meeting_date' => $meeting->meeting_date, // Enviamos el valor original de la base de datos
+                'location' => $meeting->location,
+                'description' => $meeting->description,
+                'organized_by' => $meeting->organized_by,
+                'status' => $meeting->status,
+                'result' => $meeting->result,
+                'attendees' => $meeting->attendees, // Asegúrate de incluir esta relación si es necesaria.
+            ],
         ]);
     }
+
+
+
+
 
     /**
      * Show the form for editing the specified resource.

@@ -2,6 +2,7 @@ import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { parseISO, format, isValid } from "date-fns";
 
 // Registering a default font
 Font.register({ family: 'Helvetica', src: 'https://fonts.gstatic.com/s/helvetica/v7/sW-KlwMSXsW7buS-aUr5.mp4' });
@@ -72,6 +73,11 @@ const MeetingPdfDocument = ({ meeting }) => {
     return null;
   }
 
+  const formattedDate = meeting.meeting_date ? (() => {
+    const dateObj = new Date(meeting.meeting_date);
+    return isValid(dateObj) ? format(dateObj, "dd/MM/yyyy HH:mm 'UTC'") : "No especificado";
+  })() : "No especificado";
+
   return (
     <Document>
       <Page style={styles.page}>
@@ -81,7 +87,7 @@ const MeetingPdfDocument = ({ meeting }) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Fecha y Hora:</Text>
-          <Text>{meeting.meeting_date ? new Date(meeting.meeting_date).toLocaleString() : "No especificado"}</Text>
+          <Text>{formattedDate}</Text>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Lugar:</Text>
@@ -140,6 +146,12 @@ const MeetingPdfDocument = ({ meeting }) => {
 };
 
 export default function ShowMeeting({ meeting }) {
+  const formattedDate = meeting.meeting_date ? (() => {
+    const parsedDate = parseISO(meeting.meeting_date);
+    const zonedDate = parsedDate; // Asumimos que la fecha ya es UTC
+    return isValid(zonedDate) ? format(zonedDate, "dd/MM/yyyy HH:mm 'UTC'") : "No especificado";
+  })() : "No especificado";
+
   return (
     <AuthenticatedLayout
       header={
@@ -159,7 +171,7 @@ export default function ShowMeeting({ meeting }) {
             </div>
             <div>
               <h3 className="text-lg font-semibold">Fecha:</h3>
-              <p>{new Date(meeting.meeting_date).toLocaleString()}</p>
+              <p>{formattedDate}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold">Descripción:</h3>
