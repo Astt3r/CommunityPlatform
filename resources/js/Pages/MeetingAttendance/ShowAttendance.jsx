@@ -7,22 +7,53 @@ export default function ShowAttendance({ meetingId }) {
 
     const { data, setData, post, processing } = useForm({
         attendance: {}, // Estado inicial del formulario
+        absenceReasons: {}, // Agregar razones de ausencia
     });
 
     useEffect(() => {
         // Inicializar las asistencias con valores predeterminados
         const initialAttendance = {};
+        const initialAbsenceReasons = {};
         neighbors.forEach((neighbor) => {
             initialAttendance[neighbor.id] = false; // Default: No asistió
+            initialAbsenceReasons[neighbor.id] = ""; // Default: Sin razón
         });
-        setData("attendance", initialAttendance);
+        setData((prevData) => ({
+            ...prevData,
+            attendance: initialAttendance,
+            absenceReasons: initialAbsenceReasons,
+        }));
     }, [neighbors]);
 
     const handleCheckboxChange = (neighborId) => {
-        setData("attendance", {
+        const updatedAttendance = {
             ...data.attendance,
             [neighborId]: !data.attendance[neighborId],
-        });
+        };
+        setData((prevData) => ({
+            ...prevData,
+            attendance: updatedAttendance,
+        }));
+        // Limpiar el motivo de ausencia si se marca como presente
+        if (updatedAttendance[neighborId]) {
+            setData((prevData) => ({
+                ...prevData,
+                absenceReasons: {
+                    ...prevData.absenceReasons,
+                    [neighborId]: "",
+                },
+            }));
+        }
+    };
+
+    const handleAbsenceReasonChange = (neighborId, reason) => {
+        setData((prevData) => ({
+            ...prevData,
+            absenceReasons: {
+                ...prevData.absenceReasons,
+                [neighborId]: reason,
+            },
+        }));
     };
 
     const handleSubmit = (e) => {
@@ -30,12 +61,13 @@ export default function ShowAttendance({ meetingId }) {
 
         console.log("Enviando datos de asistencia:", data);
 
-        // Asegurarse de que los datos sean booleanos correctos antes de enviarlos
+        // Asegurarse de que los datos sean correctos antes de enviarlos
         const formattedData = {
             attendance: Object.keys(data.attendance).reduce((acc, key) => {
                 acc[key] = data.attendance[key] ? true : false;
                 return acc;
             }, {}),
+            absenceReasons: data.absenceReasons,
         };
 
         post(`/meetings/${meetingId}/attendance`, {
@@ -68,6 +100,7 @@ export default function ShowAttendance({ meetingId }) {
                                     <tr>
                                         <th className="border border-gray-300 px-4 py-2">Vecino</th>
                                         <th className="border border-gray-300 px-4 py-2">Asistencia</th>
+                                        <th className="border border-gray-300 px-4 py-2">Razón de Ausencia</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -83,6 +116,22 @@ export default function ShowAttendance({ meetingId }) {
                                                     onChange={() => handleCheckboxChange(neighbor.id)}
                                                 />
                                             </td>
+                                            <td className="border border-gray-300 px-4 py-2">
+                                                {!data.attendance[neighbor.id] && (
+                                                    <input
+                                                        type="text"
+                                                        value={data.absenceReasons[neighbor.id] || ""}
+                                                        onChange={(e) =>
+                                                            handleAbsenceReasonChange(
+                                                                neighbor.id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Motivo de ausencia"
+                                                        className="w-full border border-gray-300 rounded p-2"
+                                                    />
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -97,21 +146,20 @@ export default function ShowAttendance({ meetingId }) {
                                 </button>
                             </div>
                             <div className="mt-4 space-x-2">
-                            <a
-                                href={`/meetings/${meetingId}`}
-                                className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Volver a Detalles de la Reunión
-                            </a>
+                                <a
+                                    href={`/meetings/${meetingId}`}
+                                    className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    Volver a Detalles de la Reunión
+                                </a>
 
-                            <a
-                                href={`/meetings/${meetingId}/attendance-summary`}
-                                className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                            >
-                                Ver Resumen de Asistencias
-                            </a>
-                        </div>
-
+                                <a
+                                    href={`/meetings/${meetingId}/attendance-summary`}
+                                    className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                >
+                                    Ver Resumen de Asistencias
+                                </a>
+                            </div>
                         </form>
                     </div>
                 </div>

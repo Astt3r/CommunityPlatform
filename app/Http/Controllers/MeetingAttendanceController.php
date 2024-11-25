@@ -41,23 +41,29 @@ class MeetingAttendanceController extends Controller
         $validated = $request->validate([
             'attendance' => 'required|array',
             'attendance.*' => 'boolean', // Cada valor debe ser booleano
+            'absenceReasons' => 'required|array',
+            'absenceReasons.*' => 'nullable|string', // Cada motivo de ausencia puede ser nulo o una cadena de texto
         ]);
 
         // Eliminar los registros anteriores para la reunión actual
         MeetingAttendance::where('meeting_id', $meetingId)->delete();
 
-        // Guardar los nuevos registros de asistencia
+        // Guardar los nuevos registros de asistencia y ausencia
         foreach ($validated['attendance'] as $neighborId => $attended) {
             MeetingAttendance::create([
                 'meeting_id' => $meetingId,
                 'neighbor_id' => $neighborId,
                 'attended' => $attended ? 1 : 0, // Guardar como 1 (asistió) o 0 (no asistió)
+                'absence_reason' => $attended ? null : ($validated['absenceReasons'][$neighborId] ?? null), // Guardar el motivo de ausencia si no asistió
             ]);
         }
 
         return redirect()->route('meetings.attendance', $meetingId)
             ->with('message', 'Asistencias registradas correctamente.');
     }
+
+
+
 
 
 
