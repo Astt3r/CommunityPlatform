@@ -3,6 +3,7 @@ import { usePage, Link, useForm } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
+import axios from "axios";
 
 export default function NeighborhoodAssociationsIndex() {
     const { associations, filters, flash, userRole } = usePage().props;
@@ -20,6 +21,25 @@ export default function NeighborhoodAssociationsIndex() {
     const handleSearch = (e) => {
         e.preventDefault();
         get(route("neighborhood-associations.index"));
+    };
+
+    const handleExport = async () => {
+        try {
+            const response = await axios.get('/export-neighborhoods', {
+                responseType: 'blob', // Asegura que el archivo se descargue como blob
+            });
+
+            // Crear una URL para el archivo descargado
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'neighborhood_associations.xlsx'); // Nombre del archivo
+            document.body.appendChild(link);
+            link.click();
+            link.remove(); // Eliminar el enlace después de la descarga
+        } catch (error) {
+            console.error('Error al exportar los datos:', error);
+        }
     };
 
     useEffect(() => {
@@ -62,6 +82,14 @@ export default function NeighborhoodAssociationsIndex() {
                 >
                     Crear Nueva Asociación
                 </Link>
+
+                {/* Botón de exportar */}
+                <button
+                    onClick={handleExport}
+                    className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-700 mb-4 md:mb-0"
+                >
+                    Exportar a Excel
+                </button>
 
                 {/* Filtro de búsqueda */}
                 <form

@@ -16,6 +16,9 @@ use App\Http\Controllers\NeighborhoodAssociationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DashboardController;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\NeighborhoodAssociationsExport;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -119,6 +122,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('projects', ProjectController::class);
+});
+
+Route::get('/export-neighborhoods', function () {
+    return Excel::download(new NeighborhoodAssociationsExport, 'neighborhood_associations.xlsx');
 });
 
 
