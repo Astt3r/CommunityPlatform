@@ -58,9 +58,9 @@ export default function ShowAttendance({ meetingId }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
         console.log("Enviando datos de asistencia:", data);
-
+    
         // Asegurarse de que los datos sean correctos antes de enviarlos
         const formattedData = {
             attendance: Object.keys(data.attendance).reduce((acc, key) => {
@@ -69,16 +69,20 @@ export default function ShowAttendance({ meetingId }) {
             }, {}),
             absenceReasons: data.absenceReasons,
         };
-
+    
         post(`/meetings/${meetingId}/attendance`, {
             data: formattedData,
-            onSuccess: () => alert("Asistencias guardadas correctamente."),
+            onSuccess: () => {
+                alert("Asistencias guardadas correctamente.");
+                window.location.href = `/meetings/${meetingId}`; // Redirige a los detalles de la reunión
+            },
             onError: (errors) => {
                 console.error("Errores al guardar:", errors);
                 alert("Hubo un error al intentar guardar las asistencias.");
             },
         });
     };
+    
 
     return (
         <AuthenticatedLayout
@@ -117,20 +121,24 @@ export default function ShowAttendance({ meetingId }) {
                                                 />
                                             </td>
                                             <td className="border border-gray-300 px-4 py-2">
-                                                {!data.attendance[neighbor.id] && (
-                                                    <input
-                                                        type="text"
-                                                        value={data.absenceReasons[neighbor.id] || ""}
-                                                        onChange={(e) =>
-                                                            handleAbsenceReasonChange(
-                                                                neighbor.id,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder="Motivo de ausencia"
-                                                        className="w-full border border-gray-300 rounded p-2"
-                                                    />
-                                                )}
+                                            <input
+                                                type="text"
+                                                value={data.absenceReasons[neighbor.id] || ""}
+                                                onChange={(e) =>
+                                                    handleAbsenceReasonChange(
+                                                        neighbor.id,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Motivo de ausencia"
+                                                className={`w-full border rounded p-2 ${
+                                                    data.attendance[neighbor.id]
+                                                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                                        : "bg-white"
+                                                }`}
+                                                disabled={data.attendance[neighbor.id]} // Deshabilitar si está marcado
+                                            />
+
                                             </td>
                                         </tr>
                                     ))}
