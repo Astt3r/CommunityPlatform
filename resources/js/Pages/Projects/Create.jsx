@@ -16,38 +16,36 @@ export default function ProjectCreate() {
         budget: "",
         file: null,
     });
-    
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         // Validar fechas en el frontend
         if (data.start_date && data.end_date && data.end_date < data.start_date) {
             alert("La fecha de finalización debe ser igual o posterior a la fecha de inicio.");
             return; // Detenemos el envío si las fechas no son válidas
         }
-    
+
         const formData = new FormData();
         for (const key in data) {
             if (data[key] !== null) {
                 formData.append(key, data[key]);
             }
         }
-    
+
         post(route("projects.store"), {
             data: formData,
             forceFormData: true,
-            onError: (error) =>
-                console.error("Error al crear el proyecto:", error),
+            onError: (error) => {
+                if (error.name) {
+                    alert(error.name); // Mostrar alerta si el nombre ya existe
+                }
+            },
             onFinish: () => {
-                if (Object.keys(errors).length === 0) reset(); // Asegúrate de incluir reset() en useForm
+                if (Object.keys(errors).length === 0) reset();
             },
         });
     };
-    
-    
-    
 
     return (
         <AuthenticatedLayout
