@@ -17,20 +17,20 @@ export default function ProjectsIndex() {
 
     const handleExport = async () => {
         try {
-            const response = await axios.get('/export-projects', {
-                responseType: 'blob',
+            const response = await axios.get("/export-projects", {
+                responseType: "blob",
                 params: { latest },
             });
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
-            link.setAttribute('download', 'projects.xlsx');
+            link.setAttribute("download", "projects.xlsx");
             document.body.appendChild(link);
             link.click();
             link.remove();
         } catch (error) {
-            console.error('Error al exportar los datos:', error);
+            console.error("Error al exportar los datos:", error);
         }
     };
 
@@ -46,13 +46,13 @@ export default function ProjectsIndex() {
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <Link
                     href={route("projects.create")}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
+                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
                 >
                     Crear Nuevo Proyecto
                 </Link>
 
-                <div className="flex flex-col md:flex-row items-center gap-4">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                         <label htmlFor="latest" className="text-sm text-gray-700">
                             Exportar los últimos:
                         </label>
@@ -62,12 +62,12 @@ export default function ProjectsIndex() {
                             value={latest}
                             onChange={(e) => setLatest(e.target.value)}
                             placeholder="Ejemplo: 5"
-                            className="px-4 py-2 border rounded focus:ring focus:ring-green-200"
+                            className="w-full sm:w-auto px-4 py-2 border rounded focus:ring focus:ring-green-200"
                         />
                     </div>
                     <button
                         onClick={handleExport}
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                        className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
                     >
                         Exportar a Excel
                     </button>
@@ -80,8 +80,8 @@ export default function ProjectsIndex() {
                     <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
                         <tr>
                             <th className="px-6 py-3">Nombre</th>
-                            <th className="px-6 py-3">Descripción</th>
-                            <th className="px-6 py-3">Estado</th>
+                            <th className="px-6 py-3 hidden md:table-cell">Descripción</th>
+                            <th className="px-6 py-3 hidden lg:table-cell">Estado</th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
                     </thead>
@@ -92,24 +92,28 @@ export default function ProjectsIndex() {
                                 className={`border-t ${index % 2 === 0 ? "bg-gray-50" : ""}`}
                             >
                                 <td className="px-6 py-3">{project.name}</td>
-                                <td className="px-6 py-3">{project.description}</td>
-                                <td className="px-6 py-3">{project.status}</td>
-                                <td className="px-6 py-3 flex gap-2">
+                                <td className="px-6 py-3 hidden md:table-cell">
+                                    {project.description}
+                                </td>
+                                <td className="px-6 py-3 hidden lg:table-cell">
+                                    {project.status}
+                                </td>
+                                <td className="px-6 py-3 flex flex-col sm:flex-row gap-2">
                                     <Link
                                         href={route("projects.show", project.id)}
-                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 text-center"
                                     >
                                         Ver
                                     </Link>
                                     <Link
                                         href={route("projects.edit", project.id)}
-                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
                                     >
                                         Editar
                                     </Link>
                                     <button
                                         onClick={() => handleDelete(project.id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700"
+                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
                                     >
                                         Eliminar
                                     </button>
@@ -121,7 +125,7 @@ export default function ProjectsIndex() {
             </div>
 
             {/* Paginación */}
-            <div className="mt-6 flex justify-center gap-2">
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {projects.links.map((link, index) => (
                     <Link
                         key={index}

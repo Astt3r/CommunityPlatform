@@ -19,7 +19,11 @@ export default function NeighborhoodAssociationCreate() {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("neighborhood-associations.store"), {
-            onError: (error) => console.error("Error al crear la asociación:", error),
+            onError: (error) => {
+                if (error.name) {
+                    alert(error.name); // Mostrar la alerta si hay un error en el campo 'name'\\comentar si no querer aler
+                }
+            },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },

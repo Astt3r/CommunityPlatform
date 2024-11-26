@@ -26,20 +26,20 @@ export default function NeighborhoodAssociationsIndex() {
 
     const handleExport = async () => {
         try {
-            const response = await axios.get('/export-neighborhoods', {
-                responseType: 'blob',
+            const response = await axios.get("/export-neighborhoods", {
+                responseType: "blob",
                 params: { latest: latest || undefined },
             });
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
-            link.setAttribute('download', 'neighborhood_associations.xlsx');
+            link.setAttribute("download", "neighborhood_associations.xlsx");
             document.body.appendChild(link);
             link.click();
             link.remove();
         } catch (error) {
-            console.error('Error al exportar los datos:', error);
+            console.error("Error al exportar los datos:", error);
         }
     };
 
@@ -78,29 +78,32 @@ export default function NeighborhoodAssociationsIndex() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                 <Link
                     href="/neighborhood-associations/create"
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
+                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
                 >
                     Crear Nueva Asociación
                 </Link>
 
-                <div className="flex items-center gap-4">
-                    <form onSubmit={handleSearch} className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <form
+                        onSubmit={handleSearch}
+                        className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto"
+                    >
                         <input
                             type="text"
                             placeholder="Buscar por nombre"
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
-                            className="px-4 py-2 border rounded focus:ring focus:ring-blue-200"
+                            className="w-full px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                         />
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                            className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
                         >
                             Buscar
                         </button>
                     </form>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
                         <label htmlFor="latest" className="text-sm text-gray-700">
                             Exportar últimas:
                         </label>
@@ -110,11 +113,11 @@ export default function NeighborhoodAssociationsIndex() {
                             value={latest}
                             onChange={(e) => setLatest(e.target.value)}
                             placeholder="Ej: 5"
-                            className="px-4 py-2 border rounded focus:ring focus:ring-green-200"
+                            className="w-full sm:w-auto px-4 py-2 border rounded focus:ring focus:ring-green-200"
                         />
                         <button
                             onClick={handleExport}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                            className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
                         >
                             Exportar
                         </button>
@@ -128,9 +131,9 @@ export default function NeighborhoodAssociationsIndex() {
                     <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
                         <tr>
                             <th className="px-6 py-3">Nombre</th>
-                            <th className="px-6 py-3">Dirección</th>
-                            <th className="px-6 py-3">Teléfono</th>
-                            <th className="px-6 py-3">Email</th>
+                            <th className="px-6 py-3 hidden sm:table-cell">Dirección</th>
+                            <th className="px-6 py-3 hidden md:table-cell">Teléfono</th>
+                            <th className="px-6 py-3 hidden lg:table-cell">Email</th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
                     </thead>
@@ -141,10 +144,16 @@ export default function NeighborhoodAssociationsIndex() {
                                 className={`border-t ${index % 2 === 0 ? "bg-gray-50" : ""}`}
                             >
                                 <td className="px-6 py-3">{association.name}</td>
-                                <td className="px-6 py-3">{association.address}</td>
-                                <td className="px-6 py-3">{association.phone}</td>
-                                <td className="px-6 py-3">{association.email}</td>
-                                <td className="px-6 py-3 flex gap-2">
+                                <td className="px-6 py-3 hidden sm:table-cell">
+                                    {association.address}
+                                </td>
+                                <td className="px-6 py-3 hidden md:table-cell">
+                                    {association.phone}
+                                </td>
+                                <td className="px-6 py-3 hidden lg:table-cell">
+                                    {association.email}
+                                </td>
+                                <td className="px-6 py-3 flex flex-col sm:flex-row gap-2">
                                     <Link
                                         href={`/neighborhood-associations/${association.id}`}
                                         className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
@@ -171,7 +180,7 @@ export default function NeighborhoodAssociationsIndex() {
             </div>
 
             {/* Paginación */}
-            <div className="mt-6 flex justify-center gap-2">
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {associations.links.map((link, index) => (
                     <Link
                         key={index}

@@ -52,7 +52,7 @@ class NeighborhoodAssociationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:neighborhood_associations,name',
             'address' => 'required|string|max:255',
             'phone' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:255',
@@ -60,6 +60,8 @@ class NeighborhoodAssociationController extends Controller
             'number_of_members' => 'nullable|integer',
             'date_of_funding' => 'nullable|date',
             'is_active' => 'boolean',
+        ], [
+            'name.unique' => 'Ya existe una junta de vecinos con este nombre. Por favor, elige otro.', // Mensaje personalizado
         ]);
 
         $validated['created_by'] = Auth::id();
@@ -69,6 +71,7 @@ class NeighborhoodAssociationController extends Controller
 
         return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación creada exitosamente.');
     }
+
 
     /**
      * Display the specified resource.

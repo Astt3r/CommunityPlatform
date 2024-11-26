@@ -59,7 +59,7 @@ class ProjectController extends Controller
 
         // Validar datos del formulario
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:projects,name',
             'description' => 'required|string|max:500',
             'issue' => 'required|string|max:1000',
             'start_date' => 'required|date',
@@ -68,6 +68,8 @@ class ProjectController extends Controller
             'responsible' => 'nullable|string|max:255',
             'budget' => 'required|numeric|min:0',
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
+        ], [
+            'name.unique' => 'Ya existe un proyecto con este nombre. Por favor, elige otro.', // Mensaje personalizado
         ]);
 
         // Asignar automáticamente la asociación
