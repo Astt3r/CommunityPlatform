@@ -16,6 +16,8 @@ use App\Http\Controllers\NeighborhoodAssociationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DashboardController;
+use App\Exports\ProjectsExport;
+use App\Http\Controllers\Project\ProjectDashboardController;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
@@ -135,6 +137,11 @@ Route::get('/export-neighborhoods', function (Request $request) {
     }
 
     return Excel::download(new NeighborhoodAssociationsExport($filter), 'neighborhood_associations.xlsx');
+});
+
+Route::get('/export-projects', function (Request $request) {
+    $filter = $request->only('latest'); // Captura el filtro "latest"
+    return Excel::download(new ProjectsExport($filter), 'projects.xlsx');
 });
 
 

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ExportButton = () => {
-    const [latest, setLatest] = useState(''); // Estado para capturar cuántas asociaciones exportar
+const ExportButton = ({ exportUrl, defaultFileName }) => {
+    const [latest, setLatest] = useState(''); // Estado para capturar cuántos exportar
 
     const handleExport = async () => {
         try {
-            console.log("Filtro enviado (latest): ", latest); // Verifica el valor en consola
-            const response = await axios.get('/export-neighborhoods', {
+            const response = await axios.get(exportUrl, {
                 responseType: 'blob', // Descargar como blob
                 params: { latest }, // Enviar el filtro como parámetro
             });
@@ -15,7 +14,7 @@ const ExportButton = () => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'neighborhood_associations.xlsx'); // Nombre del archivo
+            link.setAttribute('download', defaultFileName); // Nombre del archivo
             document.body.appendChild(link);
             link.click();
             link.remove(); // Eliminar el enlace después de la descarga
@@ -27,7 +26,7 @@ const ExportButton = () => {
     return (
         <div>
             <div className="mb-4">
-                <label htmlFor="latest" className="mr-2">Exportar las últimas:</label>
+                <label htmlFor="latest" className="mr-2">Exportar los últimos:</label>
                 <input
                     type="number"
                     id="latest"
