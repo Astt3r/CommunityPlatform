@@ -4,16 +4,29 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use App\Models\NeighborhoodAssociation; // Importar el modelo
+use App\Models\NeighborhoodAssociation;
 use Maatwebsite\Excel\Concerns\FromCollection;
-
 
 class NeighborhoodAssociationsExport implements FromCollection, WithHeadings, WithMapping
 {
+    protected $filter; // Propiedad para el filtro
+
+    public function __construct($filter = [])
+    {
+        $this->filter = $filter; // Asigna el filtro pasado al constructor
+    }
+
     public function collection()
     {
-        return NeighborhoodAssociation::all();
+        $query = NeighborhoodAssociation::query();
+
+        if (!empty($this->filter['latest'])) {
+            $query->latest()->take((int) $this->filter['latest']);
+        }
+
+        return $query->get();
     }
+
 
     public function headings(): array
     {

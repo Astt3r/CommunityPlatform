@@ -11,6 +11,7 @@ export default function NeighborhoodAssociationsIndex() {
         name: filters.name || "",
     });
     const [showAlert, setShowAlert] = useState(!!flash.success);
+    const [latest, setLatest] = useState(""); // Estado para capturar el filtro "últimas"
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta asociación?")) {
@@ -26,7 +27,8 @@ export default function NeighborhoodAssociationsIndex() {
     const handleExport = async () => {
         try {
             const response = await axios.get('/export-neighborhoods', {
-                responseType: 'blob', // Asegura que el archivo se descargue como blob
+                responseType: 'blob', // Descargar como blob
+                params: { latest: latest || undefined }, // Asegura que solo envíe si hay valor
             });
 
             // Crear una URL para el archivo descargado
@@ -82,6 +84,21 @@ export default function NeighborhoodAssociationsIndex() {
                 >
                     Crear Nueva Asociación
                 </Link>
+
+                {/* Campo para seleccionar cuántas asociaciones exportar */}
+                <div className="flex items-center gap-2">
+                    <label htmlFor="latest" className="text-sm text-gray-700">
+                        Últimas Asociaciones:
+                    </label>
+                    <input
+                        type="number"
+                        id="latest"
+                        value={latest}
+                        onChange={(e) => setLatest(e.target.value)}
+                        placeholder="Ej: 5"
+                        className="border rounded px-2 py-1"
+                    />
+                </div>
 
                 {/* Botón de exportar */}
                 <button
