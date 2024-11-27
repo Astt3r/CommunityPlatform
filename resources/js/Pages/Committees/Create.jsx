@@ -17,8 +17,14 @@ export default function CommitteesCreate({ types }) {
     });
 
     const validateDates = () => {
-        if (data.effective_date && data.end_date && data.end_date < data.effective_date) {
-            alert("La fecha de fin debe ser igual o posterior a la fecha de inicio.");
+        if (
+            data.effective_date &&
+            data.end_date &&
+            data.end_date < data.effective_date
+        ) {
+            alert(
+                "La fecha de fin debe ser igual o posterior a la fecha de inicio."
+            );
             return false;
         }
         return true;
@@ -27,20 +33,22 @@ export default function CommitteesCreate({ types }) {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Enviar los datos al backend
+        // Validar fechas antes de enviar
+        if (!validateDates()) return;
+
         post(route("committees.store"), {
             onError: () => {
-                // No hacer nada aquí, el objeto `errors` ya maneja los errores
+                // Maneja errores automáticamente
             },
             onFinish: () => {
-                if (Object.keys(errors).length === 0) reset(); // Limpiar el formulario si no hay errores
+                if (Object.keys(errors).length === 0) reset();
             },
         });
     };
 
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("committees.index")); // Redirige al índice de comités
+        reset();
+        router.visit(route("committees.index"));
     };
 
     return (
@@ -55,96 +63,177 @@ export default function CommitteesCreate({ types }) {
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Nombre */}
                             <div>
-                                <InputLabel htmlFor="name" value="Nombre del Comité" />
+                                <InputLabel
+                                    htmlFor="name"
+                                    value="Nombre del Comité"
+                                />
                                 <TextInput
                                     id="name"
                                     type="text"
                                     value={data.name}
-                                    onChange={(e) => setData("name", e.target.value)}
+                                    onInput={(e) => {
+                                        const cleanedValue =
+                                            e.target.value.replace(
+                                                /[^a-zA-Z0-9\s]/g,
+                                                ""
+                                            );
+                                        setData(
+                                            "name",
+                                            cleanedValue.slice(0, 50)
+                                        );
+                                    }}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.name} className="mt-2" />
+                                <InputError
+                                    message={errors.name}
+                                    className="mt-2"
+                                />
                             </div>
 
+                            {/* Descripción */}
                             <div>
-                                <InputLabel htmlFor="description" value="Descripción" />
+                                <InputLabel
+                                    htmlFor="description"
+                                    value="Descripción"
+                                />
                                 <TextInput
                                     id="description"
                                     type="text"
                                     value={data.description}
-                                    onChange={(e) => setData("description", e.target.value)}
+                                    onInput={(e) => {
+                                        const cleanedValue =
+                                            e.target.value.replace(
+                                                /[^a-zA-Z0-9\s.,-]/g,
+                                                ""
+                                            );
+                                        setData(
+                                            "description",
+                                            cleanedValue.slice(0, 255)
+                                        );
+                                    }}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.description} className="mt-2" />
+                                <InputError
+                                    message={errors.description}
+                                    className="mt-2"
+                                />
                             </div>
 
+                            {/* Código */}
                             <div>
                                 <InputLabel htmlFor="code" value="Código" />
                                 <TextInput
                                     id="code"
                                     type="text"
                                     value={data.code}
-                                    onChange={(e) => setData("code", e.target.value)}
+                                    onInput={(e) => {
+                                        const cleanedValue =
+                                            e.target.value.replace(
+                                                /[^a-zA-Z0-9]/g,
+                                                ""
+                                            );
+                                        setData(
+                                            "code",
+                                            cleanedValue.slice(0, 20)
+                                        );
+                                    }}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.code} className="mt-2" />
+                                <InputError
+                                    message={errors.code}
+                                    className="mt-2"
+                                />
                             </div>
 
+                            {/* Tipo */}
                             <div>
                                 <InputLabel htmlFor="type" value="Tipo" />
                                 <select
                                     id="type"
                                     value={data.type}
-                                    onChange={(e) => setData("type", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("type", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">Seleccione un tipo</option>
                                     {types.map((type) => (
                                         <option key={type} value={type}>
-                                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                                            {type.charAt(0).toUpperCase() +
+                                                type.slice(1)}
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.type} className="mt-2" />
+                                <InputError
+                                    message={errors.type}
+                                    className="mt-2"
+                                />
                             </div>
 
+                            {/* Estado */}
                             <div>
                                 <InputLabel htmlFor="status" value="Estado" />
                                 <select
                                     id="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
+                            {/* Fechas */}
                             <div>
-                                <InputLabel htmlFor="effective_date" value="Fecha de Inicio" />
+                                <InputLabel
+                                    htmlFor="effective_date"
+                                    value="Fecha de Inicio"
+                                />
                                 <TextInput
                                     id="effective_date"
                                     type="date"
                                     value={data.effective_date}
-                                    onChange={(e) => setData("effective_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "effective_date",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.effective_date} className="mt-2" />
+                                <InputError
+                                    message={errors.effective_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="end_date" value="Fecha de Fin (Opcional)" />
+                                <InputLabel
+                                    htmlFor="end_date"
+                                    value="Fecha de Fin (Opcional)"
+                                />
                                 <TextInput
                                     id="end_date"
                                     type="date"
                                     value={data.end_date}
-                                    onChange={(e) => setData("end_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("end_date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.end_date} className="mt-2" />
+                                <InputError
+                                    message={errors.end_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div className="flex justify-end space-x-4">

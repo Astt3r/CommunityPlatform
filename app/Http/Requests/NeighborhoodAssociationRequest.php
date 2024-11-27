@@ -20,16 +20,16 @@ class NeighborhoodAssociationRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:neighborhood_associations,name',
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
-            'website_url' => 'nullable|url|max:255',
-            // 'number_of_members' => 'required|integer|min:0',
+            'name' => 'required|unique:neighborhood_associations,name|max:255|regex:/^[\pL\s\-]+$/u',
+            'address' => 'required|unique:neighborhood_associations,address|max:255|regex:/^[\pL\pN\s\-\,\.]+$/u',
+            'phone' => 'required|numeric|digits_between:8,9|unique:neighborhood_associations,phone',
+            'email' => 'required|email|unique:neighborhood_associations,email|max:255',
+            'website_url' => 'nullable|url',
             'date_of_funding' => 'required|date|before_or_equal:today',
             'is_active' => 'required|boolean',
         ];
     }
+
 
     /**
      * Get custom messages for validation errors.
@@ -40,9 +40,13 @@ class NeighborhoodAssociationRequest extends FormRequest
             'name.required' => 'El nombre es obligatorio.',
             'name.unique' => 'Ya existe una junta de vecinos con este nombre. Por favor, elige otro.',
             'address.required' => 'La dirección es obligatoria.',
+            'address.unique' => 'Ya existe una junta de vecinos con esta dirección. Por favor, elige otra.',
             'phone.required' => 'El teléfono es obligatorio.',
-            'phone.max' => 'El teléfono no debe tener más de 15 caracteres.',
+            'phone.numeric' => 'El teléfono solo puede contener números.',
+            'phone.digits_between' => 'El teléfono debe tener entre 10 y 15 dígitos.',
+            'phone.unique' => 'Ya existe una junta de vecinos con este número de teléfono. Por favor, elige otro.',
             'email.required' => 'El email es obligatorio.',
+            'email.unique' => 'Ya existe una junta de vecinos con este email. Por favor, elige otro.',
             'email.email' => 'El email debe ser una dirección válida.',
             'website_url.url' => 'La URL del sitio web debe ser válida.',
             // 'number_of_members.required' => 'El número de miembros es obligatorio.',

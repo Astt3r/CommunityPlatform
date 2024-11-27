@@ -20,16 +20,17 @@ class CommitteeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:50',
+            'name' => 'required|string|max:50|unique:committees,name',
             'description' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20|unique:committees',
+            'code' => 'nullable|string|max:20|unique:committees,code',
             'type' => 'required|in:president,treasurer,secretary',
             'status' => 'required|in:active,inactive',
-            'effective_date' => 'nullable|date',
+            'effective_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:effective_date',
             'parent_committee_id' => 'nullable|exists:committees,id',
         ];
     }
+
 
     /**
      * Custom error messages.
@@ -38,6 +39,7 @@ class CommitteeRequest extends FormRequest
     {
         return [
             'name.required' => 'El nombre es obligatorio.',
+            'name.unique' => 'El nombre del comité ya está en uso.',
             'name.max' => 'El nombre no debe exceder los 50 caracteres.',
             'description.required' => 'La descripción es obligatoria.',
             'description.max' => 'La descripción no debe exceder los 255 caracteres.',
@@ -47,10 +49,13 @@ class CommitteeRequest extends FormRequest
             'type.in' => 'El tipo debe ser "president", "treasurer" o "secretary".',
             'status.required' => 'El estado es obligatorio.',
             'status.in' => 'El estado debe ser "active" o "inactive".',
+            'effective_date.required' => 'La fecha de inicio es obligatoria.',
             'effective_date.date' => 'La fecha de inicio debe ser una fecha válida.',
             'end_date.date' => 'La fecha de fin debe ser una fecha válida.',
             'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
             'parent_committee_id.exists' => 'El comité padre seleccionado no es válido.',
         ];
     }
+
+
 }
