@@ -37,9 +37,9 @@ export default function ProjectCreate() {
             data: formData,
             forceFormData: true,
             onError: (error) => {
-                if (error.name) {
-                    alert(error.name); // Mostrar alerta si el nombre ya existe
-                }
+                // if (error.name) {
+                //     alert(error.name); // Mostrar alerta si el nombre ya existe
+                // }
             },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();

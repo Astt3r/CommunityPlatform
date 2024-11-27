@@ -11,6 +11,7 @@ use App\Models\NeighborhoodAssociation; // Asegúrate de importar este modelo
 use App\Models\ExpenseType; // Asegúrate de importar este modelo
 use App\Models\Neighbor; // Asegúrate de importar este modelo
 use App\Models\User; // Asegúrate de importar este modelo
+use App\Http\Requests\ExpenseRequest;
 
 
 
@@ -57,7 +58,7 @@ class ExpenseController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ExpenseRequest $request)
     {
         // Obtener el vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
@@ -68,16 +69,8 @@ class ExpenseController extends Controller
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
 
-        // Validar los datos del formulario
-        $validated = $request->validate([
-            'concept' => 'required|string|max:255',
-            'responsible' => 'required|string|max:100',
-            'date' => 'required|date',
-            'amount' => 'required|numeric|min:0',
-            'type_id' => 'required|exists:expense_types,id',
-            'receipt' => 'nullable|file',
-            'status' => 'required|in:approved,pending,rejected',
-        ]);
+        // Validación ya realizada por ExpenseRequest
+        $validated = $request->validated();
 
         // Manejar archivo de recibo (opcional)
         if ($request->hasFile('receipt')) {

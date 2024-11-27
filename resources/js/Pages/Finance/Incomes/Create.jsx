@@ -18,7 +18,7 @@ export default function CreateIncome({ incomeTypes }) {
         e.preventDefault();
         post(route("incomes.store"), {
             onSuccess: () => reset(),
-            onError: (error) => console.error("Error al crear el ingreso:", error),
+            // onError: (error) => console.error("Error al crear el ingreso:", error),
         });
     };
 

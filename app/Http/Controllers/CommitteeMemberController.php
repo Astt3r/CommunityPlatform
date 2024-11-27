@@ -7,6 +7,7 @@ use App\Models\Committee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Requests\CommitteeMemberRequest;
 
 class CommitteeMemberController extends Controller
 {
@@ -38,18 +39,15 @@ class CommitteeMemberController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CommitteeMemberRequest $request)
     {
-        $validated = $request->validate([
-            'committee_id' => 'required|exists:committees,id',
-            'user_id' => 'required|exists:users,id',
-            'status' => 'required|in:active,inactive',
-            'joined_date' => 'required|date',
-            'left_date' => 'nullable|date|after_or_equal:joined_date',
-        ]);
+        // Los datos ya están validados por CommitteeMemberRequest
+        $validated = $request->validated();
 
+        // Crear el miembro del comité
         CommitteeMember::create($validated);
 
+        // Redirigir con un mensaje de éxito
         return redirect()->route('committee-members.index')->with('message', 'Miembro agregado exitosamente.');
     }
 

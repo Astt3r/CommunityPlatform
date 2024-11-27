@@ -16,15 +16,29 @@ export default function CommitteesCreate({ types }) {
         end_date: "",
     });
 
+    const validateDates = () => {
+        if (data.effective_date && data.end_date && data.end_date < data.effective_date) {
+            alert("La fecha de fin debe ser igual o posterior a la fecha de inicio.");
+            return false;
+        }
+        return true;
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
+    
+        // Enviar los datos al backend
         post(route("committees.store"), {
-            onError: (error) => console.error("Error al crear el comité:", error),
+            onError: () => {
+                // No hacer nada aquí, el objeto `errors` ya maneja los errores
+            },
             onFinish: () => {
-                if (Object.keys(errors).length === 0) reset();
+                if (Object.keys(errors).length === 0) reset(); // Limpiar el formulario si no hay errores
             },
         });
     };
+    
+    
 
     return (
         <AuthenticatedLayout

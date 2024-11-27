@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Committee;
+use App\Http\Requests\CommitteeRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -38,22 +39,18 @@ class CommitteeController extends Controller
     /**
      * Almacena un comité recién creado en la base de datos.
      */
-    public function store(Request $request)
+    public function store(CommitteeRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:50',
-            'description' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20|unique:committees',
-            'type' => 'required|in:president,treasurer,secretary',
-            'status' => 'required|in:active,inactive',
-            'effective_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
-        ]);
+        // Validación ya realizada por CommitteeRequest
+        $validated = $request->validated();
 
+        // Agregar datos adicionales
         $validated['created_by'] = auth()->id();
 
+        // Crear el comité
         Committee::create($validated);
 
+        // Redirigir con un mensaje de éxito
         return redirect()->route('committees.index')->with('message', 'Comité creado exitosamente.');
     }
 

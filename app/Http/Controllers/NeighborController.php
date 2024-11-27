@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
+use App\Http\Requests\NeighborRequest;
+
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
@@ -50,26 +52,13 @@ class NeighborController extends Controller
 
 
 
-    public function store(Request $request)
+    public function store(NeighborRequest $request)
     {
-        // Validar que el user_id no se repita
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'nullable|unique:neighbors,user_id',
-            'address' => 'required|string|max:255',
-            'identification_number' => 'required|string|max:255',
-            'registration_date' => 'required|date',
-            'birth_date' => 'required|date',
-            'status' => 'required|string',
-            'last_participation_date' => 'nullable|date',
-            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        // Los datos ya están validados por NeighborRequest
+        $validated = $request->validated();
 
         // Crear un nuevo registro de Neighbor
-        $neighbor = Neighbor::create($request->all());
+        $neighbor = Neighbor::create($validated);
 
         // Redirigir con un mensaje de éxito
         return redirect()->route('neighbors.index')->with('success', 'Vecino creado exitosamente.');
@@ -89,7 +78,7 @@ class NeighborController extends Controller
     }
 
 
-    
+
 
     public function show($id)
     {
@@ -169,5 +158,5 @@ class NeighborController extends Controller
 
     }
 
-    
+
 }

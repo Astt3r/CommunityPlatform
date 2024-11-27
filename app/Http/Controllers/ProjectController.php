@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\File;
 use App\Models\Neighbor;
 use Illuminate\Http\Request;
+use App\Http\Requests\ProjectRequest;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 
@@ -46,7 +47,7 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProjectRequest $request)
     {
         // Obtener el vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
@@ -57,41 +58,28 @@ class ProjectController extends Controller
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
 
-        // Validar datos del formulario
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:projects,name',
-            'description' => 'required|string|max:500',
-            'issue' => 'required|string|max:1000',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'nullable|string|max:100',
-            'responsible' => 'nullable|string|max:255',
-            'budget' => 'required|numeric|min:0',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
-        ], [
-            'name.unique' => 'Ya existe un proyecto con este nombre. Por favor, elige otro.', // Mensaje personalizado
-        ]);
+        // Validar los datos usando ProjectRequest (ya validado automáticamente)
+        $validated = $request->validated();
 
-        // Asignar automáticamente la asociación
+        // Asignar automáticamente la asociación del vecino
         $validated['association_id'] = $neighbor->neighborhood_association_id;
 
         // Crear el proyecto
         $project = Project::create($validated);
 
-        // Manejar archivo si se sube
+        // Manejar el archivo si se sube
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('project_files', 'public'); // Asegúrate de usar 'public'
+            $path = $request->file('file')->store('project_files', 'public'); // Asegúrate de usar el disco 'public'
             File::create([
                 'project_id' => $project->id,
                 'file_path' => $path, // Almacena el path generado
             ]);
         }
 
-
-
-
+        // Redirigir con mensaje de éxito
         return redirect()->route('projects.index')->with('success', 'Proyecto creado exitosamente.');
     }
+
 
 
 

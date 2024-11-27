@@ -19,11 +19,6 @@ export default function NeighborhoodAssociationCreate() {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("neighborhood-associations.store"), {
-            onError: (error) => {
-                if (error.name) {
-                    alert(error.name); // Mostrar la alerta si hay un error en el campo 'name'\\comentar si no querer aler
-                }
-            },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
@@ -42,6 +37,7 @@ export default function NeighborhoodAssociationCreate() {
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Nombre */}
                             <div>
                                 <InputLabel htmlFor="name" value="Nombre" />
                                 <TextInput
@@ -55,6 +51,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
+                            {/* Dirección */}
                             <div>
                                 <InputLabel htmlFor="address" value="Dirección" />
                                 <TextInput
@@ -68,6 +65,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.address} className="mt-2" />
                             </div>
 
+                            {/* Teléfono */}
                             <div>
                                 <InputLabel htmlFor="phone" value="Teléfono" />
                                 <TextInput
@@ -81,6 +79,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.phone} className="mt-2" />
                             </div>
 
+                            {/* Email */}
                             <div>
                                 <InputLabel htmlFor="email" value="Email" />
                                 <TextInput
@@ -94,6 +93,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.email} className="mt-2" />
                             </div>
 
+                            {/* URL */}
                             <div>
                                 <InputLabel htmlFor="website_url" value="URL del Sitio Web" />
                                 <TextInput
@@ -107,6 +107,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.website_url} className="mt-2" />
                             </div>
 
+                            {/* Número de miembros */}
                             <div>
                                 <InputLabel htmlFor="number_of_members" value="Número de Miembros" />
                                 <TextInput
@@ -120,6 +121,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.number_of_members} className="mt-2" />
                             </div>
 
+                            {/* Fecha de Fundación */}
                             <div>
                                 <InputLabel htmlFor="date_of_funding" value="Fecha de Fundación" />
                                 <TextInput
@@ -133,6 +135,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.date_of_funding} className="mt-2" />
                             </div>
 
+                            {/* ¿Está Activa? */}
                             <div>
                                 <InputLabel htmlFor="is_active" value="¿Está activa?" />
                                 <input
@@ -146,6 +149,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <InputError message={errors.is_active} className="mt-2" />
                             </div>
 
+                            {/* Botones */}
                             <div className="flex justify-end space-x-4 mt-4">
                                 <button
                                     type="button"

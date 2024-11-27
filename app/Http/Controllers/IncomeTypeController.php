@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\IncomeType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Requests\IncomeTypeRequest;
 
 class IncomeTypeController extends Controller
 {
@@ -27,17 +28,15 @@ class IncomeTypeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(IncomeTypeRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:50',
-            'description' => 'nullable|string|max:255',
-            'code' => 'required|string|max:20|unique:income_types,code',
-            'status' => 'required|in:active,inactive',
-        ]);
+        // Validar los datos
+        $validated = $request->validated();
 
-        $validated['created_by'] = auth()->id(); // Usuario autenticado
+        // Agregar el usuario que crea el registro
+        $validated['created_by'] = auth()->id();
 
+        // Crear el tipo de ingreso
         IncomeType::create($validated);
 
         return redirect()->route('income-types.index')->with('message', 'Tipo de ingreso creado exitosamente.');

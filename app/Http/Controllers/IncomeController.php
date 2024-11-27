@@ -7,7 +7,7 @@ use App\Models\IncomeType;
 use App\Models\Neighbor;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use App\Http\Requests\IncomeRequest;
 class IncomeController extends Controller
 {
     /**
@@ -43,7 +43,7 @@ class IncomeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(IncomeRequest $request)
     {
         // Obtener el vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
@@ -54,17 +54,8 @@ class IncomeController extends Controller
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
 
-        // Validar los datos del formulario
-        $validated = $request->validate([
-            'source' => 'required|string|max:255',
-            'responsible' => 'required|string|max:100',
-            'date' => 'required|date',
-            'amount' => 'required|numeric|min:0',
-            'type_id' => 'required|exists:income_types,id',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        // Asignar automáticamente la asociación
+        // Validar y asignar datos
+        $validated = $request->validated();
         $validated['association_id'] = $neighbor->neighborhood_association_id;
 
         // Crear el ingreso

@@ -17,7 +17,7 @@ export default function CommitteeMemberCreate({ committees, users }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("committee-members.store"), {
-            onError: (error) => console.error("Error al agregar el miembro:", error),
+            // onError: (error) => console.error("Error al agregar el miembro:", error),
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },

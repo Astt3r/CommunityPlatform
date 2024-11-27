@@ -18,7 +18,7 @@ export default function EditIncome({ income, incomeTypes }) {
         e.preventDefault();
         put(route("incomes.update", income.id), {
             onSuccess: () => console.log("Ingreso actualizado correctamente."),
-            onError: (error) => console.error("Error al actualizar ingreso:", error),
+            // onError: (error) => console.error("Error al actualizar ingreso:", error),
         });
     };
 

@@ -1,7 +1,15 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 
 export default function Index({ expenseTypes }) {
+    const { delete: destroy, processing } = useForm();
+
+    const handleDelete = (id) => {
+        if (confirm("¿Estás seguro de que deseas eliminar este tipo de gasto?")) {
+            destroy(route("expense-types.destroy", id));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Tipos de Gastos</h2>}
@@ -33,13 +41,23 @@ export default function Index({ expenseTypes }) {
                                             <td className="border px-4 py-2">{type.name}</td>
                                             <td className="border px-4 py-2">{type.code}</td>
                                             <td className="border px-4 py-2">{type.status}</td>
-                                            <td className="border px-4 py-2">
+                                            <td className="border px-4 py-2 flex space-x-2">
+                                                {/* Editar */}
                                                 <Link
                                                     href={route("expense-types.edit", type.id)}
-                                                    className="text-blue-500 hover:underline"
+                                                    className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
                                                 >
                                                     Editar
                                                 </Link>
+
+                                                {/* Eliminar */}
+                                                <button
+                                                    onClick={() => handleDelete(type.id)}
+                                                    disabled={processing}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                                                >
+                                                    Eliminar
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
