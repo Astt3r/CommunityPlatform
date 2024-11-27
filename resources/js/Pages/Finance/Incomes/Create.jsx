@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, Link } from "@inertiajs/react";
+import { useForm, router, Link } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -18,8 +18,12 @@ export default function CreateIncome({ incomeTypes }) {
         e.preventDefault();
         post(route("incomes.store"), {
             onSuccess: () => reset(),
-            // onError: (error) => console.error("Error al crear el ingreso:", error),
         });
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("incomes.index")); // Redirige al índice de ingresos
     };
 
     return (
@@ -135,7 +139,7 @@ export default function CreateIncome({ incomeTypes }) {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

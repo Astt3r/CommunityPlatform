@@ -1,11 +1,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
 export default function Create() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         description: "",
         code: "",
@@ -17,6 +17,11 @@ export default function Create() {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("expense-types.store"));
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpiar el formulario
+        router.visit(route("expense-types.index")); // Redirigir al índice de tipos de gastos
     };
 
     return (
@@ -113,6 +118,13 @@ export default function Create() {
                             </div>
 
                             <div className="flex justify-end space-x-4">
+                                <button
+                                    type="button"
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                                    onClick={handleCancel}
+                                >
+                                    Cancelar
+                                </button>
                                 <button
                                     type="submit"
                                     disabled={processing}
