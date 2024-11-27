@@ -20,10 +20,10 @@ class ExpenseRequest extends FormRequest
     public function rules()
     {
         return [
-            'concept' => 'required|string|max:255',
-            'responsible' => 'required|string|max:100',
+            'concept' => 'required|string|max:255|regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
+            'responsible' => 'required|string|max:100|regex:/^[a-zA-Z\s]+$/', // Solo letras y espacios
             'date' => 'required|date',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0', // Solo números
             'type_id' => 'required|exists:expense_types,id',
             'receipt' => 'nullable|file|mimes:jpg,png,pdf|max:2048', // Ajusta los tipos de archivo según sea necesario
             'status' => 'required|in:approved,pending,rejected',
@@ -37,9 +37,13 @@ class ExpenseRequest extends FormRequest
     {
         return [
             'concept.required' => 'El concepto es obligatorio.',
+            'concept.string' => 'El concepto debe ser texto.',
             'concept.max' => 'El concepto no debe exceder los 255 caracteres.',
+            'concept.regex' => 'El concepto solo puede contener letras y espacios.',
             'responsible.required' => 'El responsable es obligatorio.',
+            'responsible.string' => 'El responsable debe ser texto.',
             'responsible.max' => 'El responsable no debe exceder los 100 caracteres.',
+            'responsible.regex' => 'El responsable solo puede contener letras y espacios.',
             'date.required' => 'La fecha es obligatoria.',
             'date.date' => 'La fecha debe ser válida.',
             'amount.required' => 'El monto es obligatorio.',

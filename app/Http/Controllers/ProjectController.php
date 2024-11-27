@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\File;
 use App\Models\Neighbor;
+use App\Models\NeighborhoodAssociation;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
 use Inertia\Inertia;
@@ -17,12 +18,13 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with('files')->paginate(10);
+        $projects = Project::with('files')->latest()->paginate(10);
 
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
         ]);
     }
+
 
 
 
@@ -98,29 +100,90 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return Inertia::render('Projects/Edit', ['project' => $project]);
+        $associations = NeighborhoodAssociation::all(['id', 'name']); // Si aplica asociaciones
+
+        return Inertia::render('Projects/Edit', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'description' => $project->description,
+                'issue' => $project->issue,
+                'start_date' => $project->start_date,
+                'end_date' => $project->end_date,
+                'status' => $project->status,
+                'responsible' => $project->responsible,
+                'budget' => $project->budget,
+                'association_id' => $project->association_id,
+                'files' => $project->files->map(fn($file) => [
+                    'id' => $file->id,
+                    'file_path' => $file->file_path,
+                ]),
+            ],
+            'associations' => $associations,
+        ]);
     }
 
+
+
+
+
+    /**
+     * Update the specified resource in storage.
+     */
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Project $project)
     {
+        // Validar solo los campos presentes en la solicitud
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:500',
+            'name' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
             'issue' => 'nullable|string|max:1000',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'required|string|max:100',
+            'status' => 'nullable|string|max:100',
             'responsible' => 'nullable|string|max:255',
-            'budget' => 'required|numeric|min:0',
+            'budget' => 'nullable|numeric|min:0',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
         ]);
 
+        // Si se sube un archivo nuevo, manejar la lógica de la relación
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('project_files', 'public');
+
+            // Actualizar o crear el archivo asociado
+            $project->files()->updateOrCreate(
+                ['project_id' => $project->id],
+                ['file_path' => $path]
+            );
+        }
+
+        // Actualizar los demás campos
         $project->update($validated);
 
-        return redirect()->route('projects.index')->with('success', 'Proyecto actualizado exitosamente.');
+        return redirect()->route('projects.index')->with('success', 'Proyecto actualizado correctamente.');
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Remove the specified resource from storage.

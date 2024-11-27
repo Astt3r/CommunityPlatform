@@ -22,21 +22,24 @@ class ProjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:projects,name',
+            'name' => 'required|string|max:255|unique:projects,name,' . $this->route('project')->id,
             'description' => 'required|string|max:500',
-            'issue' => 'required|string|max:1000',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'issue' => 'nullable|string|max:1000',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|string|max:100',
-            'responsible' => 'required|string|max:255',
+            'responsible' => 'nullable|string|max:255',
             'budget' => 'required|numeric|min:0',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:2048',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
         ];
     }
+
+
 
     public function messages()
     {
         return [
+            'file.max' => 'El archivo no debe superar los 20 MB.',
             'name.required' => 'Por favor, ingresa el nombre del proyecto.',
             'name.string' => 'El nombre del proyecto debe ser texto.',
             'name.max' => 'El nombre del proyecto no puede tener más de 255 caracteres.',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\NeighborhoodAssociation;
+use App\Models\Neighbor;
 use App\Http\Requests\NeighborhoodAssociationRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -52,19 +53,24 @@ class NeighborhoodAssociationController extends Controller
      */
     public function store(NeighborhoodAssociationRequest $request)
     {
-        // Los datos ya están validados por NeighborhoodAssociationRequest
+        // Validar los datos
         $validated = $request->validated();
 
         // Agregar automáticamente los campos de auditoría
         $validated['created_by'] = Auth::id();
         $validated['updated_by'] = Auth::id();
 
-        // Crear la junta de vecinos
-        NeighborhoodAssociation::create($validated);
+        // Inicializar el número de miembros en 0
+        $validated['number_of_members'] = 0;
 
-        // Redirigir con mensaje de éxito
-        return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación creada exitosamente.');
+        // Crear la junta de vecinos
+        $association = NeighborhoodAssociation::create($validated);
+
+        return redirect()->route('neighborhood-associations.index')
+            ->with('success', 'Asociación creada exitosamente.');
     }
+
+
 
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Meeting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Http\Requests\MeetingRequest;
 use Inertia\Inertia;
 
 class MeetingController extends Controller
@@ -42,25 +43,18 @@ class MeetingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) 
+    public function store(MeetingRequest $request)
     {
-        // Registra el valor recibido
-        logger()->info('Valor de status:', ['status' => $request->input('status')]);
+        // Los datos ya están validados automáticamente
+        $validated = $request->validated();
 
-        $validated = $request->validate([
-            'meeting_date' => 'required|date_format:Y-m-d\TH:i',
-            'main_topic' => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'location' => 'nullable|string|max:255',
-            'organized_by' => 'nullable|string|max:100',
-            'result' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,completed,canceled',
-        ]);
-
+        // Crear la reunión
         Meeting::create($validated);
 
-        return redirect()->route('meetings.index')->with('success', 'Reunión creada correctamente.');
+        // Redirigir al índice con un mensaje de éxito
+        return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
+
 
 
 

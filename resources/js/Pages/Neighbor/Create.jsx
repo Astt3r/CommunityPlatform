@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -16,43 +16,18 @@ export default function CreateNeighbor({ associations, users = [] }) {
         neighborhood_association_id: "", // Foreign key
     });
 
-    // Manejar el envío del formulario
     const submit = (e) => {
         e.preventDefault();
         post(route("neighbors.store"), {
-            onError: () => {
-                // Maneja los errores automáticamente a través del objeto `errors`
-                // No hace falta ninguna acción aquí si los errores ya están siendo mostrados en el formulario
-            },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
     };
-    
 
-    // Alternar el estado entre activo e inactivo
-    const toggleStatus = () => {
-        setData("status", data.status === "active" ? "inactive" : "active");
-    };
-
-    // Validar RUT (o número de identificación)
-    const validateRut = (rut) => {
-        rut = rut.replace(/[.-]/g, ""); // Remover puntos y guiones
-        if (rut.length < 8 || rut.length > 9) return false;
-
-        let total = 0;
-        let multiplier = 2;
-
-        for (let i = rut.length - 2; i >= 0; i--) {
-            total += parseInt(rut[i]) * multiplier;
-            multiplier = multiplier === 7 ? 2 : multiplier + 1;
-        }
-
-        const remainder = 11 - (total % 11);
-        const dv = remainder === 11 ? "0" : remainder === 10 ? "K" : remainder.toString();
-
-        return dv === rut[rut.length - 1].toUpperCase();
+    const handleCancel = () => {
+        reset();
+        router.visit(route("neighbors.index"));
     };
 
     return (
@@ -69,64 +44,108 @@ export default function CreateNeighbor({ associations, users = [] }) {
                         <form onSubmit={submit} className="space-y-4">
                             {/* Dirección */}
                             <div>
-                                <InputLabel htmlFor="address" value="Dirección" />
+                                <InputLabel
+                                    htmlFor="address"
+                                    value="Dirección"
+                                />
                                 <TextInput
                                     id="address"
                                     type="text"
                                     name="address"
                                     value={data.address}
-                                    onChange={(e) => setData("address", e.target.value)}
+                                    onInput={(e) => {
+                                        const cleaned = e.target.value.replace(
+                                            /[^a-zA-Z0-9\s,.-]/g,
+                                            ""
+                                        );
+                                        setData(
+                                            "address",
+                                            cleaned.slice(0, 255)
+                                        );
+                                    }}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.address} className="mt-2" />
+                                <InputError
+                                    message={errors.address}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Número de Identificación */}
                             <div>
-                                <InputLabel htmlFor="identification_number" value="Número de Identificación" />
+                                <InputLabel
+                                    htmlFor="identification_number"
+                                    value="Número de Identificación"
+                                />
                                 <TextInput
                                     id="identification_number"
                                     type="text"
                                     name="identification_number"
                                     value={data.identification_number}
-                                    onChange={(e) => setData("identification_number", e.target.value)}
-                                    onBlur={() => {
-                                        if (!validateRut(data.identification_number)) {
-                                            alert("El RUT ingresado no es válido.");
-                                        }
+                                    onInput={(e) => {
+                                        const cleaned = e.target.value.replace(
+                                            /[^a-zA-Z0-9.-]/g,
+                                            ""
+                                        );
+                                        setData(
+                                            "identification_number",
+                                            cleaned.slice(0, 50)
+                                        );
                                     }}
                                     placeholder="Ej: 12.345.678-9"
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.identification_number} className="mt-2" />
+                                <InputError
+                                    message={errors.identification_number}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Fecha de Registro */}
                             <div>
-                                <InputLabel htmlFor="registration_date" value="Fecha de Registro" />
+                                <InputLabel
+                                    htmlFor="registration_date"
+                                    value="Fecha de Registro"
+                                />
                                 <TextInput
                                     id="registration_date"
                                     type="date"
                                     name="registration_date"
                                     value={data.registration_date}
-                                    onChange={(e) => setData("registration_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "registration_date",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.registration_date} className="mt-2" />
+                                <InputError
+                                    message={errors.registration_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Fecha de Nacimiento */}
                             <div>
-                                <InputLabel htmlFor="birth_date" value="Fecha de Nacimiento" />
+                                <InputLabel
+                                    htmlFor="birth_date"
+                                    value="Fecha de Nacimiento"
+                                />
                                 <TextInput
                                     id="birth_date"
                                     type="date"
                                     name="birth_date"
                                     value={data.birth_date}
-                                    onChange={(e) => setData("birth_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("birth_date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.birth_date} className="mt-2" />
+                                <InputError
+                                    message={errors.birth_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Estado */}
@@ -134,71 +153,64 @@ export default function CreateNeighbor({ associations, users = [] }) {
                                 <InputLabel htmlFor="status" value="Estado" />
                                 <button
                                     type="button"
-                                    onClick={toggleStatus}
+                                    onClick={() =>
+                                        setData(
+                                            "status",
+                                            data.status === "active"
+                                                ? "inactive"
+                                                : "active"
+                                        )
+                                    }
                                     className={`px-4 py-2 rounded ${
-                                        data.status === "active" ? "bg-green-500" : "bg-red-500"
+                                        data.status === "active"
+                                            ? "bg-green-500"
+                                            : "bg-red-500"
                                     } text-white hover:opacity-80`}
                                 >
-                                    {data.status === "active" ? "Activo" : "Inactivo"}
+                                    {data.status === "active"
+                                        ? "Activo"
+                                        : "Inactivo"}
                                 </button>
-                                <InputError message={errors.status} className="mt-2" />
-                            </div>
-
-                            {/* Fecha de Última Participación */}
-                            <div>
-                                <InputLabel htmlFor="last_participation_date" value="Fecha de Última Participación" />
-                                <TextInput
-                                    id="last_participation_date"
-                                    type="date"
-                                    name="last_participation_date"
-                                    value={data.last_participation_date}
-                                    onChange={(e) => setData("last_participation_date", e.target.value)}
-                                    className="mt-1 block w-full"
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
                                 />
-                                <InputError message={errors.last_participation_date} className="mt-2" />
                             </div>
 
                             {/* Asociación Vecinal */}
                             <div>
-                                <InputLabel htmlFor="neighborhood_association_id" value="Asociación Vecinal" />
+                                <InputLabel
+                                    htmlFor="neighborhood_association_id"
+                                    value="Asociación Vecinal"
+                                />
                                 <select
                                     id="neighborhood_association_id"
                                     name="neighborhood_association_id"
                                     value={data.neighborhood_association_id}
-                                    onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "neighborhood_association_id",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 >
-                                    <option value="">Seleccione una Asociación</option>
+                                    <option value="">
+                                        Seleccione una Asociación
+                                    </option>
                                     {associations.map((association) => (
-                                        <option key={association.id} value={association.id}>
+                                        <option
+                                            key={association.id}
+                                            value={association.id}
+                                        >
                                             {association.name}
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.neighborhood_association_id} className="mt-2" />
-                            </div>
-
-                            {/* Usuario Asignado */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="user_id"
-                                    value="Usuario Asignado (Opcional si el usuario aún no ha sido creado)"
+                                <InputError
+                                    message={errors.neighborhood_association_id}
+                                    className="mt-2"
                                 />
-                                <select
-                                    id="user_id"
-                                    name="user_id"
-                                    value={data.user_id}
-                                    onChange={(e) => setData("user_id", e.target.value)}
-                                    className="mt-1 block w-full"
-                                >
-                                    <option value="">Seleccione un Usuario (Opcional)</option>
-                                    {users.map((user) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name} - {user.email}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.user_id} className="mt-2" />
                             </div>
 
                             {/* Botones */}
@@ -206,7 +218,7 @@ export default function CreateNeighbor({ associations, users = [] }) {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

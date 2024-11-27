@@ -51,18 +51,21 @@ class NeighborController extends Controller
 
 
 
-
     public function store(NeighborRequest $request)
     {
-        // Los datos ya están validados por NeighborRequest
+        // Validar los datos
         $validated = $request->validated();
 
-        // Crear un nuevo registro de Neighbor
+        // Crear un nuevo vecino
         $neighbor = Neighbor::create($validated);
+
+        // Actualizar el número de miembros de la asociación
+        $neighbor->neighborhoodAssociation->updateNumberOfMembers();
 
         // Redirigir con un mensaje de éxito
         return redirect()->route('neighbors.index')->with('success', 'Vecino creado exitosamente.');
     }
+
 
 
 
@@ -143,20 +146,40 @@ class NeighborController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        // Guardar la asociación anterior para actualizarla si cambió
+        $oldAssociation = $neighbor->neighborhoodAssociation;
+
+        // Actualizar el vecino
         $neighbor->update($request->all());
+
+        // Actualizar el número de miembros de la asociación antigua si cambió
+        if ($oldAssociation->id !== $neighbor->neighborhood_association_id) {
+            $oldAssociation->updateNumberOfMembers();
+        }
+
+        // Actualizar el número de miembros de la nueva asociación
+        $neighbor->neighborhoodAssociation->updateNumberOfMembers();
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino actualizado exitosamente.');
     }
 
 
 
+
     public function destroy(Neighbor $neighbor)
     {
+        // Obtener la asociación antes de eliminar el vecino
+        $association = $neighbor->neighborhoodAssociation;
+
+        // Eliminar el vecino
         $neighbor->delete();
 
-        return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado exitosamente');
+        // Actualizar el número de miembros de la asociación
+        $association->updateNumberOfMembers();
 
+        return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado exitosamente');
     }
+
 
 
 }

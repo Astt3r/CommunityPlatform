@@ -11,7 +11,7 @@ export default function CreateIncome({ incomeTypes }) {
         responsible: "",
         amount: "",
         type_id: "",
-        status: "active", // Estado predeterminado
+        status: "active",
     });
 
     const handleSubmit = (e) => {
@@ -22,8 +22,8 @@ export default function CreateIncome({ incomeTypes }) {
     };
 
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("incomes.index")); // Redirige al índice de ingresos
+        reset();
+        router.visit(route("incomes.index"));
     };
 
     return (
@@ -53,24 +53,37 @@ export default function CreateIncome({ incomeTypes }) {
                                     id="source"
                                     type="text"
                                     value={data.source}
-                                    onChange={(e) => setData("source", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("source", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                     autoFocus
                                 />
-                                <InputError message={errors.source} className="mt-2" />
+                                <InputError
+                                    message={errors.source}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Responsable */}
                             <div>
-                                <InputLabel htmlFor="responsible" value="Responsable" />
+                                <InputLabel
+                                    htmlFor="responsible"
+                                    value="Responsable"
+                                />
                                 <TextInput
                                     id="responsible"
                                     type="text"
                                     value={data.responsible}
-                                    onChange={(e) => setData("responsible", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("responsible", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.responsible} className="mt-2" />
+                                <InputError
+                                    message={errors.responsible}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Fecha */}
@@ -80,10 +93,15 @@ export default function CreateIncome({ incomeTypes }) {
                                     id="date"
                                     type="date"
                                     value={data.date}
-                                    onChange={(e) => setData("date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.date} className="mt-2" />
+                                <InputError
+                                    message={errors.date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Monto */}
@@ -91,22 +109,36 @@ export default function CreateIncome({ incomeTypes }) {
                                 <InputLabel htmlFor="amount" value="Monto" />
                                 <TextInput
                                     id="amount"
-                                    type="number"
-                                    step="0.01"
+                                    type="text"
                                     value={data.amount}
-                                    onChange={(e) => setData("amount", e.target.value)}
+                                    onChange={(e) => {
+                                        const numericValue =
+                                            e.target.value.replace(
+                                                /[^0-9.]/g,
+                                                ""
+                                            );
+                                        setData("amount", numericValue);
+                                    }}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.amount} className="mt-2" />
+                                <InputError
+                                    message={errors.amount}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Tipo de Ingreso */}
                             <div>
-                                <InputLabel htmlFor="type_id" value="Tipo de Ingreso" />
+                                <InputLabel
+                                    htmlFor="type_id"
+                                    value="Tipo de Ingreso"
+                                />
                                 <select
                                     id="type_id"
                                     value={data.type_id}
-                                    onChange={(e) => setData("type_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("type_id", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
                                 >
                                     <option value="">Seleccione un tipo</option>
@@ -116,7 +148,10 @@ export default function CreateIncome({ incomeTypes }) {
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.type_id} className="mt-2" />
+                                <InputError
+                                    message={errors.type_id}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Estado */}
@@ -125,13 +160,18 @@ export default function CreateIncome({ incomeTypes }) {
                                 <select
                                     id="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
                                 >
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Botones */}
