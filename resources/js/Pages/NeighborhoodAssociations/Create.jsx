@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -22,6 +22,11 @@ export default function NeighborhoodAssociationCreate() {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("neighborhood-associations.index")); // Redirige al índice
     };
 
     return (
@@ -139,7 +144,7 @@ export default function NeighborhoodAssociationCreate() {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

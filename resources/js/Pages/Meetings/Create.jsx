@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -14,7 +14,6 @@ export default function CreateMeeting() {
         result: "",
         status: "scheduled", // Valor predeterminado explícito
     });
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -25,6 +24,11 @@ export default function CreateMeeting() {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("meetings.index")); // Redirige al índice de reuniones
     };
 
     return (
@@ -54,7 +58,6 @@ export default function CreateMeeting() {
                                     }
                                     className="mt-1 block w-full"
                                 />
-
                                 <InputError
                                     message={errors.meeting_date}
                                     className="mt-2"
@@ -166,23 +169,26 @@ export default function CreateMeeting() {
                                     id="status"
                                     name="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 >
                                     <option value="scheduled">Programada</option>
                                     <option value="completed">Completada</option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
-
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
-
 
                             <div className="flex justify-end space-x-4 mt-4">
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

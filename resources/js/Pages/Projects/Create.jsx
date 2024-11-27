@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -37,14 +37,17 @@ export default function ProjectCreate() {
             data: formData,
             forceFormData: true,
             onError: (error) => {
-                // if (error.name) {
-                //     alert(error.name); // Mostrar alerta si el nombre ya existe
-                // }
+                // Manejo de errores opcional
             },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("projects.index")); // Redirige al índice de proyectos
     };
 
     return (
@@ -179,7 +182,7 @@ export default function ProjectCreate() {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

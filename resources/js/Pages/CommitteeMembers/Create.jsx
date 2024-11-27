@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -17,11 +17,15 @@ export default function CommitteeMemberCreate({ committees, users }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("committee-members.store"), {
-            // onError: (error) => console.error("Error al agregar el miembro:", error),
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
+    };
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("committee-members.index")); // Redirige al índice de miembros del comité
     };
 
     return (
@@ -114,7 +118,7 @@ export default function CommitteeMemberCreate({ committees, users }) {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

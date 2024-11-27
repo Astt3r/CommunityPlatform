@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -23,10 +23,10 @@ export default function CommitteesCreate({ types }) {
         }
         return true;
     };
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         // Enviar los datos al backend
         post(route("committees.store"), {
             onError: () => {
@@ -37,8 +37,11 @@ export default function CommitteesCreate({ types }) {
             },
         });
     };
-    
-    
+
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("committees.index")); // Redirige al índice de comités
+    };
 
     return (
         <AuthenticatedLayout
@@ -148,7 +151,7 @@ export default function CommitteesCreate({ types }) {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

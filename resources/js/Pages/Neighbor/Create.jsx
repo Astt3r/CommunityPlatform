@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -22,14 +22,12 @@ export default function CreateNeighbor({ associations, users = [] }) {
         post(route("neighbors.store"), {
             onError: () => {
                 // Maneja los errores automáticamente a través del objeto `errors`
-                // No hace falta ninguna acción aquí si los errores ya están siendo mostrados en el formulario
             },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
     };
-    
 
     // Alternar el estado entre activo e inactivo
     const toggleStatus = () => {
@@ -53,6 +51,12 @@ export default function CreateNeighbor({ associations, users = [] }) {
         const dv = remainder === 11 ? "0" : remainder === 10 ? "K" : remainder.toString();
 
         return dv === rut[rut.length - 1].toUpperCase();
+    };
+
+    // Manejar la acción de cancelar
+    const handleCancel = () => {
+        reset(); // Limpia el formulario
+        router.visit(route("neighbors.index")); // Redirige al índice de vecinos
     };
 
     return (
@@ -206,7 +210,7 @@ export default function CreateNeighbor({ associations, users = [] }) {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>
