@@ -50,12 +50,7 @@ export default function ShowAttendanceSummary({ meetingId }) {
                             >
                                 Volver a Detalles de la Reunión
                             </a>
-                            <a
-                                href={`/meetings/${meetingId}/attendance-summary`}
-                                className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                            >
-                                Ver Resumen de Asistencias
-                            </a>
+                            
                             <a
                                 href={`/meetings/${meetingId}/attendance`}
                                 className="inline-block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"

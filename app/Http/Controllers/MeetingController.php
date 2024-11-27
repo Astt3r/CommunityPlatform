@@ -42,13 +42,13 @@ class MeetingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request) 
     {
         // Registra el valor recibido
         logger()->info('Valor de status:', ['status' => $request->input('status')]);
 
         $validated = $request->validate([
-            'meeting_date' => 'required|date',
+            'meeting_date' => 'required|date_format:Y-m-d\TH:i',
             'main_topic' => 'required|string|max:100',
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
@@ -107,13 +107,13 @@ class MeetingController extends Controller
     {
         // Validar los datos del formulario
         $validated = $request->validate([
-            'meeting_date' => 'required|date',
+            'meeting_date' => 'required|date_format:Y-m-d\TH:i',
             'main_topic' => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'organized_by' => 'nullable|string|max:100',
             'result' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,completed,canceled', // Incluir el estado
+            'status' => 'required|in:scheduled,completed,canceled',
         ]);
 
         // Actualizar la reunión con los datos validados
@@ -121,6 +121,7 @@ class MeetingController extends Controller
 
         return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
+
 
 
     /**

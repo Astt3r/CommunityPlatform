@@ -38,7 +38,7 @@ export default function EditMeeting({ meeting }) {
                                 <InputLabel htmlFor="meeting_date" value="Fecha de la Reunión" />
                                 <TextInput
                                     id="meeting_date"
-                                    type="date"
+                                    type="datetime-local"
                                     name="meeting_date"
                                     value={data.meeting_date}
                                     onChange={(e) =>
@@ -46,6 +46,7 @@ export default function EditMeeting({ meeting }) {
                                     }
                                     className="mt-1 block w-full"
                                 />
+
                                 <InputError message={errors.meeting_date} className="mt-2" />
                             </div>
 
