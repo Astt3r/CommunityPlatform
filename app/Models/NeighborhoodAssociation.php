@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use Illuminate\Support\Facades\Log as LogFacade;
 
 class NeighborhoodAssociation extends Model
 {
@@ -51,6 +52,19 @@ class NeighborhoodAssociation extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function neighbors()
+    {
+        return $this->hasMany(Neighbor::class);
+    }
+
+    public function updateNumberOfMembers()
+    {
+        $this->number_of_members = $this->neighbors()->count();
+        $this->save();
+    }
+
+
 
 
 }

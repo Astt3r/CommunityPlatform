@@ -41,4 +41,6 @@ class Neighbor extends Model
     }
 
 
+
+
 }

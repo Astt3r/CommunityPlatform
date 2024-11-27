@@ -11,7 +11,6 @@ export default function NeighborhoodAssociationCreate() {
         phone: "",
         email: "",
         website_url: "",
-        number_of_members: "",
         date_of_funding: "",
         is_active: false,
     });
@@ -105,20 +104,6 @@ export default function NeighborhoodAssociationCreate() {
                                     className="mt-1 block w-full"
                                 />
                                 <InputError message={errors.website_url} className="mt-2" />
-                            </div>
-
-                            {/* Número de miembros */}
-                            <div>
-                                <InputLabel htmlFor="number_of_members" value="Número de Miembros" />
-                                <TextInput
-                                    id="number_of_members"
-                                    type="number"
-                                    name="number_of_members"
-                                    value={data.number_of_members}
-                                    onChange={(e) => setData("number_of_members", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.number_of_members} className="mt-2" />
                             </div>
 
                             {/* Fecha de Fundación */}
