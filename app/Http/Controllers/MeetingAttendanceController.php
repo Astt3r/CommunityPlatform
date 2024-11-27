@@ -45,25 +45,30 @@ class MeetingAttendanceController extends Controller
             'absenceReasons.*' => 'nullable|string', // Cada motivo de ausencia puede ser nulo o una cadena de texto
         ]);
 
-        // Eliminar los registros anteriores para la reunión actual
-        MeetingAttendance::where('meeting_id', $meetingId)->delete();
+        // Obtener IDs de vecinos activos
+        $activeNeighborIds = Neighbor::where('status', 'active')->pluck('id')->toArray();
 
-        // Guardar los nuevos registros de asistencia y ausencia
+        // Limpiar registros existentes para vecinos inactivos
+        MeetingAttendance::where('meeting_id', $meetingId)
+            ->whereNotIn('neighbor_id', $activeNeighborIds)
+            ->delete();
+
+        // Guardar los nuevos registros de asistencia
         foreach ($validated['attendance'] as $neighborId => $attended) {
-            MeetingAttendance::create([
-                'meeting_id' => $meetingId,
-                'neighbor_id' => $neighborId,
-                'attended' => $attended ? 1 : 0, // Guardar como 1 (asistió) o 0 (no asistió)
-                'absence_reason' => $attended ? null : ($validated['absenceReasons'][$neighborId] ?? null), // Guardar el motivo de ausencia si no asistió
-            ]);
+            if (in_array($neighborId, $activeNeighborIds)) {
+                MeetingAttendance::updateOrCreate(
+                    ['meeting_id' => $meetingId, 'neighbor_id' => $neighborId],
+                    [
+                        'attended' => $attended ? 1 : 0,
+                        'absence_reason' => $attended ? null : ($validated['absenceReasons'][$neighborId] ?? null),
+                    ]
+                );
+            }
         }
 
         return redirect()->route('meetings.attendance', $meetingId)
             ->with('message', 'Asistencias registradas correctamente.');
     }
-
-
-
 
 
 
