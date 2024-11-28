@@ -126,6 +126,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('projects', ProjectController::class);
+    Route::post('/projects/{project}/upload-file', [ProjectController::class, 'uploadFile'])->name('projects.uploadFile');
+
 });
 
 

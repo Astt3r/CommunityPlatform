@@ -29,6 +29,7 @@ class Project extends Model
      */
     public function files()
     {
-        return $this->hasMany(File::class, 'project_id', 'id'); // Relación basada en la clave 'id'
+        return $this->hasMany(File::class, 'project_id', 'id');
     }
+
 }

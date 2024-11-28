@@ -6,6 +6,8 @@ use App\Models\Project;
 use App\Models\File;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
+use App\Http\Requests\UpdateProjectRequest;
+
 use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
 use Inertia\Inertia;
@@ -100,44 +102,21 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $associations = NeighborhoodAssociation::all(['id', 'name']); // Si aplica asociaciones
+        $associations = NeighborhoodAssociation::all(['id', 'name']);
 
         return Inertia::render('Projects/Edit', [
-            'project' => [
-                'id' => $project->id,
-                'name' => $project->name,
-                'description' => $project->description,
-                'issue' => $project->issue,
-                'start_date' => $project->start_date,
-                'end_date' => $project->end_date,
-                'status' => $project->status,
-                'responsible' => $project->responsible,
-                'budget' => $project->budget,
-                'association_id' => $project->association_id,
-                'files' => $project->files->map(fn($file) => [
-                    'id' => $file->id,
-                    'file_path' => $file->file_path,
-                ]),
-            ],
+            'project' => $project->load('files'),
             'associations' => $associations,
         ]);
     }
 
-
-
-
-
     /**
-     * Update the specified resource in storage.
-     */
-    /**
-     * Update the specified resource in storage.
+     * Actualiza un proyecto existente.
      */
     public function update(Request $request, Project $project)
     {
-        // Validar solo los campos presentes en la solicitud
         $validated = $request->validate([
-            'name' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
             'issue' => 'nullable|string|max:1000',
             'start_date' => 'nullable|date',
@@ -145,25 +124,44 @@ class ProjectController extends Controller
             'status' => 'nullable|string|max:100',
             'responsible' => 'nullable|string|max:255',
             'budget' => 'nullable|numeric|min:0',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
+            'association_id' => 'nullable|exists:neighborhood_associations,id',
         ]);
 
-        // Si se sube un archivo nuevo, manejar la lógica de la relación
-        if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('project_files', 'public');
-
-            // Actualizar o crear el archivo asociado
-            $project->files()->updateOrCreate(
-                ['project_id' => $project->id],
-                ['file_path' => $path]
-            );
-        }
-
-        // Actualizar los demás campos
+        // Actualizar proyecto
         $project->update($validated);
 
-        return redirect()->route('projects.index')->with('success', 'Proyecto actualizado correctamente.');
+        // Devolver respuesta JSON clara para solicitudes asíncronas
+        return response()->json(['message' => 'Proyecto actualizado correctamente.'], 200);
     }
+
+    public function uploadFile(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'file' => 'required|file|mimes:pdf,doc,docx,jpg,png|max:20480',
+        ]);
+
+        // Eliminar archivos anteriores
+        foreach ($project->files as $file) {
+            if (Storage::exists($file->file_path)) {
+                Storage::delete($file->file_path);
+            }
+            $file->delete();
+        }
+
+        // Subir el nuevo archivo
+        $path = $request->file('file')->store('project_files', 'public');
+        $project->files()->create(['file_path' => $path]);
+
+        // Respuesta JSON clara
+        return response()->json(['message' => 'Archivo subido correctamente.'], 200);
+    }
+
+
+
+
+
+
+
 
 
 
