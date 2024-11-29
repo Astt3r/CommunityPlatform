@@ -9,6 +9,8 @@ use App\Http\Requests\NeighborhoodAssociationRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\NeighborhoodAssociationsExport;
 
 class NeighborhoodAssociationController extends Controller
 {
@@ -136,6 +138,16 @@ class NeighborhoodAssociationController extends Controller
         $association->delete();
 
         return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación eliminada exitosamente.');
+    }
+
+    public function export(Request $request)
+    {
+        $latest = $request->query('latest', null); // Obtener el filtro `latest` si está presente
+
+        return Excel::download(
+            new NeighborhoodAssociationsExport(['latest' => $latest]),
+            'neighborhood_associations.xlsx'
+        );
     }
 
 }

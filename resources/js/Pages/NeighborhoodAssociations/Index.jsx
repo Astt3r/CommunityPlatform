@@ -28,7 +28,7 @@ export default function NeighborhoodAssociationsIndex() {
         try {
             const response = await axios.get("/export-neighborhoods", {
                 responseType: "blob",
-                params: { latest: latest || undefined },
+                params: { latest },
             });
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -52,7 +52,9 @@ export default function NeighborhoodAssociationsIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-2xl font-bold text-gray-800">Junta de Vecinos</h2>
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Junta de Vecinos
+                </h2>
             }
         >
             <Head title="Asociaciones de Vecinos" />
@@ -104,7 +106,10 @@ export default function NeighborhoodAssociationsIndex() {
                     </form>
 
                     <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
-                        <label htmlFor="latest" className="text-sm text-gray-700">
+                        <label
+                            htmlFor="latest"
+                            className="text-sm text-gray-700"
+                        >
                             Exportar últimas:
                         </label>
                         <input
@@ -131,9 +136,15 @@ export default function NeighborhoodAssociationsIndex() {
                     <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
                         <tr>
                             <th className="px-6 py-3">Nombre</th>
-                            <th className="px-6 py-3 hidden sm:table-cell">Dirección</th>
-                            <th className="px-6 py-3 hidden md:table-cell">Teléfono</th>
-                            <th className="px-6 py-3 hidden lg:table-cell">Email</th>
+                            <th className="px-6 py-3 hidden sm:table-cell">
+                                Dirección
+                            </th>
+                            <th className="px-6 py-3 hidden md:table-cell">
+                                Teléfono
+                            </th>
+                            <th className="px-6 py-3 hidden lg:table-cell">
+                                Email
+                            </th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
                     </thead>
@@ -141,9 +152,13 @@ export default function NeighborhoodAssociationsIndex() {
                         {associations.data.map((association, index) => (
                             <tr
                                 key={association.id}
-                                className={`border-t ${index % 2 === 0 ? "bg-gray-50" : ""}`}
+                                className={`border-t ${
+                                    index % 2 === 0 ? "bg-gray-50" : ""
+                                }`}
                             >
-                                <td className="px-6 py-3">{association.name}</td>
+                                <td className="px-6 py-3">
+                                    {association.name}
+                                </td>
                                 <td className="px-6 py-3 hidden sm:table-cell">
                                     {association.address}
                                 </td>
@@ -167,7 +182,9 @@ export default function NeighborhoodAssociationsIndex() {
                                         Editar
                                     </Link>
                                     <button
-                                        onClick={() => handleDelete(association.id)}
+                                        onClick={() =>
+                                            handleDelete(association.id)
+                                        }
                                         className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700"
                                     >
                                         Eliminar

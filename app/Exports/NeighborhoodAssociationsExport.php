@@ -30,19 +30,20 @@ class NeighborhoodAssociationsExport implements FromCollection, WithHeadings, Wi
 
     public function headings(): array
     {
-        return ['ID', 'Nombre', 'Dirección', 'Teléfono', 'Correo', 'Fecha de Fundación', 'Estado Activo'];
+        return ['ID', 'Nombre', 'Dirección', 'Teléfono', 'Correo', 'Fecha de Fundación', 'Activo'];
     }
 
     public function map($neighborhood): array
     {
         return [
-            $neighborhood->id,
-            $neighborhood->name,
-            $neighborhood->address,
-            $neighborhood->phone,
-            $neighborhood->email,
-            $neighborhood->date_of_funding,
+            $neighborhood->id ?? 'N/A',
+            $neighborhood->name ?? 'N/A',
+            $neighborhood->address ?? 'N/A',
+            $neighborhood->phone ?? 'N/A',
+            $neighborhood->email ?? 'N/A',
+            $neighborhood->date_of_funding ? \Carbon\Carbon::parse($neighborhood->date_of_funding)->format('Y-m-d') : 'N/A',
             $neighborhood->is_active ? 'Sí' : 'No',
         ];
     }
+
 }

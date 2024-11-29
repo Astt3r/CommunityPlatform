@@ -132,12 +132,7 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
 
 
 Route::get('/export-neighborhoods', function (Request $request) {
-    $filter = $request->only('latest'); // Captura el filtro desde la solicitud
-    // Verifica el filtro recibido
-    if (empty($filter['latest'])) {
-        return response()->json(['error' => 'El filtro latest no se recibió'], 400);
-    }
-
+    $filter = $request->only('latest');
     return Excel::download(new NeighborhoodAssociationsExport($filter), 'neighborhood_associations.xlsx');
 });
 
