@@ -4,29 +4,23 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, router } from "@inertiajs/react";
-import InputLabel from "@/Components/InputLabel";
-import TextInput from "@/Components/TextInput";
-import InputError from "@/Components/InputError";
-
-export default function ProjectEdit({ project }) {
-    const { data, setData, put, processing, errors, reset } = useForm({
-        name: project.name || "",
-        description: project.description || "",
-        issue: project.issue || "",
-        start_date: project.start_date || "",
-        end_date: project.end_date || "",
-        status: project.status || "",
-        responsible: project.responsible || "",
-        budget: project.budget || "",
-        file: null, // Para cargar un archivo nuevo
+export default function ProjectCreate() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: "",
+        description: "",
+        issue: "",
+        start_date: "",
+        end_date: "",
+        status: "",
+        responsible: "",
+        budget: "",
+        file: null,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validar coherencia de fechas
+        // Validar fechas en el frontend
         if (
             data.start_date &&
             data.end_date &&
@@ -35,13 +29,7 @@ export default function ProjectEdit({ project }) {
             alert(
                 "La fecha de finalización debe ser igual o posterior a la fecha de inicio."
             );
-            return;
-        }
-
-        // Validar tamaño del archivo (máximo 20 MB)
-        if (data.file && data.file.size > 20 * 1024 * 1024) {
-            alert("El archivo no debe superar los 20 MB.");
-            return;
+            return; // Detenemos el envío si las fechas no son válidas
         }
 
         const formData = new FormData();
@@ -51,11 +39,11 @@ export default function ProjectEdit({ project }) {
             }
         }
 
-        put(route("projects.update", project.id), {
+        post(route("projects.store"), {
             data: formData,
             forceFormData: true,
-            onError: () => {
-                // Opcional: Manejo de errores
+            onError: (error) => {
+                // Manejo de errores opcional
             },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
@@ -64,15 +52,15 @@ export default function ProjectEdit({ project }) {
     };
 
     const handleCancel = () => {
-        reset();
-        router.visit(route("projects.index"));
+        reset(); // Limpia el formulario
+        router.visit(route("projects.index")); // Redirige al índice de proyectos
     };
 
     return (
         <AuthenticatedLayout
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Editar Proyecto
+                    Crear Proyecto
                 </h2>
             }
         >
@@ -80,7 +68,6 @@ export default function ProjectEdit({ project }) {
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Nombre */}
                             <div>
                                 <InputLabel
                                     htmlFor="name"
@@ -102,7 +89,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Descripción */}
                             <div>
                                 <InputLabel
                                     htmlFor="description"
@@ -124,7 +110,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Problema */}
                             <div>
                                 <InputLabel
                                     htmlFor="issue"
@@ -146,7 +131,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Fecha de Inicio */}
                             <div>
                                 <InputLabel
                                     htmlFor="start_date"
@@ -168,7 +152,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Fecha de Finalización */}
                             <div>
                                 <InputLabel
                                     htmlFor="end_date"
@@ -190,7 +173,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Estado */}
                             <div>
                                 <InputLabel
                                     htmlFor="status"
@@ -212,7 +194,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Responsable */}
                             <div>
                                 <InputLabel
                                     htmlFor="responsible"
@@ -234,7 +215,6 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Presupuesto */}
                             <div>
                                 <InputLabel
                                     htmlFor="budget"
@@ -256,24 +236,11 @@ export default function ProjectEdit({ project }) {
                                 />
                             </div>
 
-                            {/* Archivo */}
                             <div>
                                 <InputLabel
                                     htmlFor="file"
-                                    value="Archivo del Proyecto (Opcional)"
+                                    value="Archivo del Proyecto"
                                 />
-                                {project.file && (
-                                    <div className="mt-2">
-                                        <a
-                                            href={project.file_url} // Asegúrate de que el backend proporcione `file_url`
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            Ver archivo actual
-                                        </a>
-                                    </div>
-                                )}
                                 <input
                                     id="file"
                                     type="file"
@@ -302,7 +269,7 @@ export default function ProjectEdit({ project }) {
                                     className="bg-blue-600 text-white px-4 py-2 rounded-md"
                                     disabled={processing}
                                 >
-                                    Guardar Cambios
+                                    Crear Proyecto
                                 </button>
                             </div>
                         </form>
