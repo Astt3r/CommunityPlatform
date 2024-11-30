@@ -22,7 +22,7 @@ class ProjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:projects,name,' . $this->route('project')->id,
+            'name' => 'required|string|max:255|unique:projects,name,',
             'description' => 'required|string|max:500',
             'issue' => 'nullable|string|max:1000',
             'start_date' => 'nullable|date',
