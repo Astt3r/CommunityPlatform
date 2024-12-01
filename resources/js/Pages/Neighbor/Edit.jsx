@@ -16,6 +16,7 @@ export default function NeighborEdit() {
         // User fields
         name: neighbor.user ? neighbor.user.name : "",
         email: neighbor.user ? neighbor.user.email : "",
+        role: neighbor.user ? neighbor.user.role : "resident", // Default role is resident
     });
 
     const handleSubmit = (e) => {
@@ -65,6 +66,28 @@ export default function NeighborEdit() {
                     {errors.email && (
                         <div className="text-red-500 text-sm">
                             {errors.email}
+                        </div>
+                    )}
+                </div>
+
+                {/* Rol del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Rol
+                    </label>
+                    <select
+                        value={data.role}
+                        onChange={(e) => setData("role", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    >
+                        <option value="resident">Residente</option>
+                        <option value="board_member">Miembro de la Junta</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                    {errors.role && (
+                        <div className="text-red-500 text-sm">
+                            {errors.role}
                         </div>
                     )}
                 </div>

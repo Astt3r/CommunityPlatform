@@ -45,6 +45,9 @@ export default function NeighborShow() {
                 <p className="mb-2">
                     <strong>Correo Electrónico:</strong> {neighbor.user_email || 'N/A'}
                 </p>
+                <p className="mb-2">
+                    <strong>Rol:</strong> {neighbor.user_role || 'N/A'}
+                </p>
             </div>
 
             <div className="flex justify-between mt-4">

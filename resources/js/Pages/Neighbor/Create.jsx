@@ -20,6 +20,7 @@ export default function CreateNeighborWithUser({ associations }) {
         email: "",
         password: "",
         password_confirmation: "",
+        role: "resident", // Default to resident
     });
 
     const submit = (e) => {

@@ -59,7 +59,8 @@ class NeighborController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|confirmed|min:8',
-            
+            'role' => 'nullable|string|in:resident,board_member,admin', // Validación del rol
+
             // Neighbor fields
             'address' => 'required|string|max:255',
             'identification_number' => ['required', 'string', 'max:50', function ($attribute, $value, $fail) {
@@ -79,6 +80,7 @@ class NeighborController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
+                'role' => $validatedData['role'] ?? 'resident', // Asignar el rol por defecto si no está presente
             ]);
 
             // Create Neighbor
@@ -95,6 +97,7 @@ class NeighborController extends Controller
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario creados exitosamente.');
     }
+
 
 
 
@@ -121,7 +124,7 @@ class NeighborController extends Controller
                 'id' => $neighbor->id,
                 'user_name' => $neighbor->user ? $neighbor->user->name : 'N/A',
                 'user_email' => $neighbor->user ? $neighbor->user->email : 'N/A',
-                'user_password' => $neighbor->user ? $neighbor->user->password : 'N/A',
+                'user_role' => $neighbor->user ? $neighbor->user->role : 'N/A',
                 'address' => $neighbor->address,
                 'identification_number' => $neighbor->identification_number,
                 'registration_date' => $neighbor->registration_date,
@@ -132,6 +135,7 @@ class NeighborController extends Controller
             ],
         ]);
     }
+
 
 
 
@@ -171,6 +175,7 @@ class NeighborController extends Controller
             // Campos de User
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $neighbor->user_id,
+            'role' => 'required|string|in:resident,board_member,admin', // Validación del campo rol
 
             // Campos de Neighbor
             'address' => 'required|string|max:255',
@@ -187,6 +192,7 @@ class NeighborController extends Controller
             $user->update([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
+                'role' => $validatedData['role'], // Actualizar el rol del usuario
             ]);
 
             // Actualizar el vecino
@@ -202,6 +208,7 @@ class NeighborController extends Controller
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
+
 
 
     public function destroy(Neighbor $neighbor)
