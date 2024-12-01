@@ -160,6 +160,7 @@ class NeighborController extends Controller
                     'name' => $neighbor->user->name,
                     'email' => $neighbor->user->email,
                     'id' => $neighbor->user->id,
+                    'role' => $neighbor->user->role, // Agregar rol del usuario
                 ] : null,
             ],
             'associations' => $associations,
@@ -169,13 +170,14 @@ class NeighborController extends Controller
 
 
 
+
     public function update(Request $request, Neighbor $neighbor)
     {
         $validatedData = $request->validate([
             // Campos de User
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $neighbor->user_id,
-            'role' => 'required|string|in:resident,board_member,admin', // Validación del campo rol
+            'role' => 'sometimes|string|in:resident,board_member,admin', // Hacer que el rol sea opcional
 
             // Campos de Neighbor
             'address' => 'required|string|max:255',
@@ -192,7 +194,7 @@ class NeighborController extends Controller
             $user->update([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
-                'role' => $validatedData['role'], // Actualizar el rol del usuario
+                'role' => $validatedData['role'] ?? $user->role, // Solo actualizar si está presente
             ]);
 
             // Actualizar el vecino
@@ -208,6 +210,7 @@ class NeighborController extends Controller
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
+
 
 
 

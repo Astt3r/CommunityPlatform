@@ -1,166 +1,232 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, Link } from "@inertiajs/react"; // Importar Link
-import InputLabel from "@/Components/InputLabel";
-import TextInput from "@/Components/TextInput";
-import InputError from "@/Components/InputError";
+import React from "react";
+import { usePage, useForm, Link } from "@inertiajs/react";
 
-export default function EditMeeting({ meeting }) {
+export default function NeighborEdit() {
+    const { neighbor, associations = [], users = [] } = usePage().props; // Default empty array for associations and users
     const { data, setData, put, processing, errors } = useForm({
-        meeting_date: meeting.meeting_date || "",
-        main_topic: meeting.main_topic || "",
-        description: meeting.description || "",
-        location: meeting.location || "",
-        organized_by: meeting.organized_by || "",
-        result: meeting.result || "",
-        status: meeting.status || "scheduled", // Valor por defecto
+        // Neighbor fields
+        address: neighbor.address || "",
+        identification_number: neighbor.identification_number || "",
+        registration_date: neighbor.registration_date || "",
+        birth_date: neighbor.birth_date || "",
+        status: neighbor.status || "",
+        last_participation_date: neighbor.last_participation_date || "",
+        neighborhood_association_id: neighbor.neighborhood_association_id || "",
+
+        // User fields
+        name: neighbor.user ? neighbor.user.name : "",
+        email: neighbor.user ? neighbor.user.email : "",
+        role: neighbor.user && neighbor.user.role ? neighbor.user.role : "resident", // Default role is resident
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
-        // Obtener la fecha actual en formato UTC
-        const currentDate = new Date().toISOString();
-    
-        // Validar si la fecha de la reunión es posterior a la actual
-        if (data.meeting_date <= currentDate) {
-            alert("La fecha de la reunión debe ser en el futuro.");
-            return;
-        }
-    
-        put(route("meetings.update", meeting.id), {
-            onSuccess: () => alert("Reunión actualizada exitosamente."),
-        });
+        put(route("neighbors.update", neighbor.id));
     };
-    
+
+    const toggleStatus = () => {
+        setData("status", data.status === "active" ? "inactive" : "active");
+    };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Editar Reunión
-                </h2>
-            }
-        >
-            <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <InputLabel htmlFor="meeting_date" value="Fecha de la Reunión" />
-                                <TextInput
-                                    id="meeting_date"
-                                    type="datetime-local"
-                                    name="meeting_date"
-                                    value={data.meeting_date}
-                                    onChange={(e) =>
-                                        setData("meeting_date", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-
-                                <InputError message={errors.meeting_date} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="main_topic" value="Tema Principal" />
-                                <TextInput
-                                    id="main_topic"
-                                    type="text"
-                                    name="main_topic"
-                                    value={data.main_topic}
-                                    onChange={(e) => setData("main_topic", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.main_topic} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="description" value="Descripción" />
-                                <TextInput
-                                    id="description"
-                                    type="text"
-                                    name="description"
-                                    value={data.description}
-                                    onChange={(e) => setData("description", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.description} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="location" value="Lugar" />
-                                <TextInput
-                                    id="location"
-                                    type="text"
-                                    name="location"
-                                    value={data.location}
-                                    onChange={(e) => setData("location", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.location} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="organized_by" value="Convocada Por" />
-                                <TextInput
-                                    id="organized_by"
-                                    type="text"
-                                    name="organized_by"
-                                    value={data.organized_by}
-                                    onChange={(e) => setData("organized_by", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.organized_by} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="result" value="Resultado" />
-                                <TextInput
-                                    id="result"
-                                    type="text"
-                                    name="result"
-                                    value={data.result}
-                                    onChange={(e) => setData("result", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.result} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="status" value="Estado" />
-                                <select
-                                    id="status"
-                                    name="status"
-                                    value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
-                                    className="mt-1 block w-full"
-                                >
-                                    <option value="scheduled">Programada</option>
-                                    <option value="completed">Completada</option>
-                                    <option value="canceled">Cancelada</option>
-                                </select>
-                                <InputError message={errors.status} className="mt-2" />
-                            </div>
-
-                            <div className="flex justify-end space-x-4 mt-4">
-                                <Link
-                                    href={route("meetings.index")}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                >
-                                    Cancelar
-                                </Link>
-                                <button
-                                    type="submit"
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                                    disabled={processing}
-                                >
-                                    Guardar Cambios
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Editar Vecino y Usuario</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Nombre del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Nombre
+                    </label>
+                    <input
+                        type="text"
+                        value={data.name}
+                        onChange={(e) => setData("name", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.name && (
+                        <div className="text-red-500 text-sm">
+                            {errors.name}
+                        </div>
+                    )}
                 </div>
-            </div>
-        </AuthenticatedLayout>
+
+                {/* Correo Electrónico del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Correo Electrónico
+                    </label>
+                    <input
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData("email", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.email && (
+                        <div className="text-red-500 text-sm">
+                            {errors.email}
+                        </div>
+                    )}
+                </div>
+
+                {/* Rol del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Rol
+                    </label>
+                    <select
+                        value={data.role}
+                        onChange={(e) => setData("role", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    >
+                        <option value="resident">Residente</option>
+                        <option value="board_member">Miembro de la Junta</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                    {errors.role && (
+                        <div className="text-red-500 text-sm">
+                            {errors.role}
+                        </div>
+                    )}
+                </div>
+
+                {/* Dirección del Vecino */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Dirección
+                    </label>
+                    <input
+                        type="text"
+                        value={data.address}
+                        onChange={(e) => setData("address", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.address && (
+                        <div className="text-red-500 text-sm">
+                            {errors.address}
+                        </div>
+                    )}
+                </div>
+
+                {/* Número de Identificación */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Número de Identificación
+                    </label>
+                    <input
+                        type="text"
+                        value={data.identification_number}
+                        onChange={(e) => setData("identification_number", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.identification_number && (
+                        <div className="text-red-500 text-sm">
+                            {errors.identification_number}
+                        </div>
+                    )}
+                </div>
+
+                {/* Fecha de Registro */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Fecha de Registro
+                    </label>
+                    <input
+                        type="date"
+                        value={data.registration_date}
+                        onChange={(e) => setData("registration_date", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.registration_date && (
+                        <div className="text-red-500 text-sm">
+                            {errors.registration_date}
+                        </div>
+                    )}
+                </div>
+
+                {/* Fecha de Nacimiento */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Fecha de Nacimiento
+                    </label>
+                    <input
+                        type="date"
+                        value={data.birth_date}
+                        onChange={(e) => setData("birth_date", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.birth_date && (
+                        <div className="text-red-500 text-sm">
+                            {errors.birth_date}
+                        </div>
+                    )}
+                </div>
+
+                {/* Estado */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Estado
+                    </label>
+                    <button
+                        type="button"
+                        onClick={toggleStatus}
+                        className={`px-4 py-2 rounded ${data.status === "active" ? "bg-green-500" : "bg-red-500"} text-white hover:opacity-80`}
+                    >
+                        {data.status === "active" ? "Activo" : "Inactivo"}
+                    </button>
+                    {errors.status && (
+                        <div className="text-red-500 text-sm">
+                            {errors.status}
+                        </div>
+                    )}
+                </div>
+
+                {/* Asociación Vecinal */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Asociación Vecinal
+                    </label>
+                    <select
+                        value={data.neighborhood_association_id}
+                        onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                    >
+                        <option value="">Seleccione una asociación</option>
+                        {associations.map((association) => (
+                            <option key={association.id} value={association.id}>
+                                {association.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.neighborhood_association_id && (
+                        <div className="text-red-500 text-sm">
+                            {errors.neighborhood_association_id}
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center space-x-4">
+                    <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                        disabled={processing}
+                    >
+                        Guardar Cambios
+                    </button>
+                    <Link
+                        href={route("neighbors.index")}
+                        className="text-gray-600 hover:text-gray-800"
+                    >
+                        Cancelar
+                    </Link>
+                </div>
+            </form>
+        </div>
     );
 }
