@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { usePage, Link } from "@inertiajs/react";
 
 export default function NeighborShow() {
@@ -41,6 +41,9 @@ export default function NeighborShow() {
                 </p>
                 <p className="mb-2">
                     <strong>Asociación Vecinal:</strong> {neighbor.neighborhood_association_name || 'N/A'}
+                </p>
+                <p className="mb-2">
+                    <strong>Correo Electrónico:</strong> {neighbor.user_email || 'N/A'}
                 </p>
             </div>
 

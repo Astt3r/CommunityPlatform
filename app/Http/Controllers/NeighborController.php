@@ -116,6 +116,8 @@ class NeighborController extends Controller
             'neighbor' => [
                 'id' => $neighbor->id,
                 'user_name' => $neighbor->user ? $neighbor->user->name : 'N/A',
+                'user_email' => $neighbor->user ? $neighbor->user->email : 'N/A',
+                'user_password' => $neighbor->user ? $neighbor->user->password : 'N/A',
                 'address' => $neighbor->address,
                 'identification_number' => $neighbor->identification_number,
                 'registration_date' => $neighbor->registration_date,
@@ -126,6 +128,7 @@ class NeighborController extends Controller
             ],
         ]);
     }
+
 
 
 
