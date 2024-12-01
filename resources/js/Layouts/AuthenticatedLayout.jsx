@@ -8,39 +8,54 @@ import ErrorAlert from "@/Components/ErrorAlert";
 
 export default function Authenticated({ header, children }) {
     const { auth, navLinks } = usePage().props;
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
 
     return (
         <div className="min-h-screen bg-gob-grey-5">
             <nav className="border-b border-gob-grey-20 bg-white shadow-lg">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between items-center">
-                        <div className="flex">
-                            {/* Logo */}
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="font-slab text-gob-black text-heading-mobile-s font-weight-bold line-height-normal" />
-                                </Link>
-                            </div>
-
-                            {/* Navigation Links */}
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                {navLinks.map((link, index) => (
-                                    <NavLink
-                                        key={index}
-                                        href={route(link.route)}
-                                        active={route().current(link.route)}
-                                        className="text-gob-grey-70 hover:text-gob-primary-base"
-                                    >
-                                        {link.name}
-                                    </NavLink>
-                                ))}
-                            </div>
+                    <div className="flex h-16 items-center justify-between">
+                        {/* Logo */}
+                        <div className="flex shrink-0 items-center">
+                            <Link href="/">
+                                <ApplicationLogo className="font-slab text-gob-black text-heading-mobile-s font-weight-bold line-height-normal" />
+                            </Link>
                         </div>
 
-                        {/* Dropdown Menu */}
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
+                        {/* Navigation Links */}
+                        <div className="hidden space-x-8 sm:ml-10 sm:flex">
+                            {navLinks.map((link, index) => (
+                                <NavLink
+                                    key={index}
+                                    href={route(link.route)}
+                                    active={route().current(link.route)}
+                                    className="text-gob-grey-70 hover:text-gob-primary-base"
+                                >
+                                    {link.name}
+                                </NavLink>
+                            ))}
+                        </div>
+
+                        {/* Bienvenida y Dropdown */}
+                        <div className="ml-auto flex items-center space-x-6">
+                            {/* Mensaje de Bienvenida */}
+                            <div className="text-right">
+                                <h2 className="text-lg font-bold text-gob-grey-70">
+                                    Bienvenido, {auth?.user?.name || "Usuario"}
+                                </h2>
+                                {auth?.neighborhood_association && (
+                                    <p className="text-sm text-gob-grey-70">
+                                        Perteneces a la junta de vecinos:{" "}
+                                        <strong>
+                                            {auth.neighborhood_association.name}
+                                        </strong>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Dropdown */}
+                            <div className="relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
@@ -80,73 +95,22 @@ export default function Authenticated({ header, children }) {
                                         >
                                             Cerrar Sesión
                                         </Dropdown.Link>
+                                        {auth?.neighborhood_association && (
+                                            <div className="px-4 py-2 text-sm text-gob-grey-70 border-t border-gob-grey-20">
+                                                Junta de vecinos:{" "}
+                                                <strong>
+                                                    {
+                                                        auth
+                                                            .neighborhood_association
+                                                            .name
+                                                    }
+                                                </strong>
+                                            </div>
+                                        )}
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
                         </div>
-
-                        {/* Hamburger Menu */}
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gob-grey-70 transition duration-150 ease-in-out hover:bg-gob-grey-10 hover:text-gob-primary-base focus:bg-gob-grey-10 focus:text-gob-primary-base focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? "inline-flex"
-                                                : "hidden"
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? "inline-flex"
-                                                : "hidden"
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Responsive Navigation Menu */}
-                <div
-                    className={
-                        (showingNavigationDropdown ? "block" : "hidden") +
-                        " sm:hidden"
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        {navLinks.map((link, index) => (
-                            <ResponsiveNavLink
-                                key={index}
-                                href={route(link.route)}
-                                active={route().current(link.route)}
-                                className="text-gob-grey-70 hover:text-gob-primary-base"
-                            >
-                                {link.name}
-                            </ResponsiveNavLink>
-                        ))}
                     </div>
                 </div>
             </nav>
@@ -163,7 +127,9 @@ export default function Authenticated({ header, children }) {
             {/* Page Content */}
             <main>
                 <ErrorAlert />
-                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    {children}
+                </div>
             </main>
         </div>
     );
