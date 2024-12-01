@@ -4,6 +4,7 @@ import { usePage, useForm, Link } from "@inertiajs/react";
 export default function NeighborEdit() {
     const { neighbor, associations = [], users = [] } = usePage().props; // Default empty array for associations and users
     const { data, setData, put, processing, errors } = useForm({
+        // Neighbor fields
         address: neighbor.address || "",
         identification_number: neighbor.identification_number || "",
         registration_date: neighbor.registration_date || "",
@@ -11,7 +12,10 @@ export default function NeighborEdit() {
         status: neighbor.status || "",
         last_participation_date: neighbor.last_participation_date || "",
         neighborhood_association_id: neighbor.neighborhood_association_id || "",
-        user_id: neighbor.user_id || "", // New field for user ID
+
+        // User fields
+        name: neighbor.user?.name || "",
+        email: neighbor.user?.email || "",
     });
 
     const handleSubmit = (e) => {
@@ -25,8 +29,47 @@ export default function NeighborEdit() {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Editar Vecino</h1>
+            <h1 className="text-2xl font-bold mb-4">Editar Vecino y Usuario</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Nombre del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Nombre
+                    </label>
+                    <input
+                        type="text"
+                        value={data.name}
+                        onChange={(e) => setData("name", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.name && (
+                        <div className="text-red-500 text-sm">
+                            {errors.name}
+                        </div>
+                    )}
+                </div>
+
+                {/* Correo Electrónico del Usuario */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Correo Electrónico
+                    </label>
+                    <input
+                        type="email"
+                        value={data.email}
+                        onChange={(e) => setData("email", e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        required
+                    />
+                    {errors.email && (
+                        <div className="text-red-500 text-sm">
+                            {errors.email}
+                        </div>
+                    )}
+                </div>
+
+                {/* Dirección del Vecino */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Dirección
@@ -36,6 +79,7 @@ export default function NeighborEdit() {
                         value={data.address}
                         onChange={(e) => setData("address", e.target.value)}
                         className="border rounded px-2 py-1 w-full"
+                        required
                     />
                     {errors.address && (
                         <div className="text-red-500 text-sm">
@@ -44,6 +88,7 @@ export default function NeighborEdit() {
                     )}
                 </div>
 
+                {/* Número de Identificación */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Número de Identificación
@@ -53,6 +98,7 @@ export default function NeighborEdit() {
                         value={data.identification_number}
                         onChange={(e) => setData("identification_number", e.target.value)}
                         className="border rounded px-2 py-1 w-full"
+                        required
                     />
                     {errors.identification_number && (
                         <div className="text-red-500 text-sm">
@@ -61,6 +107,7 @@ export default function NeighborEdit() {
                     )}
                 </div>
 
+                {/* Fecha de Registro */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Fecha de Registro
@@ -70,6 +117,7 @@ export default function NeighborEdit() {
                         value={data.registration_date}
                         onChange={(e) => setData("registration_date", e.target.value)}
                         className="border rounded px-2 py-1 w-full"
+                        required
                     />
                     {errors.registration_date && (
                         <div className="text-red-500 text-sm">
@@ -78,6 +126,7 @@ export default function NeighborEdit() {
                     )}
                 </div>
 
+                {/* Fecha de Nacimiento */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Fecha de Nacimiento
@@ -87,6 +136,7 @@ export default function NeighborEdit() {
                         value={data.birth_date}
                         onChange={(e) => setData("birth_date", e.target.value)}
                         className="border rounded px-2 py-1 w-full"
+                        required
                     />
                     {errors.birth_date && (
                         <div className="text-red-500 text-sm">
@@ -95,6 +145,7 @@ export default function NeighborEdit() {
                     )}
                 </div>
 
+                {/* Estado */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Estado
@@ -113,23 +164,7 @@ export default function NeighborEdit() {
                     )}
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Última Participación
-                    </label>
-                    <input
-                        type="date"
-                        value={data.last_participation_date}
-                        onChange={(e) => setData("last_participation_date", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.last_participation_date && (
-                        <div className="text-red-500 text-sm">
-                            {errors.last_participation_date}
-                        </div>
-                    )}
-                </div>
-
+                {/* Asociación Vecinal */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Asociación Vecinal
@@ -149,29 +184,6 @@ export default function NeighborEdit() {
                     {errors.neighborhood_association_id && (
                         <div className="text-red-500 text-sm">
                             {errors.neighborhood_association_id}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Usuario Asignado
-                    </label>
-                    <select
-                        value={data.user_id}
-                        onChange={(e) => setData("user_id", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    >
-                        <option value="">Seleccione un usuario</option>
-                        {users.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {user.name} - {user.email}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.user_id && (
-                        <div className="text-red-500 text-sm">
-                            {errors.user_id}
                         </div>
                     )}
                 </div>

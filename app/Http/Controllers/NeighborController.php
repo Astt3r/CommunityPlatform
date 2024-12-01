@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
 use App\Http\Requests\NeighborRequest;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
@@ -51,21 +52,45 @@ class NeighborController extends Controller
 
 
 
-    public function store(NeighborRequest $request)
+    public function store(Request $request)
     {
-        // Validar los datos
-        $validated = $request->validated();
+        $validatedData = $request->validate([
+            // User fields
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|confirmed|min:8',
+            
+            // Neighbor fields
+            'address' => 'required|string|max:255',
+            'identification_number' => 'required|string|max:50',
+            'registration_date' => 'required|date',
+            'birth_date' => 'required|date',
+            'status' => 'required|string',
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
+        ]);
 
-        // Crear un nuevo vecino
-        $neighbor = Neighbor::create($validated);
+        DB::transaction(function () use ($validatedData) {
+            // Create User
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+            ]);
 
-        // Actualizar el número de miembros de la asociación
-        $neighbor->neighborhoodAssociation->updateNumberOfMembers();
+            // Create Neighbor
+            Neighbor::create([
+                'user_id' => $user->id,
+                'address' => $validatedData['address'],
+                'identification_number' => $validatedData['identification_number'],
+                'registration_date' => $validatedData['registration_date'],
+                'birth_date' => $validatedData['birth_date'],
+                'status' => $validatedData['status'],
+                'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
+            ]);
+        });
 
-        // Redirigir con un mensaje de éxito
-        return redirect()->route('neighbors.index')->with('success', 'Vecino creado exitosamente.');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario creados exitosamente.');
     }
-
 
 
 
@@ -131,39 +156,41 @@ class NeighborController extends Controller
 
     public function update(Request $request, Neighbor $neighbor)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'nullable|unique:neighbors,user_id,' . $neighbor->id,
+        $validatedData = $request->validate([
+            // Campos de User
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $neighbor->user_id,
+
+            // Campos de Neighbor
             'address' => 'required|string|max:255',
-            'identification_number' => 'required|string|max:255',
+            'identification_number' => 'required|string|max:50',
             'registration_date' => 'required|date',
             'birth_date' => 'required|date',
             'status' => 'required|string',
-            'last_participation_date' => 'nullable|date',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+        DB::transaction(function () use ($validatedData, $neighbor) {
+            // Actualizar el usuario relacionado
+            $user = $neighbor->user;
+            $user->update([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+            ]);
 
-        // Guardar la asociación anterior para actualizarla si cambió
-        $oldAssociation = $neighbor->neighborhoodAssociation;
+            // Actualizar el vecino
+            $neighbor->update([
+                'address' => $validatedData['address'],
+                'identification_number' => $validatedData['identification_number'],
+                'registration_date' => $validatedData['registration_date'],
+                'birth_date' => $validatedData['birth_date'],
+                'status' => $validatedData['status'],
+                'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
+            ]);
+        });
 
-        // Actualizar el vecino
-        $neighbor->update($request->all());
-
-        // Actualizar el número de miembros de la asociación antigua si cambió
-        if ($oldAssociation->id !== $neighbor->neighborhood_association_id) {
-            $oldAssociation->updateNumberOfMembers();
-        }
-
-        // Actualizar el número de miembros de la nueva asociación
-        $neighbor->neighborhoodAssociation->updateNumberOfMembers();
-
-        return redirect()->route('neighbors.index')->with('success', 'Vecino actualizado exitosamente.');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
-
-
 
 
     public function destroy(Neighbor $neighbor)
@@ -171,14 +198,20 @@ class NeighborController extends Controller
         // Obtener la asociación antes de eliminar el vecino
         $association = $neighbor->neighborhoodAssociation;
 
+        // Eliminar el usuario asociado, si existe
+        if ($neighbor->user) {
+            $neighbor->user->delete();
+        }
+
         // Eliminar el vecino
         $neighbor->delete();
 
         // Actualizar el número de miembros de la asociación
         $association->updateNumberOfMembers();
 
-        return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado exitosamente');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario asociado eliminados exitosamente');
     }
+
 
 
 

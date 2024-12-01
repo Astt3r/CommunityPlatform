@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { usePage, Link, useForm } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
@@ -13,7 +12,7 @@ export default function NeighborIndex() {
     const [showAlert, setShowAlert] = useState(!!flash.success);
 
     const handleDelete = (id) => {
-        if (confirm("¿Estás seguro de que deseas eliminar este vecino?")) {
+        if (confirm("¿Estás seguro de que deseas eliminar este vecino y su usuario asociado?")) {
             router.delete(route("neighbors.destroy", id), {
                 onSuccess: () => {
                     setShowAlert(true); // Mostrar alerta de éxito
