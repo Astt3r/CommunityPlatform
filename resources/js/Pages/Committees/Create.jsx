@@ -1,6 +1,5 @@
-import React from "react";
-import { useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -16,30 +15,14 @@ export default function CommitteesCreate({ types }) {
         end_date: "",
     });
 
-    const validateDates = () => {
-        if (
-            data.effective_date &&
-            data.end_date &&
-            data.end_date < data.effective_date
-        ) {
-            alert(
-                "La fecha de fin debe ser igual o posterior a la fecha de inicio."
-            );
-            return false;
-        }
-        return true;
+    const handleChange = (field, value) => {
+        setData(field, value);
+        // Los errores se manejan automáticamente por Inertia
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Validar fechas antes de enviar
-        if (!validateDates()) return;
-
         post(route("committees.store"), {
-            onError: () => {
-                // Maneja errores automáticamente
-            },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
@@ -47,8 +30,8 @@ export default function CommitteesCreate({ types }) {
     };
 
     const handleCancel = () => {
-        reset();
-        router.visit(route("committees.index"));
+        reset(); // Limpia todo el formulario
+        router.visit(route("committees.index")); // Redirige al índice de comités
     };
 
     return (
@@ -62,7 +45,7 @@ export default function CommitteesCreate({ types }) {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Nombre */}
                             <div>
                                 <InputLabel
@@ -72,18 +55,11 @@ export default function CommitteesCreate({ types }) {
                                 <TextInput
                                     id="name"
                                     type="text"
+                                    name="name"
                                     value={data.name}
-                                    onInput={(e) => {
-                                        const cleanedValue =
-                                            e.target.value.replace(
-                                                /[^a-zA-Z0-9\s]/g,
-                                                ""
-                                            );
-                                        setData(
-                                            "name",
-                                            cleanedValue.slice(0, 50)
-                                        );
-                                    }}
+                                    onChange={(e) =>
+                                        handleChange("name", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -101,18 +77,14 @@ export default function CommitteesCreate({ types }) {
                                 <TextInput
                                     id="description"
                                     type="text"
+                                    name="description"
                                     value={data.description}
-                                    onInput={(e) => {
-                                        const cleanedValue =
-                                            e.target.value.replace(
-                                                /[^a-zA-Z0-9\s.,-]/g,
-                                                ""
-                                            );
-                                        setData(
+                                    onChange={(e) =>
+                                        handleChange(
                                             "description",
-                                            cleanedValue.slice(0, 255)
-                                        );
-                                    }}
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -127,18 +99,11 @@ export default function CommitteesCreate({ types }) {
                                 <TextInput
                                     id="code"
                                     type="text"
+                                    name="code"
                                     value={data.code}
-                                    onInput={(e) => {
-                                        const cleanedValue =
-                                            e.target.value.replace(
-                                                /[^a-zA-Z0-9]/g,
-                                                ""
-                                            );
-                                        setData(
-                                            "code",
-                                            cleanedValue.slice(0, 20)
-                                        );
-                                    }}
+                                    onChange={(e) =>
+                                        handleChange("code", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -152,9 +117,10 @@ export default function CommitteesCreate({ types }) {
                                 <InputLabel htmlFor="type" value="Tipo" />
                                 <select
                                     id="type"
+                                    name="type"
                                     value={data.type}
                                     onChange={(e) =>
-                                        setData("type", e.target.value)
+                                        handleChange("type", e.target.value)
                                     }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
@@ -177,9 +143,10 @@ export default function CommitteesCreate({ types }) {
                                 <InputLabel htmlFor="status" value="Estado" />
                                 <select
                                     id="status"
+                                    name="status"
                                     value={data.status}
                                     onChange={(e) =>
-                                        setData("status", e.target.value)
+                                        handleChange("status", e.target.value)
                                     }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
@@ -192,7 +159,7 @@ export default function CommitteesCreate({ types }) {
                                 />
                             </div>
 
-                            {/* Fechas */}
+                            {/* Fecha de Inicio */}
                             <div>
                                 <InputLabel
                                     htmlFor="effective_date"
@@ -201,9 +168,10 @@ export default function CommitteesCreate({ types }) {
                                 <TextInput
                                     id="effective_date"
                                     type="date"
+                                    name="effective_date"
                                     value={data.effective_date}
                                     onChange={(e) =>
-                                        setData(
+                                        handleChange(
                                             "effective_date",
                                             e.target.value
                                         )
@@ -216,6 +184,7 @@ export default function CommitteesCreate({ types }) {
                                 />
                             </div>
 
+                            {/* Fecha de Fin */}
                             <div>
                                 <InputLabel
                                     htmlFor="end_date"
@@ -224,9 +193,10 @@ export default function CommitteesCreate({ types }) {
                                 <TextInput
                                     id="end_date"
                                     type="date"
+                                    name="end_date"
                                     value={data.end_date}
                                     onChange={(e) =>
-                                        setData("end_date", e.target.value)
+                                        handleChange("end_date", e.target.value)
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -236,7 +206,8 @@ export default function CommitteesCreate({ types }) {
                                 />
                             </div>
 
-                            <div className="flex justify-end space-x-4">
+                            {/* Botones */}
+                            <div className="flex justify-end space-x-4 mt-4">
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"

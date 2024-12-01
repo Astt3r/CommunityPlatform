@@ -18,12 +18,7 @@ export default function CreateExpense({ expenseTypes }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("expenses.store"), {
-            onError: () => {
-                // Manejar errores automáticamente en `errors`
-            },
-            onFinish: () => {
-                if (Object.keys(errors).length === 0) reset();
-            },
+            onSuccess: () => reset(),
         });
     };
 

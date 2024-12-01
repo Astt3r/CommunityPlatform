@@ -15,12 +15,19 @@ export default function NeighborhoodAssociationCreate() {
         is_active: false,
     });
 
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     post(route("neighborhood-associations.store"), {
+    //         onFinish: () => {
+    //             if (Object.keys(errors).length === 0) reset();
+    //         },
+    //     });
+    // };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("neighborhood-associations.store"), {
-            onFinish: () => {
-                if (Object.keys(errors).length === 0) reset();
-            },
+            onSuccess: () => reset(),
         });
     };
 
