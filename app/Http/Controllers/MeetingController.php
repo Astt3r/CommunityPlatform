@@ -6,6 +6,7 @@ use App\Models\Meeting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Requests\MeetingRequest;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class MeetingController extends Controller
