@@ -12,14 +12,21 @@ export default function CreateMeeting() {
         location: "",
         organized_by: "",
         result: "",
-        status: "scheduled", // Valor predeterminado explícito
+        status: "scheduled", // Valor predeterminado
     });
+
+    const handleChange = (field, value) => {
+        setData(field, value);
+        // No es necesario manejar errores aquí; Inertia lo hace automáticamente.
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("meetings.store"), {
-            onError: (error) =>
-                console.error("Error al crear la reunión:", error),
+            // onError: () => {
+            //     // Podrías agregar un mensaje global aquí si lo deseas.
+            //     alert("Hubo errores en el formulario. Revisa los campos.");
+            // },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
@@ -27,8 +34,8 @@ export default function CreateMeeting() {
     };
 
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("meetings.index")); // Redirige al índice de reuniones
+        reset(); // Limpia todo el formulario
+        router.visit(route("meetings.index")); // Redirige a la página de índice
     };
 
     return (
@@ -54,7 +61,10 @@ export default function CreateMeeting() {
                                     name="meeting_date"
                                     value={data.meeting_date}
                                     onChange={(e) =>
-                                        setData("meeting_date", e.target.value)
+                                        handleChange(
+                                            "meeting_date",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -75,7 +85,10 @@ export default function CreateMeeting() {
                                     name="main_topic"
                                     value={data.main_topic}
                                     onChange={(e) =>
-                                        setData("main_topic", e.target.value)
+                                        handleChange(
+                                            "main_topic",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -96,7 +109,10 @@ export default function CreateMeeting() {
                                     name="description"
                                     value={data.description}
                                     onChange={(e) =>
-                                        setData("description", e.target.value)
+                                        handleChange(
+                                            "description",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -114,7 +130,7 @@ export default function CreateMeeting() {
                                     name="location"
                                     value={data.location}
                                     onChange={(e) =>
-                                        setData("location", e.target.value)
+                                        handleChange("location", e.target.value)
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -135,7 +151,10 @@ export default function CreateMeeting() {
                                     name="organized_by"
                                     value={data.organized_by}
                                     onChange={(e) =>
-                                        setData("organized_by", e.target.value)
+                                        handleChange(
+                                            "organized_by",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -146,14 +165,17 @@ export default function CreateMeeting() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="result" value="Resultado" />
+                                <InputLabel
+                                    htmlFor="result"
+                                    value="Resultado"
+                                />
                                 <TextInput
                                     id="result"
                                     type="text"
                                     name="result"
                                     value={data.result}
                                     onChange={(e) =>
-                                        setData("result", e.target.value)
+                                        handleChange("result", e.target.value)
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -170,12 +192,16 @@ export default function CreateMeeting() {
                                     name="status"
                                     value={data.status}
                                     onChange={(e) =>
-                                        setData("status", e.target.value)
+                                        handleChange("status", e.target.value)
                                     }
                                     className="mt-1 block w-full"
                                 >
-                                    <option value="scheduled">Programada</option>
-                                    <option value="completed">Completada</option>
+                                    <option value="scheduled">
+                                        Programada
+                                    </option>
+                                    <option value="completed">
+                                        Completada
+                                    </option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
                                 <InputError

@@ -29,7 +29,9 @@ export default function Create() {
             return;
         }
 
-        post(route("expense-types.store"));
+        post(route("expense-types.store"), {
+            onSuccess: () => reset(),
+        });
     };
 
     const handleCancel = () => {

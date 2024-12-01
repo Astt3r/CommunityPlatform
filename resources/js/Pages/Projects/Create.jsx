@@ -20,7 +20,6 @@ export default function ProjectCreate() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validar fechas en el frontend
         if (
             data.start_date &&
             data.end_date &&
@@ -29,7 +28,7 @@ export default function ProjectCreate() {
             alert(
                 "La fecha de finalización debe ser igual o posterior a la fecha de inicio."
             );
-            return; // Detenemos el envío si las fechas no son válidas
+            return;
         }
 
         const formData = new FormData();
@@ -42,13 +41,28 @@ export default function ProjectCreate() {
         post(route("projects.store"), {
             data: formData,
             forceFormData: true,
-            onError: (error) => {
-                // Manejo de errores opcional
-            },
+            // onError: (error) => {
+            //     // Por ejemplo, podrías mostrar un mensaje global de error:
+            //     alert(
+            //         "Hubo un problema al enviar el formulario. Revisa los campos."
+            //     );
+            // },
+
             onFinish: () => {
-                if (Object.keys(errors).length === 0) reset();
+                if (Object.keys(errors).length === 0) reset(); // Solo limpia si no hay errores
             },
         });
+    };
+
+    const handleChange = (field, value) => {
+        setData(field, value);
+
+        if (errors[field]) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                [field]: undefined,
+            }));
+        }
     };
 
     const handleCancel = () => {
