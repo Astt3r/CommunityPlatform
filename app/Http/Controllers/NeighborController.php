@@ -55,19 +55,24 @@ class NeighborController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            // User fields
+            // Validaciones de User
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|confirmed|min:8',
             'role' => 'nullable|string|in:resident,board_member,admin', // Validación del rol
 
-            // Neighbor fields
+            // Validaciones de Neighbor
             'address' => 'required|string|max:255',
-            'identification_number' => ['required', 'string', 'max:50', function ($attribute, $value, $fail) {
-                if (!$this->isValidRUT($value)) {
-                    $fail('El RUT ingresado no tiene un formato válido.');
-                }
-            }],
+            'identification_number' => [
+                'required',
+                'string',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    if (!$this->isValidRUT($value)) {
+                        $fail('El RUT ingresado no tiene un formato válido.');
+                    }
+                },
+            ],
             'registration_date' => 'required|date',
             'birth_date' => 'required|date',
             'status' => 'required|string',
@@ -75,16 +80,16 @@ class NeighborController extends Controller
         ]);
 
         DB::transaction(function () use ($validatedData) {
-            // Create User
+            // Crear el usuario
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
-                'role' => $validatedData['role'] ?? 'resident', // Asignar el rol por defecto si no está presente
+                'role' => $validatedData['role'] ?? 'resident', // Asignar rol predeterminado
             ]);
 
-            // Create Neighbor
-            Neighbor::create([
+            // Crear el vecino
+            $neighbor = Neighbor::create([
                 'user_id' => $user->id,
                 'address' => $validatedData['address'],
                 'identification_number' => $validatedData['identification_number'],
@@ -93,10 +98,14 @@ class NeighborController extends Controller
                 'status' => $validatedData['status'],
                 'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
             ]);
+
+            // Actualizar el número de miembros de la asociación
+            $neighbor->neighborhoodAssociation->updateNumberOfMembers();
         });
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario creados exitosamente.');
     }
+
 
 
 
@@ -172,12 +181,12 @@ class NeighborController extends Controller
     public function update(Request $request, Neighbor $neighbor)
     {
         $validatedData = $request->validate([
-            // Campos de User
+            // Validaciones de User
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $neighbor->user_id,
-            'role' => 'required|string|in:resident,board_member,admin', // Validación del campo rol
+            'role' => 'required|string|in:resident,board_member,admin',
 
-            // Campos de Neighbor
+            // Validaciones de Neighbor
             'address' => 'required|string|max:255',
             'identification_number' => 'required|string|max:50',
             'registration_date' => 'required|date',
@@ -192,8 +201,11 @@ class NeighborController extends Controller
             $user->update([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
-                'role' => $validatedData['role'], // Actualizar el rol del usuario
+                'role' => $validatedData['role'],
             ]);
+
+            // Verificar si cambió de asociación
+            $oldAssociation = $neighbor->neighborhoodAssociation;
 
             // Actualizar el vecino
             $neighbor->update([
@@ -204,10 +216,17 @@ class NeighborController extends Controller
                 'status' => $validatedData['status'],
                 'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
             ]);
+
+            // Si cambió de asociación, actualizar ambas
+            if ($oldAssociation->id !== $neighbor->neighborhood_association_id) {
+                $oldAssociation->updateNumberOfMembers();
+                $neighbor->neighborhoodAssociation->updateNumberOfMembers();
+            }
         });
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
+
 
 
 
@@ -216,25 +235,28 @@ class NeighborController extends Controller
         // Obtener la asociación antes de eliminar el vecino
         $association = $neighbor->neighborhoodAssociation;
 
-        // Eliminar el usuario asociado, si existe
-        if ($neighbor->user) {
-            $neighbor->user->delete();
-        }
+        DB::transaction(function () use ($neighbor, $association) {
+            // Eliminar el usuario asociado
+            if ($neighbor->user) {
+                $neighbor->user->delete();
+            }
 
-        // Eliminar el vecino
-        $neighbor->delete();
+            // Eliminar el vecino
+            $neighbor->delete();
 
-        // Actualizar el número de miembros de la asociación
-        $association->updateNumberOfMembers();
+            // Actualizar el número de miembros de la asociación
+            $association->updateNumberOfMembers();
+        });
 
-        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario asociado eliminados exitosamente');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario asociado eliminados exitosamente.');
     }
+
 
     private function isValidRUT($rut)
     {
         // Lógica para validar el formato del RUT chileno
         $rut = preg_replace('/[^k0-9]/i', '', $rut);
-        $dv  = substr($rut, -1);
+        $dv = substr($rut, -1);
         $numero = substr($rut, 0, strlen($rut) - 1);
         $i = 2;
         $suma = 0;
