@@ -17,10 +17,21 @@ export default function EditMeeting({ meeting }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+    
+        // Obtener la fecha actual en formato UTC
+        const currentDate = new Date().toISOString();
+    
+        // Validar si la fecha de la reunión es posterior a la actual
+        if (data.meeting_date <= currentDate) {
+            alert("La fecha de la reunión debe ser en el futuro.");
+            return;
+        }
+    
         put(route("meetings.update", meeting.id), {
             onSuccess: () => alert("Reunión actualizada exitosamente."),
         });
     };
+    
 
     return (
         <AuthenticatedLayout

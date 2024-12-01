@@ -22,16 +22,23 @@ export default function CreateMeeting() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+    
+        // Obtener la fecha actual en formato UTC
+        const currentDate = new Date().toISOString();
+    
+        // Validar si la fecha de la reunión es posterior a la actual
+        if (data.meeting_date <= currentDate) {
+            alert("La fecha de la reunión debe ser en el futuro.");
+            return;
+        }
+    
         post(route("meetings.store"), {
-            // onError: () => {
-            //     // Podrías agregar un mensaje global aquí si lo deseas.
-            //     alert("Hubo errores en el formulario. Revisa los campos.");
-            // },
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
     };
+    
 
     const handleCancel = () => {
         reset(); // Limpia todo el formulario

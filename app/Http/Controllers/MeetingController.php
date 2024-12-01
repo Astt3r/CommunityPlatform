@@ -43,15 +43,36 @@ class MeetingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(MeetingRequest $request)
+    public function store(Request $request)
     {
-        // Los datos ya están validados automáticamente
-        $validated = $request->validated();
+        // Validar los datos ingresados
+        $validator = Validator::make($request->all(), [
+            'meeting_date' => 'required|date|after:now',
+            'main_topic' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'location' => 'required|string|max:255',
+            'organized_by' => 'required|string|max:255',
+            'result' => 'nullable|string|max:1000',
+            'status' => 'required|in:scheduled,completed,canceled',
+        ]);
 
-        // Crear la reunión
-        Meeting::create($validated);
+        // Enviar respuesta con error si falla la validación
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-        // Redirigir al índice con un mensaje de éxito
+        // Crear la nueva reunión
+        $meeting = new Meeting();
+        $meeting->meeting_date = Carbon::parse($request->input('meeting_date'))->toDateTimeString();
+        $meeting->main_topic = $request->input('main_topic');
+        $meeting->description = $request->input('description');
+        $meeting->location = $request->input('location');
+        $meeting->organized_by = $request->input('organized_by');
+        $meeting->result = $request->input('result');
+        $meeting->status = $request->input('status');
+        $meeting->save();
+
+        // Redirigir con un mensaje de éxito
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
 
@@ -97,24 +118,40 @@ class MeetingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Meeting $meeting)
-    {
-        // Validar los datos del formulario
-        $validated = $request->validate([
-            'meeting_date' => 'required|date_format:Y-m-d\TH:i',
-            'main_topic' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'organized_by' => 'nullable|string|max:100',
-            'result' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,completed,canceled',
-        ]);
+    public function update(Request $request, $id)
+{
+    // Buscar la reunión que se va a actualizar
+    $meeting = Meeting::findOrFail($id);
 
-        // Actualizar la reunión con los datos validados
-        $meeting->update($validated);
+    // Validar los datos ingresados
+    $validator = Validator::make($request->all(), [
+        'meeting_date' => 'required|date|after:now',
+        'main_topic' => 'required|string|max:255',
+        'description' => 'nullable|string|max:1000',
+        'location' => 'required|string|max:255',
+        'organized_by' => 'required|string|max:255',
+        'result' => 'nullable|string|max:1000',
+        'status' => 'required|in:scheduled,completed,canceled',
+    ]);
 
-        return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
+    // Enviar respuesta con error si falla la validación
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
     }
+
+    // Actualizar los campos de la reunión
+    $meeting->meeting_date = Carbon::parse($request->input('meeting_date'))->toDateTimeString();
+    $meeting->main_topic = $request->input('main_topic');
+    $meeting->description = $request->input('description');
+    $meeting->location = $request->input('location');
+    $meeting->organized_by = $request->input('organized_by');
+    $meeting->result = $request->input('result');
+    $meeting->status = $request->input('status');
+    $meeting->save();
+
+    // Redirigir con un mensaje de éxito
+    return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
+}
 
 
 

@@ -9,62 +9,47 @@ Font.register({ family: 'Helvetica', src: 'https://fonts.gstatic.com/s/helvetica
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: 40,
     fontSize: 12,
     fontFamily: "Helvetica",
     lineHeight: 1.6,
+    backgroundColor: "#f3f3f3",
   },
   header: {
     textAlign: "center",
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    backgroundColor: "#4A90E2",
+    color: "#fff",
+  },
+  date: {
+    textAlign: "center",
+    marginBottom: 30,
+    fontSize: 14,
+    color: "#333",
   },
   title: {
-    margin: 0,
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: "bold",
   },
-  subtitle: {
-    margin: 5,
-    fontSize: 18,
-  },
-  section: {
-    marginBottom: 20,
+  sectionContainer: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
   sectionTitle: {
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "bold",
     marginBottom: 5,
-    textDecoration: "underline",
+    color: "#333",
   },
-  table: {
-    display: "table",
-    width: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    marginTop: 20,
-  },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableCell: {
-    borderStyle: "solid",
-    borderWidth: 1,
-    padding: 10,
-    flexGrow: 1,
-  },
-  signature: {
-    marginTop: 40,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  signatureBlock: {
-    textAlign: "center",
-    width: "45%",
-  },
-  signatureLine: {
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    marginTop: 50,
-    paddingTop: 5,
+  sectionContent: {
+    fontSize: 14,
+    color: "#555",
   },
 });
 
@@ -73,72 +58,45 @@ const MeetingPdfDocument = ({ meeting }) => {
     return null;
   }
 
+  // Asegurarse de que todos los valores estén definidos
+  const mainTopic = meeting.main_topic || "No especificado";
+  const location = meeting.location || "No especificado";
+  const organizedBy = meeting.organized_by || "No especificado";
+  const description = meeting.description || "Sin descripción";
+  const status = meeting.status || "No especificado";
+
+  // Formatear la fecha de la reunión en UTC
   const formattedDate = meeting.meeting_date ? (() => {
     const dateObj = new Date(meeting.meeting_date);
-    return isValid(dateObj) ? format(dateObj, "dd/MM/yyyy HH:mm 'UTC'") : "No especificado";
+    return isValid(dateObj) ? format(dateObj, "dd 'de' MMMM 'de' yyyy") : "No especificado";
   })() : "No especificado";
 
   return (
     <Document>
       <Page style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>Acta de Reunión</Text>
-          <Text style={styles.subtitle}>Tema Principal: {meeting.main_topic || "No especificado"}</Text>
+          <Text style={styles.title}>ACTA DE LA REUNIÓN</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Fecha y Hora:</Text>
-          <Text>{formattedDate}</Text>
+        <Text style={styles.date}>FECHA: {formattedDate}</Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Tema Principal</Text>
+          <Text style={styles.sectionContent}>{mainTopic}</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Lugar:</Text>
-          <Text>{meeting.location || "No especificado"}</Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Lugar</Text>
+          <Text style={styles.sectionContent}>{location}</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Descripción:</Text>
-          <Text>{meeting.description || "Sin descripción"}</Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Organizada por</Text>
+          <Text style={styles.sectionContent}>{organizedBy}</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Organizada por:</Text>
-          <Text>{meeting.organized_by || "No especificado"}</Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Descripción</Text>
+          <Text style={styles.sectionContent}>{description}</Text>
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Asistentes:</Text>
-          {meeting.attendees && meeting.attendees.length > 0 ? (
-            <View style={styles.table}>
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Nombre</Text>
-                <Text style={styles.tableCell}>Rol</Text>
-              </View>
-              {meeting.attendees.map((attendee, index) => (
-                <View style={styles.tableRow} key={index}>
-                  <Text style={styles.tableCell}>{attendee?.name || "No especificado"}</Text>
-                  <Text style={styles.tableCell}>{attendee?.role || "No especificado"}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <Text>No hay asistentes registrados</Text>
-          )}
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Puntos Tratados:</Text>
-          <Text>{meeting.agenda_points || "No especificado"}</Text>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Acuerdos y Tareas:</Text>
-          <Text>{meeting.agreements || "No especificado"}</Text>
-        </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Estado de la Reunión:</Text>
-          <Text>{meeting.status || "No especificado"}</Text>
-        </View>
-        <View style={styles.signature}>
-          <View style={styles.signatureBlock}>
-            <Text style={styles.signatureLine}>Presidente</Text>
-          </View>
-          <View style={styles.signatureBlock}>
-            <Text style={styles.signatureLine}>Secretario</Text>
-          </View>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Estado de la Reunión</Text>
+          <Text style={styles.sectionContent}>{status}</Text>
         </View>
       </Page>
     </Document>
@@ -146,6 +104,7 @@ const MeetingPdfDocument = ({ meeting }) => {
 };
 
 export default function ShowMeeting({ meeting }) {
+  // Formatear la fecha de la reunión en UTC
   const formattedDate = meeting.meeting_date ? (() => {
     const parsedDate = parseISO(meeting.meeting_date);
     const zonedDate = parsedDate; // Asumimos que la fecha ya es UTC
@@ -198,10 +157,6 @@ export default function ShowMeeting({ meeting }) {
               >
                 {meeting.status}
               </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Resultado:</h3>
-              <p>{meeting.result || "No especificado"}</p>
             </div>
             <div className="mt-4">
               <a
