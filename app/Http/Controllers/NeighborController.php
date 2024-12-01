@@ -145,13 +145,17 @@ class NeighborController extends Controller
                 'status' => $neighbor->status,
                 'last_participation_date' => $neighbor->last_participation_date,
                 'neighborhood_association_id' => $neighbor->neighborhood_association_id,
-                'user_name' => $neighbor->user ? $neighbor->user->name : null,
-                'user_id' => $neighbor->user_id, // Aseguramos incluir la ID del usuario asignado
+                'user' => $neighbor->user ? [
+                    'name' => $neighbor->user->name,
+                    'email' => $neighbor->user->email,
+                    'id' => $neighbor->user->id,
+                ] : null,
             ],
             'associations' => $associations,
             'users' => $users, // Enviamos los usuarios para el dropdown
         ]);
     }
+
 
 
     public function update(Request $request, Neighbor $neighbor)

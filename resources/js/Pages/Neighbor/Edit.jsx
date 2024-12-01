@@ -14,8 +14,8 @@ export default function NeighborEdit() {
         neighborhood_association_id: neighbor.neighborhood_association_id || "",
 
         // User fields
-        name: neighbor.user?.name || "",
-        email: neighbor.user?.email || "",
+        name: neighbor.user ? neighbor.user.name : "",
+        email: neighbor.user ? neighbor.user.email : "",
     });
 
     const handleSubmit = (e) => {
