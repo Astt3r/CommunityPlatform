@@ -5,8 +5,6 @@ import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 
-
-
 export default function CreateNeighborWithUser({ associations }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         // Neighbor fields
