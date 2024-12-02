@@ -5,9 +5,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 
 export default function NeighborIndex() {
-    const { neighbors, filters, flash, userRole } = usePage().props;
+    const { neighbors, filters, flash, userRole, juntasDeVecinos = [] } = usePage().props;
     const { data, setData, get } = useForm({
         name: filters.name || "",
+        junta_de_vecino_id: filters.junta_de_vecino_id || "",
+        is_board_member: filters.is_board_member || false,
     });
     const [showAlert, setShowAlert] = useState(!!flash.success);
 
@@ -31,6 +33,12 @@ export default function NeighborIndex() {
             setShowAlert(true);
         }
     }, [flash.success]);
+
+    const filteredNeighbors = neighbors.data.filter(neighbor => {
+        const matchesJunta = !data.junta_de_vecino_id || neighbor.neighborhood_association?.id == data.junta_de_vecino_id;
+        const matchesBoardMember = !data.is_board_member || neighbor.is_board_member;
+        return matchesJunta && matchesBoardMember;
+    });
 
     return (
         <AuthenticatedLayout
@@ -78,6 +86,25 @@ export default function NeighborIndex() {
                         onChange={(e) => setData("name", e.target.value)}
                         className="px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                     />
+                    <select
+                        value={data.junta_de_vecino_id}
+                        onChange={(e) => setData("junta_de_vecino_id", e.target.value)}
+                        className="px-4 py-2 border rounded focus:ring focus:ring-blue-200"
+                    >
+                        <option value="">Todas las Juntas de Vecinos</option>
+                        {juntasDeVecinos.map((junta) => (
+                            <option key={junta.id} value={junta.id}>{junta.name}</option>
+                        ))}
+                    </select>
+                    <label className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            checked={data.is_board_member}
+                            onChange={(e) => setData("is_board_member", e.target.checked)}
+                            className="form-checkbox"
+                        />
+                        Miembro de Directiva
+                    </label>
                     <button
                         type="submit"
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
@@ -94,14 +121,16 @@ export default function NeighborIndex() {
                         <tr>
                             <th className="px-6 py-3">Rut</th>
                             <th className="px-6 py-3">Usuario Asignado</th>
+                            <th className="px-6 py-3">Junta de Vecinos</th>
                             <th className="px-6 py-3">Estado</th>
                             <th className="px-6 py-3">Dirección</th>
                             <th className="px-6 py-3">Fecha de Registro</th>
+                            <th className="px-6 py-3">Miembro de Directiva</th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {neighbors.data.map((neighbor, index) => (
+                        {filteredNeighbors.map((neighbor, index) => (
                             <tr
                                 key={neighbor.id}
                                 className={`border-t ${index % 2 === 0 ? "bg-gray-50" : ""}`}
@@ -112,11 +141,17 @@ export default function NeighborIndex() {
                                 <td className="px-6 py-3">
                                     {neighbor.user ? neighbor.user.name : "--USUARIO POR ASIGNAR--"}
                                 </td>
+                                <td className="px-6 py-3">
+                                    {neighbor.neighborhood_association ? neighbor.neighborhood_association.name : "--NO ASIGNADO--"}
+                                </td>
                                 <td className={`px-6 py-3 ${neighbor.status === "active" ? "text-green-500" : "text-red-500"}`}>
                                     {neighbor.status === "active" ? "Activo" : "Inactivo"}
                                 </td>
                                 <td className="px-6 py-3">{neighbor.address}</td>
                                 <td className="px-6 py-3">{neighbor.registration_date}</td>
+                                <td className="px-6 py-3">
+                                    {neighbor.is_board_member ? "Sí" : "No"}
+                                </td>
                                 <td className="px-6 py-3 flex gap-2">
                                     <Link
                                         href={`/neighbors/${neighbor.id}`}

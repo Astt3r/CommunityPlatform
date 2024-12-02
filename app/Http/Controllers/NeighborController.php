@@ -20,7 +20,7 @@ class NeighborController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Neighbor::with('user');
+        $query = Neighbor::with(['user', 'neighborhoodAssociation']);
 
         if ($request->has("name")) {
             $query->whereHas('user', function ($query) use ($request) {
@@ -30,25 +30,42 @@ class NeighborController extends Controller
 
         $neighbors = $query->paginate(10)->withQueryString();
 
+        // Obtener todas las juntas de vecinos
+        $juntasDeVecinos = NeighborhoodAssociation::all();
+
+        // Añadir información sobre si el vecino es miembro de la directiva
         return Inertia::render("Neighbor/Index", [
-            'neighbors' => $neighbors->through(fn($neighbor) => [
-                'id' => $neighbor->id,
-                'address' => $neighbor->address,
-                'identification_number' => $neighbor->identification_number,
-                'registration_date' => $neighbor->registration_date,
-                'birth_date' => $neighbor->birth_date,
-                'status' => $neighbor->status, // Enviar el estado directamente
-                'last_participation_date' => $neighbor->last_participation_date,
-                'neighborhood_association_id' => $neighbor->neighborhood_association_id,
-                'user' => $neighbor->user ? [
-                    'id' => $neighbor->user->id,
-                    'name' => $neighbor->user->name,
-                    'email' => $neighbor->user->email,
-                ] : null,
-            ]),
-            'filters' => $request->only('name'),
+            'neighbors' => $neighbors->through(function ($neighbor) {
+                $isBoardMember = \App\Models\CommitteeMember::where('user_id', $neighbor->user_id)
+                    ->where('status', 'active')
+                    ->exists();
+
+                return [
+                    'id' => $neighbor->id,
+                    'address' => $neighbor->address,
+                    'identification_number' => $neighbor->identification_number,
+                    'registration_date' => $neighbor->registration_date,
+                    'birth_date' => $neighbor->birth_date,
+                    'status' => $neighbor->status,
+                    'last_participation_date' => $neighbor->last_participation_date,
+                    'neighborhood_association' => $neighbor->neighborhoodAssociation ? [
+                        'id' => $neighbor->neighborhoodAssociation->id,
+                        'name' => $neighbor->neighborhoodAssociation->name,
+                    ] : null,
+                    'user' => $neighbor->user ? [
+                        'id' => $neighbor->user->id,
+                        'name' => $neighbor->user->name,
+                        'email' => $neighbor->user->email,
+                    ] : null,
+                    'is_board_member' => $isBoardMember,
+                ];
+            }),
+            'filters' => $request->only('name', 'junta_de_vecino_id', 'is_board_member'),
+            'juntasDeVecinos' => $juntasDeVecinos,
         ]);
     }
+
+
 
 
 
