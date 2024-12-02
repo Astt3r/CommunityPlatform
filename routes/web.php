@@ -54,11 +54,11 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 
 //Rutas de ascociaciones nuevas
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committees', CommitteeController::class);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committee-members', CommitteeMemberController::class);
 });
 
