@@ -23,13 +23,13 @@ class CommitteeRequest extends FormRequest
             'name' => 'required|string|max:50|unique:committees,name',
             'description' => 'required|string|max:255',
             'code' => 'nullable|string|max:20|unique:committees,code',
-            'type' => 'required|in:president,treasurer,secretary',
             'status' => 'required|in:active,inactive',
             'effective_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:effective_date',
             'parent_committee_id' => 'nullable|exists:committees,id',
         ];
     }
+
 
 
     /**
@@ -45,8 +45,6 @@ class CommitteeRequest extends FormRequest
             'description.max' => 'La descripción no debe exceder los 255 caracteres.',
             'code.max' => 'El código no debe exceder los 20 caracteres.',
             'code.unique' => 'El código ya está en uso.',
-            'type.required' => 'El tipo es obligatorio.',
-            'type.in' => 'El tipo debe ser "president", "treasurer" o "secretary".',
             'status.required' => 'El estado es obligatorio.',
             'status.in' => 'El estado debe ser "active" o "inactive".',
             'effective_date.required' => 'La fecha de inicio es obligatoria.',

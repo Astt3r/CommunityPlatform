@@ -8,6 +8,8 @@ use App\Models\Neighbor;
 use App\Http\Requests\NeighborhoodAssociationRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use App\Models\Committee;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\NeighborhoodAssociationsExport;
@@ -55,22 +57,46 @@ class NeighborhoodAssociationController extends Controller
      */
     public function store(NeighborhoodAssociationRequest $request)
     {
-        // Validar los datos
-        $validated = $request->validated();
+        DB::beginTransaction();
 
-        // Agregar automáticamente los campos de auditoría
-        $validated['created_by'] = Auth::id();
-        $validated['updated_by'] = Auth::id();
+        try {
+            $validated = $request->validated();
+            $validated['created_by'] = Auth::id();
+            $validated['updated_by'] = Auth::id();
+            $validated['number_of_members'] = 0;
 
-        // Inicializar el número de miembros en 0
-        $validated['number_of_members'] = 0;
+            $association = NeighborhoodAssociation::create($validated);
 
-        // Crear la junta de vecinos
-        $association = NeighborhoodAssociation::create($validated);
+            $committees = [
+                ['name' => 'Presidente', 'description' => 'Comité de Presidencia'],
+                ['name' => 'Tesorero', 'description' => 'Comité de Tesorería'],
+                ['name' => 'Secretario', 'description' => 'Comité de Secretaría'],
+            ];
 
-        return redirect()->route('neighborhood-associations.index')
-            ->with('success', 'Asociación creada exitosamente.');
+            foreach ($committees as $committeeData) {
+                Committee::create([
+                    'name' => $committeeData['name'],
+                    'description' => "{$committeeData['description']} para {$association->name}",
+                    'code' => strtoupper(substr($association->name, 0, 3)) . '_' . strtoupper($committeeData['name']),
+                    'status' => 'active',
+                    'effective_date' => $association->date_of_funding,
+                    'end_date' => null,
+                    'neighborhood_association_id' => $association->id,
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('neighborhood-associations.index')
+                ->with('success', 'Asociación y comités creados exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('neighborhood-associations.create')
+                ->with('error', 'Ocurrió un error al crear la asociación.');
+        }
     }
+
 
 
 

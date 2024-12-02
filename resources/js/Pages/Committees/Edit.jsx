@@ -7,7 +7,6 @@ export default function CommitteesEdit() {
         name: committee.name || "",
         description: committee.description || "",
         code: committee.code || "",
-        type: committee.type || "",
         status: committee.status || "",
         effective_date: committee.effective_date || "",
         end_date: committee.end_date || "",
@@ -37,7 +36,9 @@ export default function CommitteesEdit() {
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.name && (
-                        <div className="text-red-500 text-sm">{errors.name}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.name}
+                        </div>
                     )}
                 </div>
 
@@ -69,28 +70,9 @@ export default function CommitteesEdit() {
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.code && (
-                        <div className="text-red-500 text-sm">{errors.code}</div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Tipo
-                    </label>
-                    <select
-                        value={data.type}
-                        onChange={(e) => setData("type", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    >
-                        <option value="">Seleccione un tipo</option>
-                        {types.map((type) => (
-                            <option key={type} value={type}>
-                                {type.charAt(0).toUpperCase() + type.slice(1)}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.type && (
-                        <div className="text-red-500 text-sm">{errors.type}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.code}
+                        </div>
                     )}
                 </div>
 
@@ -102,13 +84,17 @@ export default function CommitteesEdit() {
                         type="button"
                         onClick={toggleStatus}
                         className={`px-4 py-2 rounded ${
-                            data.status === "active" ? "bg-green-500" : "bg-red-500"
+                            data.status === "active"
+                                ? "bg-green-500"
+                                : "bg-red-500"
                         } text-white hover:opacity-80`}
                     >
                         {data.status === "active" ? "Activo" : "Inactivo"}
                     </button>
                     {errors.status && (
-                        <div className="text-red-500 text-sm">{errors.status}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.status}
+                        </div>
                     )}
                 </div>
 
@@ -119,7 +105,9 @@ export default function CommitteesEdit() {
                     <input
                         type="date"
                         value={data.effective_date}
-                        onChange={(e) => setData("effective_date", e.target.value)}
+                        onChange={(e) =>
+                            setData("effective_date", e.target.value)
+                        }
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.effective_date && (
@@ -140,7 +128,9 @@ export default function CommitteesEdit() {
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.end_date && (
-                        <div className="text-red-500 text-sm">{errors.end_date}</div>
+                        <div className="text-red-500 text-sm">
+                            {errors.end_date}
+                        </div>
                     )}
                 </div>
 

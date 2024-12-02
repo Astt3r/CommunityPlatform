@@ -13,14 +13,14 @@ class Committee extends Model
         'name',
         'description',
         'code',
-        'type', // Nuevo campo
         'status',
-        'created_by',
-        'updated_by',
         'effective_date',
         'end_date',
-        'parent_committee_id',
+        'neighborhood_association_id',
+        'created_by',
     ];
+
+
 
     public function user()
     {
