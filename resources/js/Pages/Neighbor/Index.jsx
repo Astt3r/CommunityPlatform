@@ -17,7 +17,7 @@ export default function NeighborIndex() {
         if (confirm("¿Estás seguro de que deseas eliminar este vecino y su usuario asociado?")) {
             router.delete(route("neighbors.destroy", id), {
                 onSuccess: () => {
-                    setShowAlert(true); // Mostrar alerta de éxito
+                    setShowAlert(true);
                 },
             });
         }
@@ -48,7 +48,6 @@ export default function NeighborIndex() {
         >
             <Head title="Vecinos" />
 
-            {/* Alerta de éxito */}
             {showAlert && (
                 <div
                     className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg flex justify-between"
@@ -65,38 +64,36 @@ export default function NeighborIndex() {
                 </div>
             )}
 
-            {/* Controles de Acciones */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <Link
                     href={route("neighbors.create")}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700"
+                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
                 >
                     Crear Nuevo Vecino
                 </Link>
 
-                {/* Filtro de búsqueda */}
                 <form
                     onSubmit={handleSearch}
-                    className="flex flex-col md:flex-row items-center gap-4"
+                    className="w-full md:w-auto flex flex-col md:flex-row items-center gap-4"
                 >
                     <input
                         type="text"
                         placeholder="Buscar por nombre"
                         value={data.name}
                         onChange={(e) => setData("name", e.target.value)}
-                        className="px-4 py-2 border rounded focus:ring focus:ring-blue-200"
+                        className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                     />
                     <select
                         value={data.junta_de_vecino_id}
                         onChange={(e) => setData("junta_de_vecino_id", e.target.value)}
-                        className="px-4 py-2 border rounded focus:ring focus:ring-blue-200"
+                        className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                     >
                         <option value="">Todas las Juntas de Vecinos</option>
                         {juntasDeVecinos.map((junta) => (
                             <option key={junta.id} value={junta.id}>{junta.name}</option>
                         ))}
                     </select>
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 w-full md:w-auto">
                         <input
                             type="checkbox"
                             checked={data.is_board_member}
@@ -107,14 +104,13 @@ export default function NeighborIndex() {
                     </label>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                        className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
                     >
                         Buscar
                     </button>
                 </form>
             </div>
 
-            {/* Tabla de Vecinos */}
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table className="table-auto w-full text-left text-gray-600">
                     <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
@@ -152,22 +148,22 @@ export default function NeighborIndex() {
                                 <td className="px-6 py-3">
                                     {neighbor.is_board_member ? "Sí" : "No"}
                                 </td>
-                                <td className="px-6 py-3 flex gap-2">
+                                <td className="px-6 py-3 flex flex-col md:flex-row gap-2">
                                     <Link
                                         href={`/neighbors/${neighbor.id}`}
-                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 text-center"
                                     >
                                         Ver
                                     </Link>
                                     <Link
                                         href={`/neighbors/${neighbor.id}/edit`}
-                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
                                     >
                                         Editar
                                     </Link>
                                     <button
                                         onClick={() => handleDelete(neighbor.id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
                                     >
                                         Eliminar
                                     </button>
@@ -178,7 +174,6 @@ export default function NeighborIndex() {
                 </table>
             </div>
 
-            {/* Paginación */}
             <div className="mt-6 flex justify-center gap-2">
                 {neighbors.links.map((link, index) => (
                     <Link
