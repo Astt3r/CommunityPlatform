@@ -7,20 +7,17 @@ use App\Http\Requests\CommitteeRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class CommitteeController extends Controller
 {
+    /**
+     * Listar los comités.
+     */
     public function index(Request $request)
     {
-        $type = $request->get('type'); // Filtro opcional por tipo de comité
-
-        $committees = Committee::query()
-            ->when($type, fn($query) => $query->byType($type))
-            ->get();
+        $committees = Committee::all(); // Obtener todos los comités
 
         return Inertia::render('Committees/Index', [
             'committees' => $committees,
-            'filterType' => $type,
         ]);
     }
 
@@ -29,11 +26,7 @@ class CommitteeController extends Controller
      */
     public function create()
     {
-        $types = ['president', 'treasurer', 'secretary']; // Tipos disponibles
-
-        return Inertia::render('Committees/Create', [
-            'types' => $types,
-        ]);
+        return Inertia::render('Committees/Create'); // Sin necesidad de pasar `types`
     }
 
     /**
@@ -59,14 +52,10 @@ class CommitteeController extends Controller
      */
     public function edit(Committee $committee)
     {
-        $types = ['president', 'treasurer', 'secretary'];
-
         return Inertia::render('Committees/Edit', [
             'committee' => $committee,
-            'types' => $types,
         ]);
     }
-
 
     /**
      * Actualiza la información de un comité existente.
@@ -77,7 +66,6 @@ class CommitteeController extends Controller
             'name' => 'required|string|max:50',
             'description' => 'required|string|max:255',
             'code' => 'nullable|string|max:20|unique:committees,code,' . $committee->id,
-            'type' => 'required|in:president,treasurer,secretary',
             'status' => 'required|in:active,inactive',
             'effective_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:effective_date',

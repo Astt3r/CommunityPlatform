@@ -9,7 +9,6 @@ export default function CommitteesCreate({ types }) {
         name: "",
         description: "",
         code: "",
-        type: "",
         status: "active",
         effective_date: "",
         end_date: "",
@@ -108,32 +107,6 @@ export default function CommitteesCreate({ types }) {
                                 />
                                 <InputError
                                     message={errors.code}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Tipo */}
-                            <div>
-                                <InputLabel htmlFor="type" value="Tipo" />
-                                <select
-                                    id="type"
-                                    name="type"
-                                    value={data.type}
-                                    onChange={(e) =>
-                                        handleChange("type", e.target.value)
-                                    }
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                >
-                                    <option value="">Seleccione un tipo</option>
-                                    {types.map((type) => (
-                                        <option key={type} value={type}>
-                                            {type.charAt(0).toUpperCase() +
-                                                type.slice(1)}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError
-                                    message={errors.type}
                                     className="mt-2"
                                 />
                             </div>
