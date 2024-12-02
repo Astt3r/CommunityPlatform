@@ -33,12 +33,11 @@ export default function CreateIncome({ incomeTypes }) {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Crear Ingreso
                     </h2>
-                    <Link
-                        href={route("incomes.index")}
-                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                    >
-                        Volver
-                    </Link>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
                 </div>
             }
         >
@@ -48,7 +47,7 @@ export default function CreateIncome({ incomeTypes }) {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Fuente */}
                             <div>
-                                <InputLabel htmlFor="source" value="Fuente" />
+                                <InputLabel htmlFor="source" value="Fuente *" />
                                 <TextInput
                                     id="source"
                                     type="text"
@@ -69,7 +68,7 @@ export default function CreateIncome({ incomeTypes }) {
                             <div>
                                 <InputLabel
                                     htmlFor="responsible"
-                                    value="Responsable"
+                                    value="Responsable *"
                                 />
                                 <TextInput
                                     id="responsible"
@@ -88,7 +87,7 @@ export default function CreateIncome({ incomeTypes }) {
 
                             {/* Fecha */}
                             <div>
-                                <InputLabel htmlFor="date" value="Fecha" />
+                                <InputLabel htmlFor="date" value="Fecha *" />
                                 <TextInput
                                     id="date"
                                     type="date"
@@ -106,7 +105,7 @@ export default function CreateIncome({ incomeTypes }) {
 
                             {/* Monto */}
                             <div>
-                                <InputLabel htmlFor="amount" value="Monto" />
+                                <InputLabel htmlFor="amount" value="Monto *" />
                                 <TextInput
                                     id="amount"
                                     type="text"
@@ -131,7 +130,7 @@ export default function CreateIncome({ incomeTypes }) {
                             <div>
                                 <InputLabel
                                     htmlFor="type_id"
-                                    value="Tipo de Ingreso"
+                                    value="Tipo de Ingreso *"
                                 />
                                 <select
                                     id="type_id"
@@ -156,7 +155,7 @@ export default function CreateIncome({ incomeTypes }) {
 
                             {/* Estado */}
                             <div>
-                                <InputLabel htmlFor="status" value="Estado" />
+                                <InputLabel htmlFor="status" value="Estado *" />
                                 <select
                                     id="status"
                                     value={data.status}

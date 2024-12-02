@@ -35,16 +35,23 @@ export default function CreateIncomeType() {
     };
 
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("income-types.index")); // Redirige al índice de tipos de ingreso
+        reset();
+        router.visit(route("income-types.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Tipo de Ingreso
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Tipo de Ingreso
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -53,7 +60,7 @@ export default function CreateIncomeType() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Nombre */}
                             <div>
-                                <InputLabel htmlFor="name" value="Nombre" />
+                                <InputLabel htmlFor="name" value="Nombre *" />
                                 <TextInput
                                     id="name"
                                     type="text"
@@ -93,7 +100,7 @@ export default function CreateIncomeType() {
 
                             {/* Código */}
                             <div>
-                                <InputLabel htmlFor="code" value="Código" />
+                                <InputLabel htmlFor="code" value="Código *" />
                                 <TextInput
                                     id="code"
                                     type="text"
@@ -116,7 +123,7 @@ export default function CreateIncomeType() {
 
                             {/* Estado */}
                             <div>
-                                <InputLabel htmlFor="status" value="Estado" />
+                                <InputLabel htmlFor="status" value="Estado *" />
                                 <select
                                     id="status"
                                     name="status"

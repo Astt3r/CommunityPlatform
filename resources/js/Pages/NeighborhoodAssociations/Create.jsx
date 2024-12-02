@@ -15,15 +15,6 @@ export default function NeighborhoodAssociationCreate() {
         is_active: false,
     });
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     post(route("neighborhood-associations.store"), {
-    //         onFinish: () => {
-    //             if (Object.keys(errors).length === 0) reset();
-    //         },
-    //     });
-    // };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         post(route("neighborhood-associations.store"), {
@@ -32,16 +23,23 @@ export default function NeighborhoodAssociationCreate() {
     };
 
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("neighborhood-associations.index")); // Redirige al índice
+        reset();
+        router.visit(route("neighborhood-associations.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Junta de Vecinos
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Junta de Vecinos
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -50,7 +48,7 @@ export default function NeighborhoodAssociationCreate() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Nombre */}
                             <div>
-                                <InputLabel htmlFor="name" value="Nombre" />
+                                <InputLabel htmlFor="name" value="Nombre *" />
                                 <TextInput
                                     id="name"
                                     type="text"
@@ -61,13 +59,13 @@ export default function NeighborhoodAssociationCreate() {
                                             e.target.value.replace(
                                                 /[^a-zA-Z\s\-]/g,
                                                 ""
-                                            ); // Permite letras, espacios y guiones
+                                            );
                                         setData(
                                             "name",
                                             cleanedValue.slice(0, 255)
-                                        ); // Limita a 255 caracteres
+                                        );
                                     }}
-                                    maxLength={255} // Máximo de 255 caracteres
+                                    maxLength={255}
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -80,7 +78,7 @@ export default function NeighborhoodAssociationCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="address"
-                                    value="Dirección"
+                                    value="Dirección *"
                                 />
                                 <TextInput
                                     id="address"
@@ -92,13 +90,13 @@ export default function NeighborhoodAssociationCreate() {
                                             e.target.value.replace(
                                                 /[^a-zA-Z0-9\s\-,\.]/g,
                                                 ""
-                                            ); // Permite letras, números, espacios, comas y puntos
+                                            );
                                         setData(
                                             "address",
                                             cleanedValue.slice(0, 255)
-                                        ); // Limita a 255 caracteres
+                                        );
                                     }}
-                                    maxLength={255} // Máximo de 255 caracteres
+                                    maxLength={255}
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -109,7 +107,10 @@ export default function NeighborhoodAssociationCreate() {
 
                             {/* Teléfono */}
                             <div>
-                                <InputLabel htmlFor="phone" value="Teléfono" />
+                                <InputLabel
+                                    htmlFor="phone"
+                                    value="Teléfono *"
+                                />
                                 <TextInput
                                     id="phone"
                                     type="text"
@@ -119,13 +120,12 @@ export default function NeighborhoodAssociationCreate() {
                                         e.target.value = e.target.value.replace(
                                             /[^0-9]/g,
                                             ""
-                                        ); // Elimina caracteres no numéricos
+                                        );
                                         setData("phone", e.target.value);
                                     }}
-                                    maxLength={9} // Máximo de 15 caracteres
+                                    maxLength={9}
                                     className="mt-1 block w-full"
                                 />
-
                                 <InputError
                                     message={errors.phone}
                                     className="mt-2"
@@ -134,7 +134,7 @@ export default function NeighborhoodAssociationCreate() {
 
                             {/* Email */}
                             <div>
-                                <InputLabel htmlFor="email" value="Email" />
+                                <InputLabel htmlFor="email" value="Email *" />
                                 <TextInput
                                     id="email"
                                     type="email"
@@ -177,7 +177,7 @@ export default function NeighborhoodAssociationCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="date_of_funding"
-                                    value="Fecha de Fundación"
+                                    value="Fecha de Fundación *"
                                 />
                                 <TextInput
                                     id="date_of_funding"
@@ -202,7 +202,7 @@ export default function NeighborhoodAssociationCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="is_active"
-                                    value="¿Está activa?"
+                                    value="¿Está activa? *"
                                 />
                                 <input
                                     id="is_active"
