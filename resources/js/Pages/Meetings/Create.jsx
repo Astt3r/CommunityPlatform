@@ -17,40 +17,43 @@ export default function CreateMeeting() {
 
     const handleChange = (field, value) => {
         setData(field, value);
-        // No es necesario manejar errores aquí; Inertia lo hace automáticamente.
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
-        // Obtener la fecha actual en formato UTC
+
         const currentDate = new Date().toISOString();
-    
-        // Validar si la fecha de la reunión es posterior a la actual
+
         if (data.meeting_date <= currentDate) {
             alert("La fecha de la reunión debe ser en el futuro.");
             return;
         }
-    
+
         post(route("meetings.store"), {
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
             },
         });
     };
-    
 
     const handleCancel = () => {
-        reset(); // Limpia todo el formulario
-        router.visit(route("meetings.index")); // Redirige a la página de índice
+        reset();
+        router.visit(route("meetings.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Reunión
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Reunión
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -60,7 +63,7 @@ export default function CreateMeeting() {
                             <div>
                                 <InputLabel
                                     htmlFor="meeting_date"
-                                    value="Fecha de la Reunión"
+                                    value="Fecha de la Reunión *"
                                 />
                                 <TextInput
                                     id="meeting_date"
@@ -84,7 +87,7 @@ export default function CreateMeeting() {
                             <div>
                                 <InputLabel
                                     htmlFor="main_topic"
-                                    value="Tema Principal"
+                                    value="Tema Principal *"
                                 />
                                 <TextInput
                                     id="main_topic"
@@ -130,7 +133,10 @@ export default function CreateMeeting() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="location" value="Lugar" />
+                                <InputLabel
+                                    htmlFor="location"
+                                    value="Lugar *"
+                                />
                                 <TextInput
                                     id="location"
                                     type="text"
@@ -150,7 +156,7 @@ export default function CreateMeeting() {
                             <div>
                                 <InputLabel
                                     htmlFor="organized_by"
-                                    value="Convocada Por"
+                                    value="Convocada Por *"
                                 />
                                 <TextInput
                                     id="organized_by"
@@ -193,7 +199,7 @@ export default function CreateMeeting() {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="status" value="Estado" />
+                                <InputLabel htmlFor="status" value="Estado *" />
                                 <select
                                     id="status"
                                     name="status"

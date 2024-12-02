@@ -35,16 +35,23 @@ export default function Create() {
     };
 
     const handleCancel = () => {
-        reset(); // Limpiar el formulario
-        router.visit(route("expense-types.index")); // Redirigir al índice de tipos de gastos
+        reset();
+        router.visit(route("expense-types.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Tipo de Gasto
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Tipo de Gasto
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -55,7 +62,7 @@ export default function Create() {
                             <div>
                                 <InputLabel
                                     htmlFor="name"
-                                    value="Nombre del Tipo de Gasto"
+                                    value="Nombre del Tipo de Gasto *"
                                 />
                                 <TextInput
                                     id="name"
@@ -96,7 +103,7 @@ export default function Create() {
 
                             {/* Código */}
                             <div>
-                                <InputLabel htmlFor="code" value="Código" />
+                                <InputLabel htmlFor="code" value="Código *" />
                                 <TextInput
                                     id="code"
                                     type="text"
@@ -120,7 +127,7 @@ export default function Create() {
 
                             {/* Estado */}
                             <div>
-                                <InputLabel htmlFor="status" value="Estado" />
+                                <InputLabel htmlFor="status" value="Estado *" />
                                 <select
                                     id="status"
                                     name="status"

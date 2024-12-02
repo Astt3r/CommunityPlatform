@@ -41,41 +41,30 @@ export default function ProjectCreate() {
         post(route("projects.store"), {
             data: formData,
             forceFormData: true,
-            // onError: (error) => {
-            //     // Por ejemplo, podrías mostrar un mensaje global de error:
-            //     alert(
-            //         "Hubo un problema al enviar el formulario. Revisa los campos."
-            //     );
-            // },
-
             onFinish: () => {
-                if (Object.keys(errors).length === 0) reset(); // Solo limpia si no hay errores
+                if (Object.keys(errors).length === 0) reset();
             },
         });
     };
 
-    const handleChange = (field, value) => {
-        setData(field, value);
-
-        if (errors[field]) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
-                [field]: undefined,
-            }));
-        }
-    };
-
     const handleCancel = () => {
-        reset(); // Limpia el formulario
-        router.visit(route("projects.index")); // Redirige al índice de proyectos
+        reset();
+        router.visit(route("projects.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Proyecto
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Proyecto
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -85,7 +74,7 @@ export default function ProjectCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="name"
-                                    value="Nombre del Proyecto"
+                                    value="Nombre del Proyecto *"
                                 />
                                 <TextInput
                                     id="name"
@@ -106,7 +95,7 @@ export default function ProjectCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="description"
-                                    value="Descripción"
+                                    value="Descripción *"
                                 />
                                 <TextInput
                                     id="description"
@@ -190,7 +179,7 @@ export default function ProjectCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="status"
-                                    value="Estado del Proyecto"
+                                    value="Estado del Proyecto *"
                                 />
                                 <TextInput
                                     id="status"
@@ -232,7 +221,7 @@ export default function ProjectCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="budget"
-                                    value="Presupuesto"
+                                    value="Presupuesto *"
                                 />
                                 <TextInput
                                     id="budget"

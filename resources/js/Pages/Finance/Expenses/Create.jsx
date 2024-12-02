@@ -23,16 +23,23 @@ export default function CreateExpense({ expenseTypes }) {
     };
 
     const handleCancel = () => {
-        reset(); // Limpiar los datos del formulario
-        router.visit(route("expenses.index")); // Redirigir a la página de índice
+        reset();
+        router.visit(route("expenses.index"));
     };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Crear Gasto
-                </h2>
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Gasto
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
             }
         >
             <div className="py-12">
@@ -42,7 +49,7 @@ export default function CreateExpense({ expenseTypes }) {
                             <div>
                                 <InputLabel
                                     htmlFor="concept"
-                                    value="Concepto"
+                                    value="Concepto *"
                                 />
                                 <TextInput
                                     id="concept"
@@ -50,7 +57,6 @@ export default function CreateExpense({ expenseTypes }) {
                                     name="concept"
                                     value={data.concept}
                                     onChange={(e) => {
-                                        // Permitir solo letras y espacios
                                         const regex = /^[a-zA-Z\s]*$/;
                                         if (regex.test(e.target.value)) {
                                             setData("concept", e.target.value);
@@ -58,7 +64,6 @@ export default function CreateExpense({ expenseTypes }) {
                                     }}
                                     className="mt-1 block w-full"
                                 />
-
                                 <InputError
                                     message={errors.concept}
                                     className="mt-2"
@@ -68,7 +73,7 @@ export default function CreateExpense({ expenseTypes }) {
                             <div>
                                 <InputLabel
                                     htmlFor="responsible"
-                                    value="Responsable"
+                                    value="Responsable *"
                                 />
                                 <TextInput
                                     id="responsible"
@@ -87,7 +92,7 @@ export default function CreateExpense({ expenseTypes }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="date" value="Fecha" />
+                                <InputLabel htmlFor="date" value="Fecha *" />
                                 <TextInput
                                     id="date"
                                     type="date"
@@ -105,15 +110,14 @@ export default function CreateExpense({ expenseTypes }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="amount" value="Monto" />
+                                <InputLabel htmlFor="amount" value="Monto *" />
                                 <TextInput
                                     id="amount"
                                     type="text"
                                     name="amount"
                                     value={data.amount}
                                     onChange={(e) => {
-                                        // Permitir solo números
-                                        const regex = /^[0-9]*\.?[0-9]*$/; // Permite números con decimales opcionales
+                                        const regex = /^[0-9]*\.?[0-9]*$/;
                                         if (regex.test(e.target.value)) {
                                             setData("amount", e.target.value);
                                         }
@@ -129,7 +133,7 @@ export default function CreateExpense({ expenseTypes }) {
                             <div>
                                 <InputLabel
                                     htmlFor="type_id"
-                                    value="Tipo de Gasto"
+                                    value="Tipo de Gasto *"
                                 />
                                 <select
                                     id="type_id"
@@ -149,6 +153,26 @@ export default function CreateExpense({ expenseTypes }) {
                                 </select>
                                 <InputError
                                     message={errors.type_id}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    htmlFor="receipt"
+                                    value="Recibo (opcional)"
+                                />
+                                <input
+                                    id="receipt"
+                                    type="file"
+                                    name="receipt"
+                                    onChange={(e) =>
+                                        setData("receipt", e.target.files[0])
+                                    }
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError
+                                    message={errors.receipt}
                                     className="mt-2"
                                 />
                             </div>
