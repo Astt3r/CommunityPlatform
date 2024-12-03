@@ -32,4 +32,9 @@ class Project extends Model
         return $this->hasMany(File::class, 'project_id', 'id');
     }
 
+    public function contributions()
+    {
+        return $this->hasMany(Contribution::class);
+    }
+
 }

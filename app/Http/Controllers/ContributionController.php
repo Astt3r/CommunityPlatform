@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Contribution;
 use Illuminate\Http\Request;
+use App\Models\Project;
+use App\Models\Neighbor;
+use Illuminate\Support\Facades\Validator;
 
 class ContributionController extends Controller
 {
@@ -28,8 +31,33 @@ class ContributionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'project_id' => 'required|exists:projects,id',
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error de validación',
+                'errors' => $validator->errors(),
+            ], 400);
+        }
+
+        $contribution = Contribution::create([
+            'neighbor_id' => Neighbor::where('user_id', auth('web')->id())->first()->id, // Encuentra al vecino por user_id
+            'project_id' => $request->project_id,
+            'amount' => $request->amount,
+        ]);
+
+
+        return response()->json([
+            'message' => 'Contribución creada exitosamente',
+            'contribution' => $contribution,
+        ]);
     }
+
+
+
 
     /**
      * Display the specified resource.
@@ -62,4 +90,18 @@ class ContributionController extends Controller
     {
         //
     }
+
+    public function indexByProject($projectId)
+    {
+        // Verificar que el proyecto exista y esté activo
+        $project = Project::findOrFail($projectId);
+
+        // Obtener contribuciones relacionadas con el proyecto
+        $contributions = Contribution::where('project_id', $projectId)
+            ->with('neighbor') // Si tienes relación con Neighbor
+            ->get();
+
+        return response()->json($contributions);
+    }
+
 }

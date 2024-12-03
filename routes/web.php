@@ -62,7 +62,7 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committee-members', CommitteeMemberController::class);
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,resident'])->group(function () {
     Route::resource('contributions', ContributionController::class);
 });
 
@@ -124,7 +124,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('neighborhood-associations', NeighborhoodAssociationController::class);
 });
 
-Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
+    Route::get('/projects/{project}/contributions', [ContributionController::class, 'indexByProject'])->name('projects.contributions');
+});
+
+
+Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::post('/projects/{project}/upload-file', [ProjectController::class, 'uploadFile'])->name('projects.uploadFile');
 

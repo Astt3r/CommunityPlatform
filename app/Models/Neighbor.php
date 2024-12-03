@@ -40,6 +40,12 @@ class Neighbor extends Model
         return $this->belongsTo(NeighborhoodAssociation::class, 'association_id'); // Ajusta 'association_id' si la clave foránea tiene otro nombre
     }
 
+    // Relación con Contributions
+    public function contributions()
+    {
+        return $this->hasMany(Contribution::class);
+    }
+
 
 
 

@@ -51,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
                     ],
                     'resident' => [
                         ['name' => 'Dashboard', 'route' => 'dashboard'],
+                        ['name' => 'Proyectos', 'route' => 'projects.index'],
+                        // ['name' => 'Contribuciones', 'route' => 'contributions.index'],
+    
                     ],
                     default => [],
                 };
