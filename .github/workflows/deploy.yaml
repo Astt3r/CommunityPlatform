@@ -1,101 +1,99 @@
-name: CI/CD Pipeline
+# name: CI/CD Pipeline
 
-on:
-  push:
-    branches:
-      - master  # o la rama específica
+# on:
+#   push:
+#     branches:
+#       - master  # o la rama específica
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '22'
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: '22'
 
-      - name: Install dependencies
-        run: npm install
+#       - name: Install dependencies
+#         run: npm install
 
-      - name: Build assets
-        run: npm run build
+#       - name: Build assets
+#         run: npm run build
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, bcmath, pdo_mysql, zip
-          ini-values: post_max_size=256M, upload_max_filesize=256M
+#       - name: Set up PHP
+#         uses: shivammathur/setup-php@v2
+#         with:
+#           php-version: '8.2'
+#           extensions: mbstring, bcmath, pdo_mysql, zip
+#           ini-values: post_max_size=256M, upload_max_filesize=256M
 
-      - name: Install Composer dependencies
-        run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
+#       - name: Install Composer dependencies
+#         run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
-      - name: Deploy to EC2
-        env:
-          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          EC2_USER: 'ec2-user'
-          EC2_HOST: '18.229.142.228'
-          PROJECT_PATH: '/var/www/html/juntatransparente'
+#       - name: Deploy to EC2
+#         env:
+#           SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+#           EC2_USER: 'ec2-user'
+#           EC2_HOST: '18.229.142.228'
+#           PROJECT_PATH: '/var/www/html/juntatransparente'
 
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+#         run: |
+#           mkdir -p ~/.ssh
+#           echo "$SSH_KEY" > ~/.ssh/id_rsa
+#           chmod 600 ~/.ssh/id_rsa
 
-          # Ajuste temporal de permisos antes de ejecutar `rsync`
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            sudo chmod -R 777 /var/www/html/juntatransparente/storage
-            sudo chmod -R 777 /var/www/html/juntatransparente/bootstrap/cache
-          EOF
+#           # Ajuste temporal de permisos antes de ejecutar `rsync`
+#           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+#             sudo chmod -R 777 /var/www/html/juntatransparente/storage
+#             sudo chmod -R 777 /var/www/html/juntatransparente/bootstrap/cache
+#           EOF
 
+#           # Copy files to EC2
+#           rsync -avr --delete-after --no-times --no-perms \
+#           rsync -avr --delete-after --no-times --no-perms \
+#             --exclude 'node_modules' \
+#             --exclude '.git' \
+#             --exclude 'storage/framework/cache/data' \
+#             --exclude '.env' \
+#             --exclude 'database/database.sqlite' \
+#             -e "ssh -o StrictHostKeyChecking=no" \
+#             . $EC2_USER@$EC2_HOST:$PROJECT_PATH
 
-          # Copy files to EC2
-          rsync -avr --delete-after --no-times --no-perms \
-          rsync -avr --delete-after --no-times --no-perms \
-            --exclude 'node_modules' \
-            --exclude '.git' \
-            --exclude 'storage/framework/cache/data' \
-            --exclude '.env' \
-            --exclude 'database/database.sqlite' \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            . $EC2_USER@$EC2_HOST:$PROJECT_PATH
+#           # Restauración de permisos después de `rsync`
+#           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+#             sudo chown -R apache:apache /var/www/html/juntatransparente/storage
+#             sudo chmod -R 775 /var/www/html/juntatransparente/storage
+#             sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
+#             sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+#           EOF
 
-          # Restauración de permisos después de `rsync`
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            sudo chown -R apache:apache /var/www/html/juntatransparente/storage
-            sudo chmod -R 775 /var/www/html/juntatransparente/storage
-            sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
-            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
-          EOF
+#           # Run deployment commands with necessary permissions
+#           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+#             cd /var/www/html/juntatransparente
 
+#             # Configurar permisos para los directorios y archivos necesarios
+#             sudo chown -R apache:apache /var/www/html/juntatransparente/database
+#             sudo chmod -R 775 /var/www/html/juntatransparente/database
+#             sudo chown apache:apache /var/www/html/juntatransparente/database/database.sqlite
+#             sudo chmod 664 /var/www/html/juntatransparente/database/database.sqlite
 
-          # Run deployment commands with necessary permissions
-          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-            cd /var/www/html/juntatransparente
-            
-            # Configurar permisos para los directorios y archivos necesarios
-            sudo chown -R apache:apache /var/www/html/juntatransparente/database
-            sudo chmod -R 775 /var/www/html/juntatransparente/database
-            sudo chown apache:apache /var/www/html/juntatransparente/database/database.sqlite
-            sudo chmod 664 /var/www/html/juntatransparente/database/database.sqlite
+#             sudo chown -R ec2-user:ec2-user /var/www/html/juntatransparente
+#             sudo chown -R apache:apache /var/www/html/juntatransparente/storage
+#             sudo chmod -R 775 /var/www/html/juntatransparente/storage
+#             sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
+#             sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
 
-            sudo chown -R ec2-user:ec2-user /var/www/html/juntatransparente
-            sudo chown -R apache:apache /var/www/html/juntatransparente/storage
-            sudo chmod -R 775 /var/www/html/juntatransparente/storage
-            sudo chown -R apache:apache /var/www/html/juntatransparente/bootstrap/cache
-            sudo chmod -R 775 /var/www/html/juntatransparente/bootstrap/cache
+#             # Ejecutar comandos de Laravel
+#             php artisan migrate --force
+#             php artisan config:cache
+#             php artisan route:cache
+#             php artisan view:cache
 
-            # Ejecutar comandos de Laravel
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-
-            # Reiniciar Apache para aplicar cambios
-            sudo systemctl restart httpd
-            exit
-          EOF
+#             # Reiniciar Apache para aplicar cambios
+#             sudo systemctl restart httpd
+#             exit
+#           EOF
