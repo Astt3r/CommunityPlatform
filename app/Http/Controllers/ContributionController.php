@@ -44,7 +44,7 @@ class ContributionController extends Controller
         }
 
         $contribution = Contribution::create([
-            'neighbor_id' => Neighbor::where('user_id', auth('web')->id())->first()->id, // Encuentra al vecino por user_id
+            'neighbor_id' => Neighbor::where('user_id', operator: auth('web')->id())->first()->id, // Encuentra al vecino por user_id
             'project_id' => $request->project_id,
             'amount' => $request->amount,
         ]);
@@ -93,15 +93,31 @@ class ContributionController extends Controller
 
     public function indexByProject($projectId)
     {
-        // Verificar que el proyecto exista y esté activo
+        // Verificar que el proyecto exista
         $project = Project::findOrFail($projectId);
 
-        // Obtener contribuciones relacionadas con el proyecto
+        // Verificar si el usuario es board_member
+        $isBoardMember = \App\Models\User::find(auth()->id())->role === 'board_member';
+
+        // Obtener contribuciones con la relación cargada
         $contributions = Contribution::where('project_id', $projectId)
-            ->with('neighbor') // Si tienes relación con Neighbor
-            ->get();
+            ->with(['neighbor.user']) // Cargar la relación hasta el modelo User
+            ->get()
+            ->map(function ($contribution) use ($isBoardMember) {
+                return [
+                    'id' => $contribution->id,
+                    'amount' => $contribution->amount,
+                    'created_at' => $contribution->created_at->format('Y-m-d'),
+                    'neighbor_name' => $isBoardMember && $contribution->neighbor ? optional($contribution->neighbor->user)->name : "Anónimo", // Obtener el nombre del usuario relacionado
+                ];
+            });
 
         return response()->json($contributions);
     }
+
+
+
+
+
 
 }

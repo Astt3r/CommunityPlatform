@@ -189,8 +189,9 @@ export default function ProjectsIndex() {
                                                     }`}
                                                 >
                                                     <td className="px-6 py-3">
-                                                        {contribution.neighbor_name ||
-                                                            "Anónimo"}
+                                                        {
+                                                            contribution.neighbor_name
+                                                        }
                                                     </td>
                                                     <td className="px-6 py-3">
                                                         ${contribution.amount}
@@ -211,6 +212,7 @@ export default function ProjectsIndex() {
                                 </p>
                             )}
                         </div>
+
                         {isResident && (
                             <form
                                 onSubmit={(e) => {
