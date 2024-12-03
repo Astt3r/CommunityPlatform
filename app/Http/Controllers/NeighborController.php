@@ -6,6 +6,7 @@ use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
 use App\Http\Requests\NeighborRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -169,6 +170,12 @@ class NeighborController extends Controller
     public function edit($id)
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
+
+        // Verificar que el usuario autenticado no pueda editar su propio registro
+        if (Auth::id() === $neighbor->user_id) {
+            return redirect()->route('neighbors.index')->with('error', 'No puedes editar tu propio registro. Inicia Sesión con la cuenta Debug');
+        }
+
         $associations = NeighborhoodAssociation::all(['id', 'name']);
         $users = User::all(['id', 'name', 'email']); // Obtenemos todos los usuarios con su ID, nombre y correo electrónico
 
@@ -251,6 +258,11 @@ class NeighborController extends Controller
 
     public function destroy(Neighbor $neighbor)
     {
+        // Verificar que el usuario autenticado no pueda eliminar su propio registro
+        if (Auth::id() === $neighbor->user_id) {
+            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar tu propio registro. Inicia Sesión con la cuenta Debug');
+        }
+
         // Obtener la asociación antes de eliminar el vecino
         $association = $neighbor->neighborhoodAssociation;
 
