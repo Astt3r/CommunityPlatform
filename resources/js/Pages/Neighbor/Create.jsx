@@ -4,6 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
+import { formatRUT } from "@/Components/format";
 
 export default function CreateNeighborWithUser({ associations }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -185,7 +186,7 @@ export default function CreateNeighborWithUser({ associations }) {
                                     onChange={(e) =>
                                         setData(
                                             "identification_number",
-                                            e.target.value
+                                            formatRUT(e.target.value)
                                         )
                                     }
                                     placeholder="Ej: 12.345.678-9"
@@ -322,7 +323,10 @@ export default function CreateNeighborWithUser({ associations }) {
                                 >
                                     Cancelar
                                 </button>
-                                <PrimaryButton className="bg-blue-600 text-white px-4 py-2 rounded-md" disabled={processing}>
+                                <PrimaryButton
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                                    disabled={processing}
+                                >
                                     Agregar Vecino y Usuario
                                 </PrimaryButton>
                             </div>
