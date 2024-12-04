@@ -27,9 +27,9 @@ export default function CreateNeighborWithUser({ associations }) {
     const submit = (e) => {
         e.preventDefault();
         post(route("neighbors.store"), {
-            onFinish: () => {
-                if (Object.keys(errors).length === 0) reset();
-            },
+            // onFinish: () => {
+            //     if (Object.keys(errors).length === 0) reset();
+            // },
         });
     };
 

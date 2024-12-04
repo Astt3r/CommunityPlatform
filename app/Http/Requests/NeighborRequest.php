@@ -19,29 +19,35 @@ class NeighborRequest extends FormRequest
      */
     public function rules()
     {
-        $neighborId = $this->route('neighbor')?->id; // Para permitir la edición sin duplicados
+        $neighborId = $this->route('neighbor')?->id; // Obtener el ID del vecino (para edición)
+        $userId = $this->route('neighbor')?->user_id; // Obtener el ID del usuario relacionado
 
         return [
-            'user_id' => 'nullable|unique:neighbors,user_id,' . $neighborId, // Cada usuario debe ser único como vecino
-            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId, // Dirección única
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $userId, // Ignorar el usuario actual
+            'password' => $this->isMethod('post') ? 'required|string|confirmed|min:8' : 'nullable|string|confirmed|min:8', // Obligatorio solo al crear
+            'role' => 'nullable|string|in:resident,board_member,admin',
+            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId, // Ignorar la dirección actual
             'identification_number' => [
                 'required',
-                'regex:/^[a-zA-Z0-9.-]+$/',
                 'max:50',
-                'unique:neighbors,identification_number,' . $neighborId, // Único para nuevos y actualizaciones
+                'unique:neighbors,identification_number,' . $neighborId, // Ignorar el vecino actual
                 function ($attribute, $value, $fail) {
                     if (!$this->isValidRUT($value)) {
                         $fail('El RUT ingresado no tiene un formato válido.');
                     }
                 },
             ],
-            'registration_date' => 'required|date|before_or_equal:today', // Fecha de registro válida y no futura
-            'birth_date' => 'required|date|before:today', // Fecha de nacimiento válida y anterior a hoy
-            'status' => 'required|in:active,inactive', // Solo "active" o "inactive"
-            'last_participation_date' => 'nullable|date|after_or_equal:registration_date', // Fecha posterior o igual a la de registro
-            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id', // Asociación vecinal válida
+            'registration_date' => 'required|date|before_or_equal:today',
+            'birth_date' => 'required|date|before:today',
+            'status' => 'required|in:active,inactive',
+            'last_participation_date' => 'nullable|date|after_or_equal:registration_date',
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
     }
+
+
+
 
     /**
      * Custom error messages.
@@ -78,11 +84,12 @@ class NeighborRequest extends FormRequest
      */
     private function isValidRUT($rut)
     {
-        $rut = preg_replace('/[^k0-9]/i', '', $rut);
+        $rut = preg_replace('/[^k0-9]/i', '', $rut); // Eliminar caracteres no válidos
         $dv = substr($rut, -1);
         $numero = substr($rut, 0, strlen($rut) - 1);
         $i = 2;
         $suma = 0;
+
         foreach (array_reverse(str_split($numero)) as $v) {
             if ($i == 8) {
                 $i = 2;
@@ -90,6 +97,7 @@ class NeighborRequest extends FormRequest
             $suma += $v * $i;
             ++$i;
         }
+
         $dvr = 11 - ($suma % 11);
         if ($dvr == 11) {
             $dvr = 0;
@@ -97,6 +105,8 @@ class NeighborRequest extends FormRequest
         if ($dvr == 10) {
             $dvr = 'K';
         }
+
         return (string) $dvr === strtoupper($dv);
     }
+
 }

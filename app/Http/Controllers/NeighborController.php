@@ -75,6 +75,7 @@ class NeighborController extends Controller
         $validatedData = $request->validated();
 
         DB::transaction(function () use ($validatedData) {
+            // Crear el usuario
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
@@ -82,7 +83,8 @@ class NeighborController extends Controller
                 'role' => $validatedData['role'] ?? 'resident',
             ]);
 
-            Neighbor::create([
+            // Crear el vecino
+            $neighbor = Neighbor::create([
                 'user_id' => $user->id,
                 'address' => $validatedData['address'],
                 'identification_number' => $validatedData['identification_number'],
@@ -91,10 +93,15 @@ class NeighborController extends Controller
                 'status' => $validatedData['status'],
                 'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
             ]);
+
+            // Actualizar el número de miembros de la asociación
+            $neighbor->neighborhoodAssociation->updateNumberOfMembers();
         });
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario creados exitosamente.');
     }
+
+
 
 
 
@@ -183,12 +190,17 @@ class NeighborController extends Controller
         $validatedData = $request->validated();
 
         DB::transaction(function () use ($validatedData, $neighbor) {
+            // Actualizar el usuario relacionado
             $neighbor->user->update([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'role' => $validatedData['role'],
             ]);
 
+            // Verificar si cambió de asociación
+            $oldAssociation = $neighbor->neighborhoodAssociation;
+
+            // Actualizar el vecino
             $neighbor->update([
                 'address' => $validatedData['address'],
                 'identification_number' => $validatedData['identification_number'],
@@ -197,10 +209,18 @@ class NeighborController extends Controller
                 'status' => $validatedData['status'],
                 'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
             ]);
+
+            // Si cambió de asociación, actualizar ambas
+            if ($oldAssociation->id !== $neighbor->neighborhood_association_id) {
+                $oldAssociation->updateNumberOfMembers();
+                $neighbor->neighborhoodAssociation->updateNumberOfMembers();
+            }
         });
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
+
+
 
 
 
