@@ -19,10 +19,22 @@ class NeighborRequest extends FormRequest
      */
     public function rules()
     {
+        $neighborId = $this->route('neighbor')?->id; // Para permitir la edición sin duplicados
+
         return [
-            'user_id' => 'nullable|unique:neighbors,user_id', // Cada usuario debe ser único como vecino
-            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address', // Dirección única con formato válido
-            'identification_number' => 'required|regex:/^[a-zA-Z0-9.-]+$/|max:50|unique:neighbors,identification_number', // Número de identificación único
+            'user_id' => 'nullable|unique:neighbors,user_id,' . $neighborId, // Cada usuario debe ser único como vecino
+            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId, // Dirección única
+            'identification_number' => [
+                'required',
+                'regex:/^[a-zA-Z0-9.-]+$/',
+                'max:50',
+                'unique:neighbors,identification_number,' . $neighborId, // Único para nuevos y actualizaciones
+                function ($attribute, $value, $fail) {
+                    if (!$this->isValidRUT($value)) {
+                        $fail('El RUT ingresado no tiene un formato válido.');
+                    }
+                },
+            ],
             'registration_date' => 'required|date|before_or_equal:today', // Fecha de registro válida y no futura
             'birth_date' => 'required|date|before:today', // Fecha de nacimiento válida y anterior a hoy
             'status' => 'required|in:active,inactive', // Solo "active" o "inactive"
@@ -30,7 +42,6 @@ class NeighborRequest extends FormRequest
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id', // Asociación vecinal válida
         ];
     }
-
 
     /**
      * Custom error messages.
@@ -62,4 +73,30 @@ class NeighborRequest extends FormRequest
         ];
     }
 
+    /**
+     * Validar el formato del RUT.
+     */
+    private function isValidRUT($rut)
+    {
+        $rut = preg_replace('/[^k0-9]/i', '', $rut);
+        $dv = substr($rut, -1);
+        $numero = substr($rut, 0, strlen($rut) - 1);
+        $i = 2;
+        $suma = 0;
+        foreach (array_reverse(str_split($numero)) as $v) {
+            if ($i == 8) {
+                $i = 2;
+            }
+            $suma += $v * $i;
+            ++$i;
+        }
+        $dvr = 11 - ($suma % 11);
+        if ($dvr == 11) {
+            $dvr = 0;
+        }
+        if ($dvr == 10) {
+            $dvr = 'K';
+        }
+        return (string) $dvr === strtoupper($dv);
+    }
 }
