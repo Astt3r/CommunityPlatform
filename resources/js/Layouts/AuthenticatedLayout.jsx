@@ -39,21 +39,6 @@ export default function Authenticated({ header, children }) {
 
                         {/* Bienvenida y Dropdown */}
                         <div className="ml-auto flex items-center space-x-6">
-                            {/* Mensaje de Bienvenida */}
-                            <div className="text-right">
-                                <h2 className="text-lg font-bold text-gob-grey-70">
-                                    Bienvenido, {auth?.user?.name || "Usuario"}
-                                </h2>
-                                {auth?.neighborhood_association && (
-                                    <p className="text-sm text-gob-grey-70">
-                                        Perteneces a la junta de vecinos:{" "}
-                                        <strong>
-                                            {auth.neighborhood_association.name}
-                                        </strong>
-                                    </p>
-                                )}
-                            </div>
-
                             {/* Dropdown */}
                             <div className="relative">
                                 <Dropdown>
@@ -64,6 +49,18 @@ export default function Authenticated({ header, children }) {
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gob-grey-70 transition duration-150 ease-in-out hover:text-gob-primary-base focus:outline-none"
                                             >
                                                 {auth.user.name}
+                                                {auth.neighborhood_association
+                                                    ?.name && (
+                                                    <>
+                                                        {" "}
+                                                        |{" "}
+                                                        {
+                                                            auth
+                                                                .neighborhood_association
+                                                                .name
+                                                        }
+                                                    </>
+                                                )}
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -95,18 +92,6 @@ export default function Authenticated({ header, children }) {
                                         >
                                             Cerrar Sesión
                                         </Dropdown.Link>
-                                        {auth?.neighborhood_association && (
-                                            <div className="px-4 py-2 text-sm text-gob-grey-70 border-t border-gob-grey-20">
-                                                Junta de vecinos:{" "}
-                                                <strong>
-                                                    {
-                                                        auth
-                                                            .neighborhood_association
-                                                            .name
-                                                    }
-                                                </strong>
-                                            </div>
-                                        )}
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
