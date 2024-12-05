@@ -18,9 +18,6 @@ return new class extends Migration {
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->date('effective_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->foreignId('neighborhood_association_id')
-                ->constrained('neighborhood_associations')
-                ->onDelete('cascade');
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();
