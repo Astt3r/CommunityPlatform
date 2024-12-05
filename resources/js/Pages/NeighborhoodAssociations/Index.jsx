@@ -26,15 +26,35 @@ export default function NeighborhoodAssociationsIndex() {
 
     const handleExport = async () => {
         try {
+            // Realizar la solicitud al backend
             const response = await axios.get("/export-neighborhoods", {
                 responseType: "blob",
                 params: { latest },
             });
 
+            // Obtener la fecha y hora actual en formato chileno (DD-MM-YYYY)
+            const now = new Date();
+            const timestamp = `${String(now.getDate()).padStart(
+                2,
+                "0"
+            )}-${String(now.getMonth() + 1).padStart(
+                2,
+                "0"
+            )}-${now.getFullYear()}_${String(now.getHours()).padStart(
+                2,
+                "0"
+            )}-${String(now.getMinutes()).padStart(2, "0")}-${String(
+                now.getSeconds()
+            ).padStart(2, "0")}`;
+
+            // Generar un nombre de archivo con la fecha y hora
+            const fileName = `juntas_de_vecinos_${timestamp}.xlsx`;
+
+            // Crear un enlace de descarga
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
             link.href = url;
-            link.setAttribute("download", "neighborhood_associations.xlsx");
+            link.setAttribute("download", fileName);
             document.body.appendChild(link);
             link.click();
             link.remove();
