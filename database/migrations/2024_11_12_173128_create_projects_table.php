@@ -16,10 +16,11 @@ return new class extends Migration {
             $table->string('description');
             $table->text('issue');
             $table->date('start_date');
-            $table->date('end_date');
-            $table->string('status')->nullable();
-            $table->string('responsible')->nullable();
+            $table->date('end_date')->nullable();
+            $table->enum('status', ['planeado', 'aprovado', 'en_proceso', 'completado', 'cancelado'])->default('planeado');
             $table->string('budget');
+            // Agregar columna para registro de cambios en base a texto
+            $table->longText('changes');
             $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
             $table->timestamps();
         });
