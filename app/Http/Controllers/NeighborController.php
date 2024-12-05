@@ -21,17 +21,44 @@ class NeighborController extends Controller
      */
     public function index(Request $request)
     {
+        // Obtener el usuario autenticado desde el request
+        $user = $request->user();
+
+        // Verificar si el usuario es administrador
+        $isAdmin = $user->role === 'admin'; // Cambia 'role' por el campo real donde almacenes los roles
+
+        // Si no es administrador, obtener su Neighbor relacionado
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            // Validar que el usuario tenga un registro como Neighbor
+            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+                abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
+            }
+
+            // Obtener el ID de la junta de vecinos del Neighbor
+            $neighborhoodAssociationId = $neighbor->neighborhoodAssociation->id;
+        }
+
+        // Query para obtener los vecinos
         $query = Neighbor::with(['user', 'neighborhoodAssociation']);
 
+        // Si no es administrador, filtrar por junta de vecinos
+        if (!$isAdmin) {
+            $query->where('neighborhood_association_id', $neighborhoodAssociationId);
+        }
+
+        // Aplicar filtro por nombre si está presente
         if ($request->has("name")) {
             $query->whereHas('user', function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->input('name') . '%');
             });
         }
 
+        // Paginación de resultados
         $neighbors = $query->paginate(10)->withQueryString();
 
-        // Obtener todas las juntas de vecinos
+        // Obtener todas las juntas de vecinos (opcional, si es relevante para la vista)
         $juntasDeVecinos = NeighborhoodAssociation::all();
 
         // Añadir información sobre si el vecino es miembro de la directiva
@@ -65,6 +92,11 @@ class NeighborController extends Controller
             'juntasDeVecinos' => $juntasDeVecinos,
         ]);
     }
+
+
+
+
+
 
 
 
