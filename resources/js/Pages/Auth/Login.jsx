@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import SmallLink from "@/Components/SmallLink";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -26,19 +26,6 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head>
                 <title>Iniciar Sesión</title>
-                <link
-                    rel="preconnect"
-                    href="https://fonts.googleapis.com"
-                ></link>
-                <link
-                    rel="preconnect"
-                    href="https://fonts.gstatic.com"
-                    crossorigin
-                ></link>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-                    rel="stylesheet"
-                ></link>
             </Head>
 
             {status && (
