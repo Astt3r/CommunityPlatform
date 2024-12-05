@@ -30,10 +30,12 @@ class AppServiceProvider extends ServiceProvider
             'navLinks' => function () {
                 $user = Auth::user();
 
+                // Si el usuario no está autenticado, devuelve una lista vacía
                 if (!$user) {
                     return [];
                 }
 
+                // Devuelve una lista de enlaces de navegación basado en el rol del usuario
                 return match ($user->role) {
                     'admin' => [
                         ['name' => 'Dashboard', 'route' => 'dashboard'],
@@ -42,18 +44,24 @@ class AppServiceProvider extends ServiceProvider
                         ['name' => 'Directivas', 'route' => 'committee-members.index'],
                         ['name' => 'Proyectos', 'route' => 'projects.index'],
                         ['name' => 'Reuniones', 'route' => 'meetings.index'],
-                        ['name' => 'Finanzas', 'route' => 'finance.index'], // Actualizado para redirigir a Finanzas
+                        ['name' => 'Finanzas', 'route' => 'finance.index'],
                     ],
                     'board_member' => [
                         ['name' => 'Finanzas', 'route' => 'finance.index'],
-                        ['name' => 'Proyectos', 'route' => 'projects.index'],
+                        ['name' => 'Vecinos', 'route' => 'neighbors.index'],
                         ['name' => 'Directivas', 'route' => 'committee-members.index'],
+                        ['name' => 'Proyectos', 'route' => 'projects.index'],
+                        ['name' => 'Reuniones', 'route' => 'meetings.index'],
+                        ['name' => 'Finanzas', 'route' => 'finance.index'],
+
                     ],
                     'resident' => [
                         ['name' => 'Dashboard', 'route' => 'dashboard'],
+                        ['name' => 'Vecinos', 'route' => 'neighbors.index'],
                         ['name' => 'Proyectos', 'route' => 'projects.index'],
-                        // ['name' => 'Contribuciones', 'route' => 'contributions.index'],
-    
+                        ['name' => 'Reuniones', 'route' => 'meetings.index'],
+                        ['name' => 'Finanzas', 'route' => 'finance.index'],
+
                     ],
                     default => [],
                 };
