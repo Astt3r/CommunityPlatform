@@ -3,9 +3,16 @@ import { usePage, Link, useForm } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
+import { formatDate } from "@/Components/formatDate"; // Importa la función formatDate
 
 export default function NeighborIndex() {
-    const { neighbors, filters, flash, userRole, juntasDeVecinos = [] } = usePage().props;
+    const {
+        neighbors,
+        filters,
+        flash,
+        userRole,
+        juntasDeVecinos = [],
+    } = usePage().props;
     const { data, setData, get } = useForm({
         name: filters.name || "",
         junta_de_vecino_id: filters.junta_de_vecino_id || "",
@@ -14,7 +21,11 @@ export default function NeighborIndex() {
     const [showAlert, setShowAlert] = useState(!!flash.success);
 
     const handleDelete = (id) => {
-        if (confirm("¿Estás seguro de que deseas eliminar este vecino y su usuario asociado?")) {
+        if (
+            confirm(
+                "¿Estás seguro de que deseas eliminar este vecino y su usuario asociado?"
+            )
+        ) {
             router.delete(route("neighbors.destroy", id), {
                 onSuccess: () => {
                     setShowAlert(true);
@@ -34,9 +45,12 @@ export default function NeighborIndex() {
         }
     }, [flash.success]);
 
-    const filteredNeighbors = neighbors.data.filter(neighbor => {
-        const matchesJunta = !data.junta_de_vecino_id || neighbor.neighborhood_association?.id == data.junta_de_vecino_id;
-        const matchesBoardMember = !data.is_board_member || neighbor.is_board_member;
+    const filteredNeighbors = neighbors.data.filter((neighbor) => {
+        const matchesJunta =
+            !data.junta_de_vecino_id ||
+            neighbor.neighborhood_association?.id == data.junta_de_vecino_id;
+        const matchesBoardMember =
+            !data.is_board_member || neighbor.user?.role === "board_member";
         return matchesJunta && matchesBoardMember;
     });
 
@@ -85,19 +99,25 @@ export default function NeighborIndex() {
                     />
                     <select
                         value={data.junta_de_vecino_id}
-                        onChange={(e) => setData("junta_de_vecino_id", e.target.value)}
+                        onChange={(e) =>
+                            setData("junta_de_vecino_id", e.target.value)
+                        }
                         className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                     >
                         <option value="">Todas las Juntas de Vecinos</option>
                         {juntasDeVecinos.map((junta) => (
-                            <option key={junta.id} value={junta.id}>{junta.name}</option>
+                            <option key={junta.id} value={junta.id}>
+                                {junta.name}
+                            </option>
                         ))}
                     </select>
                     <label className="flex items-center gap-2 w-full md:w-auto">
                         <input
                             type="checkbox"
                             checked={data.is_board_member}
-                            onChange={(e) => setData("is_board_member", e.target.checked)}
+                            onChange={(e) =>
+                                setData("is_board_member", e.target.checked)
+                            }
                             className="form-checkbox"
                         />
                         Miembro de Directiva
@@ -121,6 +141,7 @@ export default function NeighborIndex() {
                             <th className="px-6 py-3">Estado</th>
                             <th className="px-6 py-3">Dirección</th>
                             <th className="px-6 py-3">Fecha de Registro</th>
+                            <th className="px-6 py-3">Fecha de Nacimiento</th>
                             <th className="px-6 py-3">Miembro de Directiva</th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
@@ -129,24 +150,47 @@ export default function NeighborIndex() {
                         {filteredNeighbors.map((neighbor, index) => (
                             <tr
                                 key={neighbor.id}
-                                className={`border-t ${index % 2 === 0 ? "bg-gray-50" : ""}`}
+                                className={`border-t ${
+                                    index % 2 === 0 ? "bg-gray-50" : ""
+                                }`}
                             >
                                 <td className="px-6 py-3">
                                     {neighbor.identification_number}
                                 </td>
                                 <td className="px-6 py-3">
-                                    {neighbor.user ? neighbor.user.name : "--USUARIO POR ASIGNAR--"}
+                                    {neighbor.user
+                                        ? neighbor.user.name
+                                        : "--USUARIO POR ASIGNAR--"}
                                 </td>
                                 <td className="px-6 py-3">
-                                    {neighbor.neighborhood_association ? neighbor.neighborhood_association.name : "--NO ASIGNADO--"}
+                                    {neighbor.neighborhood_association
+                                        ? neighbor.neighborhood_association.name
+                                        : "--NO ASIGNADO--"}
                                 </td>
-                                <td className={`px-6 py-3 ${neighbor.status === "active" ? "text-green-500" : "text-red-500"}`}>
-                                    {neighbor.status === "active" ? "Activo" : "Inactivo"}
+                                <td
+                                    className={`px-6 py-3 ${
+                                        neighbor.status === "active"
+                                            ? "text-green-500"
+                                            : "text-red-500"
+                                    }`}
+                                >
+                                    {neighbor.status === "active"
+                                        ? "Activo"
+                                        : "Inactivo"}
                                 </td>
-                                <td className="px-6 py-3">{neighbor.address}</td>
-                                <td className="px-6 py-3">{neighbor.registration_date}</td>
                                 <td className="px-6 py-3">
-                                    {neighbor.is_board_member ? "Sí" : "No"}
+                                    {neighbor.address}
+                                </td>
+                                <td className="px-6 py-3">
+                                    {formatDate(neighbor.registration_date)}
+                                </td>
+                                <td className="px-6 py-3">
+                                    {formatDate(neighbor.birth_date)}
+                                </td>
+                                <td className="px-6 py-3">
+                                    {neighbor.user?.role === "board_member"
+                                        ? "Sí"
+                                        : "No"}
                                 </td>
                                 <td className="px-6 py-3 flex flex-col md:flex-row gap-2">
                                     <Link
@@ -162,7 +206,9 @@ export default function NeighborIndex() {
                                         Editar
                                     </Link>
                                     <button
-                                        onClick={() => handleDelete(neighbor.id)}
+                                        onClick={() =>
+                                            handleDelete(neighbor.id)
+                                        }
                                         className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
                                     >
                                         Eliminar

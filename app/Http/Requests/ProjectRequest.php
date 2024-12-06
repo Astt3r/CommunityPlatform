@@ -28,7 +28,6 @@ class ProjectRequest extends FormRequest
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'required|string|max:100',
-            'responsible' => 'nullable|string|max:255',
             'budget' => 'required|numeric|min:0',
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
         ];
@@ -55,8 +54,6 @@ class ProjectRequest extends FormRequest
             'end_date.after_or_equal' => 'La fecha de finalización debe ser igual o posterior a la fecha de inicio.',
             'status.required' => 'Especifica el estado del proyecto.',
             'status.string' => 'El estado debe ser una cadena de texto.',
-            'responsible.required' => 'Por favor, indica quién es el responsable del proyecto.',
-            'responsible.string' => 'El responsable debe ser texto.',
             'budget.required' => 'El presupuesto es obligatorio.',
             'budget.numeric' => 'El presupuesto debe ser un número.',
             'budget.min' => 'El presupuesto no puede ser negativo.',

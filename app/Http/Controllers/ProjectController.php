@@ -18,14 +18,36 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with('files')->latest()->paginate(10);
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin'; // Cambia 'role' por tu lógica real para roles
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+                abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
+            }
+
+            $associationId = $neighbor->neighborhoodAssociation->id; // Cambiar a association_id
+        }
+
+        $query = Project::with('files');
+
+        if (!$isAdmin) {
+            $query->where('association_id', $associationId); // Usar la columna correcta
+        }
+
+        $projects = $query->latest()->paginate(10);
 
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
         ]);
     }
+
+
+
 
 
 
@@ -53,36 +75,35 @@ class ProjectController extends Controller
      */
     public function store(ProjectRequest $request)
     {
-        // Obtener el vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
-        // Validar si el vecino está asociado a una junta
         if (!$neighbor || !$neighbor->neighborhood_association_id) {
             return redirect()->route('projects.index')
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
 
-        // Validar los datos usando ProjectRequest (ya validado automáticamente)
         $validated = $request->validated();
 
-        // Asignar automáticamente la asociación del vecino
+        // Agregar registro inicial en el campo 'changes'
+        $validated['changes'] = "Proyecto creado con estado '{$validated['status']}' el " . now()->format('Y-m-d H:i:s');
+
         $validated['association_id'] = $neighbor->neighborhood_association_id;
 
-        // Crear el proyecto
         $project = Project::create($validated);
 
-        // Manejar el archivo si se sube
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('project_files', 'public'); // Asegúrate de usar el disco 'public'
+            $path = $request->file('file')->store('project_files', 'public');
             File::create([
                 'project_id' => $project->id,
-                'file_path' => $path, // Almacena el path generado
+                'file_path' => $path,
             ]);
         }
 
-        // Redirigir con mensaje de éxito
         return redirect()->route('projects.index')->with('success', 'Proyecto creado exitosamente.');
     }
+
+
+
 
 
 
@@ -94,8 +115,12 @@ class ProjectController extends Controller
     {
         $project->load('files'); // Cargar relación de archivos asociados
 
-        return Inertia::render('Projects/Show', ['project' => $project]);
+        return Inertia::render('Projects/Show', [
+            'project' => $project,
+            'changes' => nl2br($project->changes), // Mostrar cambios con saltos de línea
+        ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -122,17 +147,26 @@ class ProjectController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'nullable|string|max:100',
-            'responsible' => 'nullable|string|max:255',
             'budget' => 'nullable|numeric|min:0',
             'association_id' => 'nullable|exists:neighborhood_associations,id',
         ]);
 
-        // Actualizar proyecto
+        // Verificar si el estado ha cambiado
+        if (isset($validated['status']) && $validated['status'] !== $project->status) {
+            $currentDateTime = now()->format('Y-m-d H:i:s');
+            $newChange = "Estado cambiado de '{$project->status}' a '{$validated['status']}' el {$currentDateTime}";
+
+            // Concatenar el nuevo cambio al historial existente
+            $project->changes .= ($project->changes ? "\n" : "") . $newChange;
+        }
+
+        // Actualizar el proyecto con los nuevos datos
         $project->update($validated);
 
-        // Devolver respuesta JSON clara para solicitudes asíncronas
         return response()->json(['message' => 'Proyecto actualizado correctamente.'], 200);
     }
+
+
 
     public function uploadFile(Request $request, Project $project)
     {

@@ -27,11 +27,8 @@ export default function ProjectShow() {
                     <strong>Fecha de Finalización:</strong> {project.end_date}
                 </p>
                 <p className="mb-2">
-                    <strong>Estado:</strong> {project.status || "No especificado"}
-                </p>
-                <p className="mb-2">
-                    <strong>Responsable:</strong>{" "}
-                    {project.responsible || "No especificado"}
+                    <strong>Estado:</strong>{" "}
+                    {project.status || "No especificado"}
                 </p>
                 <p className="mb-2">
                     <strong>Presupuesto:</strong> ${project.budget}
@@ -48,12 +45,31 @@ export default function ProjectShow() {
                                         className="text-blue-500 hover:text-blue-700"
                                         download
                                     >
-                                        Descargar {file.file_path.split("/").pop()}
+                                        Descargar{" "}
+                                        {file.file_path.split("/").pop()}
                                     </a>
                                 </li>
                             ))}
                         </ul>
                     </div>
+                )}
+            </div>
+
+            {/* Sección de historial de cambios */}
+            <div className="bg-white shadow rounded p-4">
+                <h2 className="text-xl font-semibold mb-2">
+                    Historial de Cambios
+                </h2>
+                {project.changes ? (
+                    <ul className="list-disc list-inside">
+                        {project.changes.split("\n").map((change, index) => (
+                            <li key={index} className="mb-2">
+                                {change}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No hay cambios registrados.</p>
                 )}
             </div>
 
