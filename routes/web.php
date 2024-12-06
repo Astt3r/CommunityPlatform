@@ -75,7 +75,7 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
 });
 
 // Meetings
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('meetings', MeetingController::class);
     Route::get('/meetings/{meeting}/generate-pdf', [MinutesController::class, 'generatePdf']);
     Route::get('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'showAttendance'])->name('meetings.attendance');
