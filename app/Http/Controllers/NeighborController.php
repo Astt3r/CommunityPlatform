@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 
 class NeighborController extends Controller
@@ -70,8 +71,8 @@ class NeighborController extends Controller
                     'id' => $neighbor->id,
                     'address' => $neighbor->address,
                     'identification_number' => $neighbor->identification_number,
-                    'registration_date' => $neighbor->registration_date,
-                    'birth_date' => $neighbor->birth_date,
+                    'registration_date' => Carbon::parse($neighbor->registration_date)->format('Y-m-d'),
+                    'birth_date' => Carbon::parse($neighbor->birth_date)->format('Y-m-d'),
                     'status' => $neighbor->status,
                     'last_participation_date' => $neighbor->last_participation_date,
                     'neighborhood_association' => $neighbor->neighborhoodAssociation ? [
