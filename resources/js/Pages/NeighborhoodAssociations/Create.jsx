@@ -5,14 +5,22 @@ import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
 export default function NeighborhoodAssociationCreate() {
+    const getCurrentDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         address: "",
         phone: "",
         email: "",
         website_url: "",
-        date_of_funding: "",
-        is_active: false,
+        date_of_funding: getCurrentDate(), // Set default to today's date
+        is_active: true,
     });
 
     const handleSubmit = (e) => {
@@ -28,23 +36,20 @@ export default function NeighborhoodAssociationCreate() {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <div>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Crear Junta de Vecinos
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                        Los campos marcados con{" "}
-                        <span className="text-red-500">*</span> son
-                        obligatorios.
-                    </p>
-                </div>
-            }
-        >
+        <AuthenticatedLayout>
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <div className="mb-4">
+                            <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                                Crear Junta de Vecinos
+                            </h2>
+                            <p className="text-sm text-gray-600">
+                                Los campos marcados con{" "}
+                                <span className="text-red-500">*</span> son
+                                obligatorios.
+                            </p>
+                        </div>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Nombre */}
                             <div>
