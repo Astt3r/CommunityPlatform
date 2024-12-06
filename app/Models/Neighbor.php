@@ -46,6 +46,24 @@ class Neighbor extends Model
         return $this->hasMany(Contribution::class);
     }
 
+    
+    public function meetingAttendances()
+    {
+        return $this->hasMany(MeetingAttendance::class);
+    }
+
+    public function attendanceSummary()
+    {
+        $attended = $this->meetingAttendances()->where('status', 'attended')->count();
+        $absent = $this->meetingAttendances()->where('status', 'absent')->count();
+
+        return [
+            'attended' => $attended,
+            'absent' => $absent,
+        ];
+    }
+
+
 
 
 

@@ -162,8 +162,14 @@ class MeetingController extends Controller
     public function destroy($id)
     {
         $meeting = Meeting::findOrFail($id);
+
+        // Eliminar las asistencias relacionadas
+        $meeting->attendances()->delete();
+
+        // Eliminar la reunión
         $meeting->delete();
 
         return back()->with('success', 'La reunión fue eliminada correctamente.');
     }
+
 }

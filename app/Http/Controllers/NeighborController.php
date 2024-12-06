@@ -186,15 +186,21 @@ class NeighborController extends Controller
     }
 
 
-
-
-
-
-
-
     public function show($id)
     {
-        $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
+        $neighbor = Neighbor::with('user', 'neighborhoodAssociation', 'meetingAttendances.meeting')->findOrFail($id);
+
+        // Filtrar las asistencias válidas (relacionadas con reuniones existentes)
+        $validAttendances = $neighbor->meetingAttendances->filter(function ($attendance) {
+            return $attendance->meeting !== null; // Validar que la reunión existe
+        });
+
+        // Calcular las asistencias y el total de reuniones válidas
+        $totalMeetings = $validAttendances->count();
+        $attendedMeetings = $validAttendances->where('attended', 1)->count(); // Suponiendo que 'attended' es booleano
+
+        // Calcular el porcentaje de asistencia
+        $attendancePercentage = $totalMeetings > 0 ? round(($attendedMeetings / $totalMeetings) * 100, 2) : 0;
 
         return Inertia::render('Neighbor/Show', [
             'neighbor' => [
@@ -210,8 +216,16 @@ class NeighborController extends Controller
                 'last_participation_date' => $neighbor->last_participation_date,
                 'neighborhood_association_name' => $neighbor->neighborhoodAssociation ? $neighbor->neighborhoodAssociation->name : 'N/A',
             ],
+            'attendanceSummary' => [
+                'totalMeetings' => $totalMeetings,
+                'attendedMeetings' => $attendedMeetings,
+                'attendancePercentage' => $attendancePercentage,
+            ],
         ]);
     }
+
+
+    
 
 
 
