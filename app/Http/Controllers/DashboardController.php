@@ -11,57 +11,46 @@ use Inertia\Response;
 use App\Models\User;
 use App\Models\Neighbor;
 use App\Models\CommitteeMember;
+use App\Models\Expense;
 use App\Models\NeighborhoodAssociation;
-
-
-
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $meetings = Meeting::latest()->take(10)->get();
-        $projects = Project::latest()->take(10)->get();
-        $neighbors = Neighbor::count();
-        $boardMembers = CommitteeMember::count();
-        $associations = NeighborhoodAssociation::count();
+        $user = Auth::user();
+        $role = $user->role;
+
+        // Fetch data based on the user's role
+        if ($role === 'admin') {
+            // Admin can see all data
+            $meetings = Meeting::latest()->take(10)->get();
+            $projects = Project::latest()->take(10)->get();
+            $neighbors = Neighbor::count();
+            $boardMembers = CommitteeMember::count();
+            $associations = NeighborhoodAssociation::count();
+            $totalexpense = Expense::sum('amount');
+        } else {
+            // Non-admin users: Scope data to their association or involvement
+            $userAssociations = $user->association()->pluck('id');
+
+            $meetings = Meeting::whereIn('association_id', $userAssociations)->latest()->take(10)->get();
+            $projects = Project::whereIn('association_id', $userAssociations)->latest()->take(10)->get();
+            $neighbors = Neighbor::whereIn('association_id', $userAssociations)->count();
+            $boardMembers = CommitteeMember::whereIn('association_id', $userAssociations)->count();
+            $associations = $userAssociations->count();
+            $totalexpense = Expense::sum('amount');
+
+        }
 
         return Inertia::render('Dashboard', [
+            'role' => $role,
             'meetings' => $meetings,
             'projects' => $projects,
             'neighbors' => $neighbors,
             'boardMembers' => $boardMembers,
             'associations' => $associations,
+            'total' => $totalexpense,
         ]);
     }
-
-
-
-
-    // public function admin()
-    // {
-    //     return Inertia::render('AdminDashboard', [
-    //         'user' => Auth::user(),
-    //         'buttons' => ['Crear Asociación', 'Ver Reportes'],
-    //         // Otros datos específicos para el rol de admin
-    //     ]);
-    // }
-
-    // public function boardMember()
-    // {
-    //     return Inertia::render('BoardMemberDashboard', [
-    //         'user' => Auth::user(),
-    //         'buttons' => ['Ver Proyectos', 'Solicitar Reunión'],
-    //         // Otros datos específicos para el rol de board_member
-    //     ]);
-    // }
-
-    // public function neighbor()
-    // {
-    //     return Inertia::render('NeighborDashboard', [
-    //         'user' => Auth::user(),
-    //         'buttons' => ['Ver Beneficios', 'Enviar Sugerencia'],
-    //         // Otros datos específicos para el rol de vecino
-    //     ]);
-    // }
 }
