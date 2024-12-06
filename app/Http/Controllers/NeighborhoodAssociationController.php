@@ -135,14 +135,26 @@ class NeighborhoodAssociationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(string $id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
 
+        // Verificar si la asociación tiene vecinos asociados
+        if ($association->neighbors()->count() > 0) {
+            return redirect()->route('neighborhood-associations.index')
+                ->with('error', 'No se puede eliminar la asociación porque tiene vecinos asociados.');
+        }
+
+        // Si no tiene vecinos, proceder con la eliminación
         $association->delete();
 
-        return redirect()->route('neighborhood-associations.index')->with('success', 'Asociación eliminada exitosamente.');
+        return redirect()->route('neighborhood-associations.index')
+            ->with('success', 'Asociación eliminada exitosamente.');
     }
+
 
     public function export(Request $request)
     {
