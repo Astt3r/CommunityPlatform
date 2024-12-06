@@ -39,12 +39,18 @@ class NeighborRequest extends FormRequest
                 },
             ],
             'registration_date' => 'required|date|before_or_equal:today',
-            'birth_date' => 'required|date|before:today',
+            'birth_date' => [
+                'required',
+                'date',
+                'before:today', // Fecha de nacimiento debe ser en el pasado
+                'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), // Validación para mayor de 18 años
+            ],
             'status' => 'required|in:active,inactive',
             'last_participation_date' => 'nullable|date|after_or_equal:registration_date',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
     }
+
 
 
 
@@ -70,6 +76,7 @@ class NeighborRequest extends FormRequest
             'birth_date.required' => 'La fecha de nacimiento es obligatoria.',
             'birth_date.date' => 'La fecha de nacimiento debe ser una fecha válida.',
             'birth_date.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
+            'birth_date.before_or_equal' => 'El vecino debe ser mayor de 18 años.', // Mensaje personalizado
             'status.required' => 'El estado es obligatorio.',
             'status.in' => 'El estado debe ser "activo" o "inactivo".',
             'last_participation_date.date' => 'La fecha de última participación debe ser una fecha válida.',
@@ -78,6 +85,7 @@ class NeighborRequest extends FormRequest
             'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no es válida.',
         ];
     }
+
 
     /**
      * Validar el formato del RUT.

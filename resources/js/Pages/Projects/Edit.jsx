@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import axios from "axios";
-import { router } from "@inertiajs/react"; // Asegúrate de importar esto si usas Inertia
+import { router } from "@inertiajs/react";
 
 export default function ProjectEdit({ project, associations }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -14,7 +14,6 @@ export default function ProjectEdit({ project, associations }) {
         start_date: project.start_date || "",
         end_date: project.end_date || "",
         status: project.status || "",
-        responsible: project.responsible || "",
         budget: project.budget || "",
         association_id: project.association_id || "",
         file: null, // Para el archivo
@@ -63,8 +62,7 @@ export default function ProjectEdit({ project, associations }) {
             }
 
             // Redirigir al índice después de guardar
-            router.visit(route("projects.index")); // Redirige usando Inertia.js
-            // Si no usas Inertia, usa: window.location.href = route("projects.index");
+            router.visit(route("projects.index"));
         } catch (error) {
             // Manejo de errores
             if (error.response) {
@@ -78,7 +76,7 @@ export default function ProjectEdit({ project, associations }) {
     };
 
     const handleCancel = () => {
-        window.location.href = route("projects.index");
+        router.visit(route("projects.index"));
     };
 
     return (
@@ -208,38 +206,29 @@ export default function ProjectEdit({ project, associations }) {
                                     htmlFor="status"
                                     value="Estado del Proyecto"
                                 />
-                                <TextInput
+                                <select
                                     id="status"
-                                    type="text"
                                     value={data.status}
                                     onChange={(e) =>
                                         setData("status", e.target.value)
                                     }
-                                    className="mt-1 block w-full"
-                                />
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                >
+                                    <option value="">
+                                        Selecciona un estado
+                                    </option>
+                                    <option value="planeado">Planeado</option>
+                                    <option value="aprovado">Aprobado</option>
+                                    <option value="en_proceso">
+                                        En Proceso
+                                    </option>
+                                    <option value="completado">
+                                        Completado
+                                    </option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
                                 <InputError
                                     message={errors.status}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Responsable */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="responsible"
-                                    value="Responsable"
-                                />
-                                <TextInput
-                                    id="responsible"
-                                    type="text"
-                                    value={data.responsible}
-                                    onChange={(e) =>
-                                        setData("responsible", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.responsible}
                                     className="mt-2"
                                 />
                             </div>

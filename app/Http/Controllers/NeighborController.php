@@ -25,7 +25,7 @@ class NeighborController extends Controller
         $user = $request->user();
 
         // Verificar si el usuario es administrador
-        $isAdmin = $user->role === 'admin'; // Cambia 'role' por el campo real donde almacenes los roles
+        $isAdmin = $user->role === 'admin';
 
         // Si no es administrador, obtener su Neighbor relacionado
         if (!$isAdmin) {
@@ -64,9 +64,7 @@ class NeighborController extends Controller
         // Añadir información sobre si el vecino es miembro de la directiva
         return Inertia::render("Neighbor/Index", [
             'neighbors' => $neighbors->through(function ($neighbor) {
-                $isBoardMember = \App\Models\CommitteeMember::where('user_id', $neighbor->user_id)
-                    ->where('status', 'active')
-                    ->exists();
+                $isBoardMember = $neighbor->user && $neighbor->user->role === 'board_member';
 
                 return [
                     'id' => $neighbor->id,
@@ -84,6 +82,7 @@ class NeighborController extends Controller
                         'id' => $neighbor->user->id,
                         'name' => $neighbor->user->name,
                         'email' => $neighbor->user->email,
+                        'role' => $neighbor->user->role, // Incluimos el rol para más flexibilidad
                     ] : null,
                     'is_board_member' => $isBoardMember,
                 ];
@@ -102,10 +101,28 @@ class NeighborController extends Controller
 
 
 
+
     public function store(NeighborRequest $request)
     {
         $validatedData = $request->validated();
+        $user = $request->user();
 
+        // Verificar si el usuario es board_member
+        if ($user->role === 'board_member') {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+            if ($neighbor && $neighbor->neighborhoodAssociation) {
+                $associationId = $neighbor->neighborhoodAssociation->id;
+
+                // Validar que la asociación asignada corresponda a la del board_member
+                if ($validatedData['neighborhood_association_id'] != $associationId) {
+                    abort(403, 'No puedes asignar vecinos a otra asociación.');
+                }
+            } else {
+                abort(403, 'No tienes una asociación asignada como miembro de la directiva.');
+            }
+        }
+
+        // Administradores no tienen restricciones, proceden con normalidad
         DB::transaction(function () use ($validatedData) {
             // Crear el usuario
             $user = User::create([
@@ -141,16 +158,36 @@ class NeighborController extends Controller
 
 
 
-    public function create()
+    public function create(Request $request)
     {
-        $associations = NeighborhoodAssociation::all(['id', 'name']);
-        $users = User::all(['id', 'name', 'email']); // Obtenemos todos los usuarios con su ID, nombre y correo electrónico
+        $user = $request->user();
+        $userAssociationId = null;
+        $userAssociationName = null;
+
+        if ($user->role === 'board_member') {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+            if ($neighbor && $neighbor->neighborhoodAssociation) {
+                $userAssociationId = $neighbor->neighborhoodAssociation->id;
+                $userAssociationName = $neighbor->neighborhoodAssociation->name;
+            } else {
+                abort(403, 'No tienes una asociación asignada como miembro de la directiva.');
+            }
+        }
+
+        $associations = $user->role === 'admin'
+            ? NeighborhoodAssociation::all(['id', 'name'])
+            : [];
 
         return Inertia::render('Neighbor/Create', [
             'associations' => $associations,
-            'users' => $users, // Enviamos los usuarios para el dropdown
+            'userAssociationId' => $userAssociationId,
+            'userAssociationName' => $userAssociationName,
         ]);
     }
+
+
+
+
 
 
 

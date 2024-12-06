@@ -6,7 +6,11 @@ import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import { formatRUT } from "@/Components/format";
 
-export default function CreateNeighborWithUser({ associations }) {
+export default function CreateNeighborWithUser({
+    associations,
+    userAssociationId,
+    userAssociationName,
+}) {
     const { data, setData, post, processing, errors, reset } = useForm({
         // Neighbor fields
         address: "",
@@ -14,7 +18,7 @@ export default function CreateNeighborWithUser({ associations }) {
         registration_date: "",
         birth_date: "",
         status: "inactive", // Default to inactive
-        neighborhood_association_id: "",
+        neighborhood_association_id: userAssociationId || "", // Preseleccionada si es board_member
 
         // User fields
         name: "",
@@ -24,13 +28,11 @@ export default function CreateNeighborWithUser({ associations }) {
         role: "resident", // Default to resident
     });
 
+    const isBoardMember = !!userAssociationId; // Determinar si el usuario es board_member
+
     const submit = (e) => {
         e.preventDefault();
-        post(route("neighbors.store"), {
-            // onFinish: () => {
-            //     if (Object.keys(errors).length === 0) reset();
-            // },
-        });
+        post(route("neighbors.store"));
     };
 
     const handleCancel = () => {
@@ -217,6 +219,7 @@ export default function CreateNeighborWithUser({ associations }) {
                                         )
                                     }
                                     className="mt-1 block w-full"
+                                    max={new Date().toISOString().split("T")[0]} // Restringe hasta el día actual
                                     required
                                 />
                                 <InputError
@@ -240,6 +243,7 @@ export default function CreateNeighborWithUser({ associations }) {
                                         setData("birth_date", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    max={new Date().toISOString().split("T")[0]} // Restringe hasta el día actual
                                     required
                                 />
                                 <InputError
@@ -283,31 +287,47 @@ export default function CreateNeighborWithUser({ associations }) {
                                     htmlFor="neighborhood_association_id"
                                     value="Asociación Vecinal *"
                                 />
-                                <select
-                                    id="neighborhood_association_id"
-                                    name="neighborhood_association_id"
-                                    value={data.neighborhood_association_id}
-                                    onChange={(e) =>
-                                        setData(
-                                            "neighborhood_association_id",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="mt-1 block w-full"
-                                    required
-                                >
-                                    <option value="">
-                                        Seleccione una Asociación
-                                    </option>
-                                    {associations.map((association) => (
-                                        <option
-                                            key={association.id}
-                                            value={association.id}
-                                        >
-                                            {association.name}
+                                {isBoardMember ? (
+                                    <div className="mt-1">
+                                        <TextInput
+                                            id="neighborhood_association_id"
+                                            name="neighborhood_association_id"
+                                            value={userAssociationName}
+                                            readOnly
+                                            className="bg-gray-100 cursor-not-allowed w-full"
+                                        />
+                                        <p className="text-sm text-gray-500">
+                                            Solo puedes asignar vecinos a la
+                                            asociación a la que perteneces.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <select
+                                        id="neighborhood_association_id"
+                                        name="neighborhood_association_id"
+                                        value={data.neighborhood_association_id}
+                                        onChange={(e) =>
+                                            setData(
+                                                "neighborhood_association_id",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="mt-1 block w-full"
+                                        required
+                                    >
+                                        <option value="">
+                                            Seleccione una Asociación
                                         </option>
-                                    ))}
-                                </select>
+                                        {associations.map((association) => (
+                                            <option
+                                                key={association.id}
+                                                value={association.id}
+                                            >
+                                                {association.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
                                 <InputError
                                     message={errors.neighborhood_association_id}
                                     className="mt-2"

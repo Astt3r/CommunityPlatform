@@ -13,15 +13,15 @@ class Project extends Model
      * Campos que pueden ser llenados en masa.
      */
     protected $fillable = [
-        'description',  // Descripción del proyecto
-        'name',         // Nombre del proyecto
-        'issue',        // Problema abordado por el proyecto
-        'start_date',   // Fecha de inicio
-        'end_date',     // Fecha de finalización
-        'status',       // Estado del proyecto (por ejemplo, activo, completado)
-        'responsible',  // Responsable del proyecto
-        'budget',       // Presupuesto
-        'association_id', // Relación con la tabla 'neighborhood_associations'
+        'name',
+        'description',
+        'issue',
+        'start_date',
+        'end_date',
+        'status',
+        'budget',
+        'changes',
+        'association_id',
     ];
 
     /**
@@ -36,5 +36,16 @@ class Project extends Model
     {
         return $this->hasMany(Contribution::class);
     }
+
+    public function neighborhoodAssociation()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class);
+    }
+
+    public function setChangesAttribute($value)
+    {
+        $this->attributes['changes'] = trim($value);
+    }
+
 
 }
