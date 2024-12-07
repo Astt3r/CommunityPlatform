@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('organized_by', 100)->nullable();
             $table->string('result', 255)->nullable();
             $table->enum('status', ['scheduled', 'completed', 'canceled'])->default('scheduled');
+            $table->foreignId('neighborhood_association_id')->nullable()->constrained('neighborhood_associations')->onDelete('set null');
             $table->timestamps();
         });
     }
