@@ -313,14 +313,14 @@ class NeighborController extends Controller
 
     public function destroy(Neighbor $neighbor)
     {
-        // Verificar si el vecino pertenece a la directiva
-        if ($neighbor->user && $neighbor->user->role === 'board_member') {
-            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar un miembro de la directiva.');
-        }
-
         // Verificar que el usuario autenticado no pueda eliminar su propio registro
         if (Auth::id() === $neighbor->user_id) {
             return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar tu propio registro.');
+        }
+
+        // Verificar si el vecino pertenece a la directiva
+        if ($neighbor->user && $neighbor->user->role === 'board_member') {
+            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar un miembro de la directiva.');
         }
 
         // Si pasa todas las validaciones, eliminar
