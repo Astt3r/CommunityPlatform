@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function EditMeeting({ meeting }) {
+export default function EditMeeting({ meeting, associations }) {
     const { data, setData, put, processing, errors } = useForm({
         meeting_date: meeting.meeting_date || "",
         main_topic: meeting.main_topic || "",
@@ -13,25 +13,25 @@ export default function EditMeeting({ meeting }) {
         organized_by: meeting.organized_by || "",
         result: meeting.result || "",
         status: meeting.status || "scheduled", // Valor por defecto
+        neighborhood_association_id: meeting.neighborhood_association_id || "", // Asociación de vecindario
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         // Obtener la fecha actual en formato UTC
         const currentDate = new Date().toISOString();
-    
+
         // Validar si la fecha de la reunión es posterior a la actual
         if (data.meeting_date <= currentDate) {
             alert("La fecha de la reunión debe ser en el futuro.");
             return;
         }
-    
+
         put(route("meetings.update", meeting.id), {
             onSuccess: () => alert("Reunión actualizada exitosamente."),
         });
     };
-    
 
     return (
         <AuthenticatedLayout
@@ -140,6 +140,33 @@ export default function EditMeeting({ meeting }) {
                                     <option value="canceled">Cancelada</option>
                                 </select>
                                 <InputError message={errors.status} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    htmlFor="neighborhood_association_id"
+                                    value="Junta Vecinal"
+                                />
+                                <select
+                                    id="neighborhood_association_id"
+                                    name="neighborhood_association_id"
+                                    value={data.neighborhood_association_id}
+                                    onChange={(e) =>
+                                        setData("neighborhood_association_id", e.target.value)
+                                    }
+                                    className="mt-1 block w-full"
+                                >
+                                    <option value="">Seleccione una junta</option>
+                                    {associations.map((association) => (
+                                        <option key={association.id} value={association.id}>
+                                            {association.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError
+                                    message={errors.neighborhood_association_id}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div className="flex justify-end space-x-4 mt-4">

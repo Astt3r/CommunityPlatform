@@ -36,7 +36,10 @@ class Meeting extends Model
             $meeting->attendances()->delete(); // Eliminar asistencias asociadas antes de eliminar la reunión
         });
     }
-
+    public function neighborhoodAssociation()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class);
+    }
 
 
     // Define any relationships, if needed, such as with attendees or minutes

@@ -8,16 +8,36 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { parseISO } from "date-fns";
 
-export default function MeetingIndex() {
+export default function MeetingIndex({ allAssociations }) {
     const { meetings, filters, flash } = usePage().props;
     const { data, setData, get } = useForm({
         main_topic: filters.main_topic || "",
         status: filters.status || "",
+        neighborhood_association_id: filters.neighborhood_association_id || "",
     });
     const [showAlert, setShowAlert] = useState(!!flash.success);
     const [selectedMeeting, setSelectedMeeting] = useState(null);
     const [showPanel, setShowPanel] = useState(false);
     const [showCreateButton, setShowCreateButton] = useState(false);
+    const [events, setEvents] = useState([]); // Estado para eventos del calendario
+
+    useEffect(() => {
+        // Actualizar eventos del calendario cada vez que las reuniones cambien
+        setEvents(
+            meetings.data.map((meeting) => ({
+                id: meeting.id,
+                title: meeting.main_topic,
+                start: parseISO(meeting.meeting_date).toISOString(),
+                allDay: true,
+                backgroundColor:
+                    meeting.status === "completed"
+                        ? "green"
+                        : meeting.status === "cancelled"
+                        ? "red"
+                        : "blue",
+            }))
+        );
+    }, [meetings.data]);
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar esta reunión?")) {
@@ -32,14 +52,29 @@ export default function MeetingIndex() {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        get(route("meetings.index"));
+        get(route("meetings.index", { ...data }), {
+            onSuccess: (page) => {
+                setEvents(
+                    page.props.meetings.data.map((meeting) => ({
+                        id: meeting.id,
+                        title: meeting.main_topic,
+                        start: parseISO(meeting.meeting_date).toISOString(),
+                        allDay: true,
+                        backgroundColor:
+                            meeting.status === "completed"
+                                ? "green"
+                                : meeting.status === "cancelled"
+                                ? "red"
+                                : "blue",
+                    }))
+                );
+            },
+        });
     };
 
-    useEffect(() => {
-        if (flash.success) {
-            setShowAlert(true);
-        }
-    }, [flash.success]);
+    const handleAssociationChange = (e) => {
+        setData("neighborhood_association_id", e.target.value);
+    };
 
     const handleDateClick = (info) => {
         setShowCreateButton(true);
@@ -60,34 +95,48 @@ export default function MeetingIndex() {
         setShowPanel(false);
     };
 
-    const handleClickOutside = (e) => {
-    if (e.target.closest("#calendarPanel") === null && e.target.closest(".fc-event") === null) {
-        setShowPanel(false);
-    }
-};
-
     useEffect(() => {
-        if (showPanel) {
-            document.addEventListener("click", handleClickOutside);
-        } else {
-            document.removeEventListener("click", handleClickOutside);
+        if (flash.success) {
+            setShowAlert(true);
         }
-        return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    }, [showPanel]);
+    }, [flash.success]);
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Reuniones
-                </h2>
+                <div className="flex flex-col gap-4">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                        Reuniones
+                    </h2>
+                    <div className="flex items-center gap-4">
+                        <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
+                            Filtrar por Junta:
+                        </label>
+                        <select
+                            id="neighborhood_filter"
+                            value={data.neighborhood_association_id}
+                            onChange={handleAssociationChange}
+                            className="px-4 py-2 border rounded"
+                        >
+                            <option value="">Todas las Juntas</option>
+                            {allAssociations.map((association) => (
+                                <option key={association.id} value={association.id}>
+                                    {association.name}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleSearch}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
             }
         >
             <Head title="Reuniones" />
 
-            {/* Alerta de éxito */}
             {showAlert && (
                 <div className="alert alert-success flex items-center justify-between p-4 mb-4 text-green-700 bg-green-100 rounded-lg">
                     <span>{flash.success}</span>
@@ -101,7 +150,6 @@ export default function MeetingIndex() {
                 </div>
             )}
 
-            {/* Botón para crear reunión */}
             <div className="mb-4 flex justify-between">
                 <Link
                     href={route("meetings.create")}
@@ -111,30 +159,17 @@ export default function MeetingIndex() {
                 </Link>
             </div>
 
-            {/* Calendario */}
             <div className="mb-8 relative">
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
-                    events={meetings.data.map((meeting) => ({
-                        id: meeting.id,
-                        title: meeting.main_topic,
-                        start: parseISO(meeting.meeting_date).toISOString(),
-                        allDay: true,
-                        backgroundColor:
-                            meeting.status === "completed"
-                                ? "green"
-                                : meeting.status === "cancelled"
-                                ? "red"
-                                : "blue",
-                    }))}
+                    events={events} // Usar el estado `events` para los datos del calendario
                     dateClick={handleDateClick}
                     eventClick={handleEventClick}
                     locale="es"
                 />
             </div>
 
-            {/* Panel superior para ver/editar/crear reunión */}
             {showPanel && (
                 <div id="calendarPanel" className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white shadow-lg z-50 p-6 rounded-lg mt-4">
                     <button
@@ -181,12 +216,7 @@ export default function MeetingIndex() {
                 </div>
             )}
 
-            {/* Listado de reuniones */}
             <div className="overflow-x-auto">
-                <div className="flex gap-2 mb-2">
-                    <button className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">▲</button>
-                    <button className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">▼</button>
-                </div>
                 <table className="table-auto w-full mt-4 text-sm md:text-base">
                     <thead>
                         <tr>
@@ -244,7 +274,6 @@ export default function MeetingIndex() {
                 </table>
             </div>
 
-            {/* Paginación */}
             <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
                 {meetings.links.map((link, index) => (
                     <Link
@@ -264,4 +293,3 @@ export default function MeetingIndex() {
         </AuthenticatedLayout>
     );
 }
-

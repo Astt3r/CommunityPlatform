@@ -63,6 +63,11 @@ class NeighborhoodAssociation extends Model
         $this->number_of_members = $this->neighbors()->count();
         $this->save();
     }
+    // Relación con las reuniones
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
 
 
 

@@ -158,6 +158,11 @@ export default function ShowMeeting({ meeting }) {
                 {meeting.status}
               </p>
             </div>
+            <div>
+              <h3 className="text-lg font-semibold">Junta Vecinal:</h3>
+              <p>{meeting.neighborhood_association || "Reunión General"}</p>
+            </div>
+
             <div className="mt-4">
               <a
                 href="/meetings"

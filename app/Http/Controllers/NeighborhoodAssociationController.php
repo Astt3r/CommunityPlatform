@@ -138,7 +138,7 @@ class NeighborhoodAssociationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) 
     {
         $association = NeighborhoodAssociation::findOrFail($id);
 
@@ -148,12 +148,16 @@ class NeighborhoodAssociationController extends Controller
                 ->with('error', 'No se puede eliminar la asociación porque tiene vecinos asociados.');
         }
 
-        // Si no tiene vecinos, proceder con la eliminación
+        // Actualizar las reuniones relacionadas para que tengan neighborhood_association_id en null
+        $association->meetings()->update(['neighborhood_association_id' => null]);
+
+        // Proceder con la eliminación de la asociación
         $association->delete();
 
         return redirect()->route('neighborhood-associations.index')
             ->with('success', 'Asociación eliminada exitosamente.');
     }
+
 
 
     public function export(Request $request)

@@ -3,8 +3,9 @@ import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
+import PrimaryButton from "@/Components/PrimaryButton";
 
-export default function CreateMeeting() {
+export default function CreateMeeting({ associations }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         meeting_date: "",
         main_topic: "",
@@ -13,6 +14,7 @@ export default function CreateMeeting() {
         organized_by: "",
         result: "",
         status: "scheduled", // Valor predeterminado
+        neighborhood_association_id: "", // Nueva propiedad
     });
 
     const handleChange = (field, value) => {
@@ -21,14 +23,6 @@ export default function CreateMeeting() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        const currentDate = new Date().toISOString();
-
-        if (data.meeting_date <= currentDate) {
-            alert("La fecha de la reunión debe ser en el futuro.");
-            return;
-        }
-
         post(route("meetings.store"), {
             onFinish: () => {
                 if (Object.keys(errors).length === 0) reset();
@@ -49,7 +43,7 @@ export default function CreateMeeting() {
                         Crear Reunión
                     </h2>
                     <p className="text-sm text-gray-600">
-                        Los campos marcados con{" "}
+                        Los campos marcados con {" "}
                         <span className="text-red-500">*</span> son
                         obligatorios.
                     </p>
@@ -219,6 +213,42 @@ export default function CreateMeeting() {
                                 </select>
                                 <InputError
                                     message={errors.status}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
+                                <InputLabel
+                                    htmlFor="neighborhood_association_id"
+                                    value="Asociación Vecinal *"
+                                />
+                                <select
+                                    id="neighborhood_association_id"
+                                    name="neighborhood_association_id"
+                                    value={data.neighborhood_association_id}
+                                    onChange={(e) =>
+                                        handleChange(
+                                            "neighborhood_association_id",
+                                            e.target.value
+                                        )
+                                    }
+                                    className="mt-1 block w-full"
+                                    required
+                                >
+                                    <option value="">
+                                        Seleccione una Asociación
+                                    </option>
+                                    {associations.map((association) => (
+                                        <option
+                                            key={association.id}
+                                            value={association.id}
+                                        >
+                                            {association.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError
+                                    message={errors.neighborhood_association_id}
                                     className="mt-2"
                                 />
                             </div>
