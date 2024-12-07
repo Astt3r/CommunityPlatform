@@ -197,7 +197,7 @@ export default function ProjectCreate() {
                                 />
                             </div>
 
-                            {/* Selección de vecinos si no es para todos */}
+                            {/* Selección de vecinos si no es para todos
                             {!data.is_for_all_neighbors && (
                                 <div>
                                     <InputLabel value="Seleccionar vecinos" />
@@ -274,7 +274,7 @@ export default function ProjectCreate() {
                                         className="mt-2"
                                     />
                                 </div>
-                            )}
+                            )} */}
 
                             {/* Archivo del Proyecto */}
                             <div>

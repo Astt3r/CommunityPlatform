@@ -55,6 +55,26 @@ export default function ProjectShow() {
                 )}
             </div>
 
+            {/* Sección de vecinos asignados */}
+            <div className="bg-white shadow rounded p-4 mb-4">
+                <h2 className="text-xl font-semibold mb-2">
+                    Vecinos Asignados
+                </h2>
+                {project.neighbors?.length > 0 ? (
+                    <ul className="list-disc list-inside">
+                        {project.neighbors.map((neighbor) => (
+                            <li key={neighbor.id} className="mb-2">
+                                <strong>Nombre:</strong> {neighbor.user.name}{" "}
+                                <br />
+                                <strong>Dirección:</strong> {neighbor.address}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No hay vecinos asignados a este proyecto.</p>
+                )}
+            </div>
+
             {/* Sección de historial de cambios */}
             <div className="bg-white shadow rounded p-4">
                 <h2 className="text-xl font-semibold mb-2">

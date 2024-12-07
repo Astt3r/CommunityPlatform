@@ -7,7 +7,12 @@ import InputError from "@/Components/InputError";
 import axios from "axios";
 import { router } from "@inertiajs/react";
 
-export default function ProjectEdit({ project, associations, neighbors }) {
+export default function ProjectEdit({
+    project,
+    associations,
+    neighbors,
+    assignedNeighborIds,
+}) {
     const { data, setData, put, processing, errors } = useForm({
         name: project.name || "",
         description: project.description || "",
@@ -19,9 +24,7 @@ export default function ProjectEdit({ project, associations, neighbors }) {
         association_id: project.association_id || "",
         file: null, // Para el archivo
         is_for_all_neighbors: project.is_for_all_neighbors || false, // Indica si es para todos
-        neighbor_ids: Array.isArray(project.neighbors)
-            ? project.neighbors.map((n) => n.id)
-            : [], // Asegúrate de inicializar como array
+        neighbor_ids: assignedNeighborIds || [], // Usar los IDs asignados proporcionados por el backend
     });
 
     const handleSubmit = async (e) => {
@@ -219,34 +222,33 @@ export default function ProjectEdit({ project, associations, neighbors }) {
                                         Asignar Vecinos
                                     </h3>
                                     <div className="space-y-2">
-                                        {Array.isArray(data.neighbor_ids) &&
-                                            neighbors.map((neighbor) => (
-                                                <div
-                                                    key={neighbor.id}
-                                                    className="flex items-center"
+                                        {neighbors.map((neighbor) => (
+                                            <div
+                                                key={neighbor.id}
+                                                className="flex items-center"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    id={`neighbor_${neighbor.id}`}
+                                                    checked={data.neighbor_ids.includes(
+                                                        neighbor.id
+                                                    )}
+                                                    onChange={(e) =>
+                                                        handleNeighborChange(
+                                                            neighbor.id,
+                                                            e.target.checked
+                                                        )
+                                                    }
+                                                    className="mr-2"
+                                                />
+                                                <label
+                                                    htmlFor={`neighbor_${neighbor.id}`}
+                                                    className="text-gray-800"
                                                 >
-                                                    <input
-                                                        type="checkbox"
-                                                        id={`neighbor_${neighbor.id}`}
-                                                        checked={data.neighbor_ids.includes(
-                                                            neighbor.id
-                                                        )}
-                                                        onChange={(e) =>
-                                                            handleNeighborChange(
-                                                                neighbor.id,
-                                                                e.target.checked
-                                                            )
-                                                        }
-                                                        className="mr-2"
-                                                    />
-                                                    <label
-                                                        htmlFor={`neighbor_${neighbor.id}`}
-                                                        className="text-gray-800"
-                                                    >
-                                                        {neighbor.user.name}
-                                                    </label>
-                                                </div>
-                                            ))}
+                                                    {neighbor.user.name}
+                                                </label>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}

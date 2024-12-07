@@ -53,8 +53,8 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
-    
-    
+
+
 
     /**
      * Check if the user has a board member role.
@@ -79,7 +79,6 @@ class User extends Authenticatable
     public function neighbor()
     {
         return $this->hasOne(Neighbor::class, 'user_id');
-        return $this->hasOne(Neighbor::class);
     }
     public function boardMember()
     {
@@ -92,7 +91,7 @@ class User extends Authenticatable
 
 
 
-    
+
 
 
 
