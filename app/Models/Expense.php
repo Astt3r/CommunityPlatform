@@ -44,4 +44,5 @@ class Expense extends Model
     {
         return $this->belongsTo(NeighborhoodAssociation::class, 'association_id');
     }
+
 }
