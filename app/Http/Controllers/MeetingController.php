@@ -211,7 +211,10 @@ class MeetingController extends Controller
     {
         $meeting = Meeting::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
+        $user = auth()->user();
+
+        // Definir reglas de validación
+        $rules = [
             'meeting_date' => 'required|date|after:now',
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -220,23 +223,36 @@ class MeetingController extends Controller
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
-        ]);
+        ];
+
+        // Si el usuario es un `board_member`, limitar la edición de la asociación
+        if ($user->role === 'board_member') {
+            $rules['neighborhood_association_id'] .= '|in:' . $meeting->neighborhood_association_id;
+        }
+
+        // Validar los datos
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Prevenir cambios de la junta de vecinos para board_member
-        if (auth()->user()->role === 'board_member') {
-            $request->merge([
-                'neighborhood_association_id' => $meeting->neighborhood_association_id,
-            ]);
+        // Asegurar que solo el `admin` pueda cambiar la asociación
+        if ($user->role === 'admin') {
+            $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
         }
 
-        $meeting->update($request->all());
+        // Actualizar el resto de los campos
+        $meeting->update($request->except('neighborhood_association_id'));
+
+        // Guardar los cambios
+        $meeting->save();
 
         return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
+
+
+
 
 
 

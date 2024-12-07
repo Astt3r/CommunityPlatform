@@ -151,19 +151,21 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                     id="neighborhood_association_id"
                                     name="neighborhood_association_id"
                                     value={data.neighborhood_association_id}
-                                    onChange={(e) =>
-                                        setData("neighborhood_association_id", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                    disabled={userRole === "board_member"} // Deshabilitar si el usuario es board_member
+                                    onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                                    className={`mt-1 block w-full ${
+                                        userRole === "board_member" ? "bg-gray-100 cursor-not-allowed" : ""
+                                    }`}
+                                    disabled={userRole === "board_member"}
                                 >
-                                    <option value="">Seleccione una junta</option>
                                     {associations.map((association) => (
                                         <option key={association.id} value={association.id}>
                                             {association.name}
                                         </option>
                                     ))}
                                 </select>
+
+
+
                                 <InputError
                                     message={errors.neighborhood_association_id}
                                     className="mt-2"
