@@ -55,42 +55,88 @@ class ProjectController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $neighbor = Neighbor::where('user_id', auth()->id())->first();
+        $user = $request->user();
 
-        // Verificar que el vecino esté asociado a una junta
-        if (!$neighbor || !$neighbor->neighborhood_association_id) {
-            return redirect()->route('projects.index')
-                ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
+        // Verificar el vecino asociado
+        $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+        if (!$neighbor) {
+            abort(403, 'No estás asociado a ninguna junta de vecinos.');
         }
 
-        return Inertia::render('Projects/Create');
+        // Obtener vecinos según el rol del usuario
+        if ($user->role === 'board_member') {
+            $neighbors = Neighbor::where('neighborhood_association_id', $neighbor->neighborhood_association_id)
+                ->get(['id', 'name']);
+        } elseif ($user->role === 'admin') {
+            $neighbors = Neighbor::all(['id', 'name']);
+        } else {
+            abort(403, 'No tienes permiso para crear proyectos.');
+        }
+
+        return Inertia::render('Projects/Create', [
+            'user' => $user,
+            'neighbors' => $neighbors, // Asegúrate de enviar esto
+        ]);
     }
+
+
+
+
+
+
+
+
+
 
 
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProjectRequest $request)
+    public function store(Request $request)
     {
-        $neighbor = Neighbor::where('user_id', auth()->id())->first();
+        $user = $request->user();
 
-        if (!$neighbor || !$neighbor->neighborhood_association_id) {
-            return redirect()->route('projects.index')
-                ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
+        $rules = [
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
+            'issue' => 'required|string|max:1000',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'required|string|in:planeado,aprovado,en_proceso,completado,cancelado',
+            'budget' => 'required|numeric|min:0',
+            'is_for_all_neighbors' => 'required|boolean',
+            'neighbor_ids' => 'nullable|array',
+            'neighbor_ids.*' => 'exists:neighbors,id',
+        ];
+
+        // Ajustar la validación para los board_members
+        if ($user->role === 'board_member') {
+            $rules['neighbor_ids.*'] .= '|exists:neighbors,id';
         }
 
-        $validated = $request->validated();
+        $validated = $request->validate($rules);
 
-        // Agregar registro inicial en el campo 'changes'
-        $validated['changes'] = "Proyecto creado con estado '{$validated['status']}' el " . now()->format('Y-m-d H:i:s');
+        // Asignar automáticamente la junta vecinal
+        if ($user->role === 'board_member') {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+            $validated['association_id'] = $neighbor->neighborhood_association_id;
+        }
 
-        $validated['association_id'] = $neighbor->neighborhood_association_id;
-
+        // Crear el proyecto
         $project = Project::create($validated);
 
+        // Manejar relaciones con la tabla intermedia
+        if (!$validated['is_for_all_neighbors'] && isset($validated['neighbor_ids'])) {
+            foreach ($validated['neighbor_ids'] as $neighborId) {
+                $project->neighbors()->attach($neighborId, ['access_type' => 'viewer']);
+            }
+        }
+
+        // Manejar archivo adjunto
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('project_files', 'public');
             File::create([
@@ -101,6 +147,9 @@ class ProjectController extends Controller
 
         return redirect()->route('projects.index')->with('success', 'Proyecto creado exitosamente.');
     }
+
+
+
 
 
 
@@ -128,12 +177,20 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $associations = NeighborhoodAssociation::all(['id', 'name']);
+        $neighbors = Neighbor::where('neighborhood_association_id', $project->association_id)
+            ->with('user') // Asegúrate de cargar la relación con los usuarios
+            ->get();
+        $assignedNeighbors = $project->neighbors()->get();
 
         return Inertia::render('Projects/Edit', [
             'project' => $project->load('files'),
             'associations' => $associations,
+            'neighbors' => $neighbors, // Aquí se pasan los vecinos
+            'assignedNeighbors' => $assignedNeighbors,
         ]);
     }
+
+
 
     /**
      * Actualiza un proyecto existente.

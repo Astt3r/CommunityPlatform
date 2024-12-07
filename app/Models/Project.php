@@ -15,13 +15,14 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
-        'issue',
+        'issue', // Agregar el campo issue
+        'is_for_all_neighbors',
         'start_date',
         'end_date',
         'status',
         'budget',
-        'changes',
-        'association_id',
+        'association_id', // Asociación del proyecto
+        'changes', // Historial de cambios
     ];
 
     /**
@@ -32,28 +33,45 @@ class Project extends Model
         return $this->hasMany(File::class, 'project_id', 'id');
     }
 
+    /**
+     * Relación con las contribuciones.
+     */
     public function contributions()
     {
         return $this->hasMany(Contribution::class);
     }
 
+    /**
+     * Relación con la junta de vecinos asociada.
+     */
     public function neighborhoodAssociation()
     {
         return $this->belongsTo(NeighborhoodAssociation::class);
     }
 
+    /**
+     * Relación con los vecinos asociados al proyecto.
+     */
     public function neighbors()
     {
-        return $this->belongsToMany(Neighbor::class, 'neighbor_project');
+        return $this->belongsToMany(Neighbor::class, 'neighbor_project')
+            ->withPivot('access_type', 'remarks')
+            ->withTimestamps();
     }
+
+    /**
+     * Determina si el proyecto es para todos los vecinos.
+     */
     public function isForAllNeighbors()
     {
         return $this->is_for_all_neighbors;
     }
+
+    /**
+     * Mutador para eliminar espacios en blanco del campo changes.
+     */
     public function setChangesAttribute($value)
     {
         $this->attributes['changes'] = trim($value);
     }
-
-
 }

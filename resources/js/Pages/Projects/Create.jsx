@@ -1,273 +1,314 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, router, usePage } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import { useEffect } from "react";
+import { useState } from "react";
 
-export default function CreateNeighborWithUser({
-    associations,
-    userAssociationId,
-    userAssociationName,
-}) {
+export default function ProjectCreate() {
+    const { neighbors } = usePage().props; // Vecinos pasados desde el backend
+
     const { data, setData, post, processing, errors, reset } = useForm({
-        // Neighbor fields
-        address: "",
-        identification_number: "",
-        registration_date: "",
-        birth_date: "",
-        status: "inactive", // Default to inactive
-        neighborhood_association_id: userAssociationId || "", // Preseleccionada si es board_member
-
-        // User fields
         name: "",
-        email: "",
-        password: "",
-        password_confirmation: "",
-        role: "resident", // Default to resident
+        description: "",
+        issue: "",
+        start_date: "",
+        end_date: "",
+        status: "planeado",
+        budget: "",
+        is_for_all_neighbors: true,
+        neighbor_ids: [], // IDs de los vecinos seleccionados
+        file: null, // Archivo opcional
     });
 
-    const isBoardMember = !!userAssociationId; // Determinar si el usuario es board_member
-
-    const submit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("neighbors.store"));
-    };
 
-    const handleCancel = () => {
-        reset();
-        router.visit(route("neighbors.index"));
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            if (key === "neighbor_ids") {
+                formData.append(key, JSON.stringify(data[key]));
+            } else {
+                formData.append(key, data[key]);
+            }
+        });
+
+        post(route("projects.store"), {
+            data: formData,
+            onFinish: () => reset(),
+        });
     };
 
     return (
         <AuthenticatedLayout
-            header={
-                <div>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Crear Vecino y Usuario
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                        Los campos marcados con{" "}
-                        <span className="text-red-500">*</span> son
-                        obligatorios.
-                    </p>
-                </div>
-            }
+            header={<h2 className="font-semibold text-xl">Crear Proyecto</h2>}
         >
             <div className="py-12">
-                <div className="max-w-full mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <form onSubmit={submit} className="space-y-4">
-                            {/* Nombre */}
+                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white shadow-sm sm:rounded-lg p-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* Nombre del proyecto */}
                             <div>
                                 <InputLabel htmlFor="name" value="Nombre *" />
                                 <TextInput
                                     id="name"
                                     type="text"
-                                    name="name"
                                     value={data.name}
                                     onChange={(e) =>
                                         setData("name", e.target.value)
                                     }
                                     className="mt-1 block w-full"
-                                    required
                                 />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.name} />
                             </div>
 
-                            {/* Correo Electrónico */}
+                            {/* Descripción */}
                             <div>
                                 <InputLabel
-                                    htmlFor="email"
-                                    value="Correo Electrónico *"
+                                    htmlFor="description"
+                                    value="Descripción *"
                                 />
                                 <TextInput
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    value={data.email}
+                                    id="description"
+                                    type="text"
+                                    value={data.description}
                                     onChange={(e) =>
-                                        setData("email", e.target.value)
+                                        setData("description", e.target.value)
                                     }
                                     className="mt-1 block w-full"
-                                    required
                                 />
-                                <InputError
-                                    message={errors.email}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.description} />
                             </div>
 
-                            {/* Contraseña */}
+                            {/* Problema */}
                             <div>
                                 <InputLabel
-                                    htmlFor="password"
-                                    value="Contraseña *"
+                                    htmlFor="issue"
+                                    value="Problema que aborda *"
                                 />
                                 <TextInput
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    value={data.password}
+                                    id="issue"
+                                    type="text"
+                                    value={data.issue}
                                     onChange={(e) =>
-                                        setData("password", e.target.value)
+                                        setData("issue", e.target.value)
                                     }
                                     className="mt-1 block w-full"
-                                    required
                                 />
-                                <InputError
-                                    message={errors.password}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.issue} />
                             </div>
 
-                            {/* Confirmar Contraseña */}
+                            {/* Fecha de inicio */}
                             <div>
                                 <InputLabel
-                                    htmlFor="password_confirmation"
-                                    value="Confirmar Contraseña *"
+                                    htmlFor="start_date"
+                                    value="Fecha de Inicio *"
                                 />
                                 <TextInput
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    value={data.password_confirmation}
+                                    id="start_date"
+                                    type="date"
+                                    value={data.start_date}
+                                    onChange={(e) =>
+                                        setData("start_date", e.target.value)
+                                    }
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.start_date} />
+                            </div>
+
+                            {/* Fecha de finalización */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="end_date"
+                                    value="Fecha de Finalización"
+                                />
+                                <TextInput
+                                    id="end_date"
+                                    type="date"
+                                    value={data.end_date}
+                                    onChange={(e) =>
+                                        setData("end_date", e.target.value)
+                                    }
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.end_date} />
+                            </div>
+
+                            {/* Estado */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="status"
+                                    value="Estado del Proyecto *"
+                                />
+                                <select
+                                    id="status"
+                                    value={data.status}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300"
+                                >
+                                    <option value="planeado">Planeado</option>
+                                    <option value="aprovado">Aprobado</option>
+                                    <option value="en_proceso">
+                                        En Proceso
+                                    </option>
+                                    <option value="completado">
+                                        Completado
+                                    </option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                                <InputError message={errors.status} />
+                            </div>
+
+                            {/* Presupuesto */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="budget"
+                                    value="Presupuesto *"
+                                />
+                                <TextInput
+                                    id="budget"
+                                    type="number"
+                                    value={data.budget}
+                                    onChange={(e) =>
+                                        setData("budget", e.target.value)
+                                    }
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.budget} />
+                            </div>
+                            <div>
+                                <InputLabel
+                                    htmlFor="is_for_all_neighbors"
+                                    value="¿Proyecto para todos los vecinos?"
+                                />
+                                <input
+                                    type="checkbox"
+                                    id="is_for_all_neighbors"
+                                    checked={data.is_for_all_neighbors}
                                     onChange={(e) =>
                                         setData(
-                                            "password_confirmation",
-                                            e.target.value
+                                            "is_for_all_neighbors",
+                                            e.target.checked
                                         )
                                     }
-                                    className="mt-1 block w-full"
-                                    required
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                    className="mt-2"
+                                    className="mt-1 block"
                                 />
                             </div>
 
-                            {/* Dirección */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="address"
-                                    value="Dirección *"
-                                />
-                                <TextInput
-                                    id="address"
-                                    type="text"
-                                    name="address"
-                                    value={data.address}
-                                    onChange={(e) =>
-                                        setData("address", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                    required
-                                />
-                                <InputError
-                                    message={errors.address}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Número de Identificación */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="identification_number"
-                                    value="Número de Identificación (RUT) *"
-                                />
-                                <TextInput
-                                    id="identification_number"
-                                    type="text"
-                                    name="identification_number"
-                                    value={data.identification_number}
-                                    onChange={(e) =>
-                                        setData(
-                                            "identification_number",
-                                            formatRUT(e.target.value)
-                                        )
-                                    }
-                                    placeholder="Ej: 12.345.678-9"
-                                    className="mt-1 block w-full"
-                                    required
-                                />
-                                <InputError
-                                    message={errors.identification_number}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Asociación Vecinal */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="neighborhood_association_id"
-                                    value="Asociación Vecinal *"
-                                />
-                                {isBoardMember ? (
-                                    <div className="mt-1">
-                                        <TextInput
-                                            id="neighborhood_association_id"
-                                            name="neighborhood_association_id"
-                                            value={userAssociationName}
-                                            readOnly
-                                            className="bg-gray-100 cursor-not-allowed w-full"
-                                        />
-                                        <p className="text-sm text-gray-500">
-                                            Solo puedes asignar vecinos a la
-                                            asociación a la que perteneces.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <select
-                                        id="neighborhood_association_id"
-                                        name="neighborhood_association_id"
-                                        value={data.neighborhood_association_id}
-                                        onChange={(e) =>
-                                            setData(
-                                                "neighborhood_association_id",
-                                                e.target.value
-                                            )
-                                        }
-                                        className="mt-1 block w-full"
-                                        required
-                                    >
-                                        <option value="">
-                                            Seleccione una Asociación
-                                        </option>
-                                        {associations.map((association) => (
-                                            <option
-                                                key={association.id}
-                                                value={association.id}
+                            {/* Selección de vecinos si no es para todos */}
+                            {!data.is_for_all_neighbors && (
+                                <div>
+                                    <InputLabel value="Seleccionar vecinos" />
+                                    {neighbors.length > 0 ? (
+                                        neighbors.map((neighbor) => (
+                                            <div
+                                                key={neighbor.id}
+                                                className="flex items-center"
                                             >
-                                                {association.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                )}
-                                <InputError
-                                    message={errors.neighborhood_association_id}
-                                    className="mt-2"
+                                                <input
+                                                    type="checkbox"
+                                                    value={neighbor.id}
+                                                    checked={data.neighbor_ids.includes(
+                                                        neighbor.id
+                                                    )}
+                                                    onChange={(e) => {
+                                                        const id = parseInt(
+                                                            e.target.value,
+                                                            10
+                                                        );
+                                                        setData(
+                                                            "neighbor_ids",
+                                                            (prev) => {
+                                                                const updatedIds =
+                                                                    Array.isArray(
+                                                                        prev
+                                                                    )
+                                                                        ? [
+                                                                              ...prev,
+                                                                          ]
+                                                                        : [];
+                                                                if (
+                                                                    e.target
+                                                                        .checked
+                                                                ) {
+                                                                    if (
+                                                                        !updatedIds.includes(
+                                                                            id
+                                                                        )
+                                                                    ) {
+                                                                        updatedIds.push(
+                                                                            id
+                                                                        );
+                                                                    }
+                                                                } else {
+                                                                    const index =
+                                                                        updatedIds.indexOf(
+                                                                            id
+                                                                        );
+                                                                    if (
+                                                                        index >
+                                                                        -1
+                                                                    ) {
+                                                                        updatedIds.splice(
+                                                                            index,
+                                                                            1
+                                                                        );
+                                                                    }
+                                                                }
+                                                                return updatedIds;
+                                                            }
+                                                        );
+                                                    }}
+                                                    className="mr-2"
+                                                />
+                                                <label>{neighbor.name}</label>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p>No hay vecinos disponibles</p>
+                                    )}
+                                    <InputError
+                                        message={errors.neighbor_ids}
+                                        className="mt-2"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Archivo del Proyecto */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="file"
+                                    value="Archivo del Proyecto"
                                 />
+                                <input
+                                    id="file"
+                                    type="file"
+                                    onChange={(e) =>
+                                        setData("file", e.target.files[0])
+                                    }
+                                    className="mt-1 block w-full"
+                                />
+                                <InputError message={errors.file} />
                             </div>
 
                             {/* Botones */}
-                            <div className="flex flex-col md:flex-row justify-end space-y-4 md:space-y-0 md:space-x-4 mt-4">
+                            <div className="flex justify-end space-x-4">
                                 <button
                                     type="button"
-                                    className="w-full md:w-auto bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={handleCancel}
+                                    className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                                    onClick={() => reset()}
                                 >
                                     Cancelar
                                 </button>
-                                <PrimaryButton
+                                <button
+                                    type="submit"
                                     className="bg-blue-600 text-white px-4 py-2 rounded-md"
                                     disabled={processing}
                                 >
-                                    Agregar Vecino y Usuario
-                                </PrimaryButton>
+                                    Guardar Proyecto
+                                </button>
                             </div>
                         </form>
                     </div>
