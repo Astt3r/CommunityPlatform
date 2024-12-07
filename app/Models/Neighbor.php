@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Neighbor extends Model
 {
@@ -46,10 +47,15 @@ class Neighbor extends Model
         return $this->hasMany(Contribution::class);
     }
 
-    
+
     public function meetingAttendances()
     {
         return $this->hasMany(MeetingAttendance::class);
+    }
+
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class);
     }
 
     public function attendanceSummary()
@@ -62,6 +68,8 @@ class Neighbor extends Model
             'absent' => $absent,
         ];
     }
+
+
 
 
 
