@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->enum('status', ['planeado', 'aprovado', 'en_proceso', 'completado', 'cancelado'])->default('planeado');
-            $table->string('budget');
+            $table->integer('budget');
             $table->longText('changes');
             $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
             $table->timestamps();
