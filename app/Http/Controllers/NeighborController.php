@@ -238,7 +238,7 @@ class NeighborController extends Controller
 
         // Verificar que el usuario autenticado no pueda editar su propio registro
         if (Auth::id() === $neighbor->user_id) {
-            return redirect()->route('neighbors.index')->with('error', 'No puedes editar tu propio registro. Inicia Sesión con la cuenta Debug');
+            return redirect()->route('neighbors.index')->with('error', 'No puedes editar tu propio registro.');
         }
 
         $associations = NeighborhoodAssociation::all(['id', 'name']);
