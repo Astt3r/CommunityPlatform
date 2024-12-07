@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('budget');
             // Agregar columna para registro de cambios en base a texto
             $table->longText('changes');
+            $table->boolean('is_for_all_neighbors')->default(false);
             $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
             $table->timestamps();
         });

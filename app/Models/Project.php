@@ -46,6 +46,10 @@ class Project extends Model
     {
         return $this->belongsToMany(Neighbor::class, 'neighbor_project');
     }
+    public function isForAllNeighbors()
+    {
+        return $this->is_for_all_neighbors;
+    }
     public function setChangesAttribute($value)
     {
         $this->attributes['changes'] = trim($value);
