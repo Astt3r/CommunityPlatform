@@ -53,9 +53,11 @@ class Neighbor extends Model
         return $this->hasMany(MeetingAttendance::class);
     }
 
-    public function projects(): BelongsToMany
+    public function projects()
     {
-        return $this->belongsToMany(Project::class);
+        return $this->belongsToMany(Project::class, 'neighbor_project')
+            ->withPivot('access_type', 'remarks')
+            ->withTimestamps();
     }
 
     public function attendanceSummary()

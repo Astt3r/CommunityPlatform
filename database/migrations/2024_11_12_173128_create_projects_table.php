@@ -14,14 +14,13 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->text('issue');
+            $table->string('issue');
+            $table->boolean('is_for_all_neighbors')->default(false); // Elimina "after description"
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->enum('status', ['planeado', 'aprovado', 'en_proceso', 'completado', 'cancelado'])->default('planeado');
             $table->string('budget');
-            // Agregar columna para registro de cambios en base a texto
             $table->longText('changes');
-            $table->boolean('is_for_all_neighbors')->default(false);
             $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
             $table->timestamps();
         });
@@ -32,6 +31,11 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::table('projects', function (Blueprint $table) {
+            $table->dropColumn('is_for_all_neighbors');
+        });
     }
+
+
+
 };

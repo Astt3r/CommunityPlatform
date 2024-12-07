@@ -6,7 +6,7 @@ import InputError from "@/Components/InputError";
 import axios from "axios";
 import { router } from "@inertiajs/react";
 
-export default function ProjectEdit({ project, associations }) {
+export default function ProjectEdit({ project, associations, neighbors }) {
     const { data, setData, put, processing, errors } = useForm({
         name: project.name || "",
         description: project.description || "",
@@ -17,6 +17,10 @@ export default function ProjectEdit({ project, associations }) {
         budget: project.budget || "",
         association_id: project.association_id || "",
         file: null, // Para el archivo
+        is_for_all_neighbors: project.is_for_all_neighbors || false, // Indica si es para todos
+        neighbor_ids: Array.isArray(project.neighbors)
+            ? project.neighbors.map((n) => n.id)
+            : [], // Asegúrate de inicializar como array
     });
 
     const handleSubmit = async (e) => {
@@ -73,6 +77,23 @@ export default function ProjectEdit({ project, associations }) {
                 alert("Error al conectar con el servidor.");
             }
         }
+    };
+
+    const handleNeighborChange = (neighborId, isChecked) => {
+        setData("neighbor_ids", (prev) => {
+            const updatedIds = Array.isArray(prev) ? [...prev] : [];
+            if (isChecked) {
+                if (!updatedIds.includes(neighborId)) {
+                    updatedIds.push(neighborId);
+                }
+            } else {
+                const index = updatedIds.indexOf(neighborId);
+                if (index > -1) {
+                    updatedIds.splice(index, 1);
+                }
+            }
+            return updatedIds;
+        });
     };
 
     const handleCancel = () => {
@@ -154,6 +175,66 @@ export default function ProjectEdit({ project, associations }) {
                                 />
                             </div>
 
+                            {/* Proyecto para todos los vecinos */}
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="is_for_all_neighbors"
+                                    name="is_for_all_neighbors"
+                                    checked={data.is_for_all_neighbors}
+                                    onChange={(e) =>
+                                        setData(
+                                            "is_for_all_neighbors",
+                                            e.target.checked
+                                        )
+                                    }
+                                    className="mr-2"
+                                />
+                                <InputLabel
+                                    htmlFor="is_for_all_neighbors"
+                                    value="¿Proyecto para todos los vecinos?"
+                                />
+                            </div>
+
+                            {/* Selección de vecinos */}
+                            {!data.is_for_all_neighbors && (
+                                <div>
+                                    <h3 className="font-semibold text-lg">
+                                        Asignar Vecinos
+                                    </h3>
+                                    <div className="space-y-2">
+                                        {Array.isArray(data.neighbor_ids) &&
+                                            neighbors.map((neighbor) => (
+                                                <div
+                                                    key={neighbor.id}
+                                                    className="flex items-center"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`neighbor_${neighbor.id}`}
+                                                        checked={data.neighbor_ids.includes(
+                                                            neighbor.id
+                                                        )}
+                                                        onChange={(e) =>
+                                                            handleNeighborChange(
+                                                                neighbor.id,
+                                                                e.target.checked
+                                                            )
+                                                        }
+                                                        className="mr-2"
+                                                    />
+                                                    <label
+                                                        htmlFor={`neighbor_${neighbor.id}`}
+                                                        className="text-gray-800"
+                                                    >
+                                                        {neighbor.user.name}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Fechas */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
@@ -214,9 +295,6 @@ export default function ProjectEdit({ project, associations }) {
                                     }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
-                                    <option value="">
-                                        Selecciona un estado
-                                    </option>
                                     <option value="planeado">Planeado</option>
                                     <option value="aprovado">Aprobado</option>
                                     <option value="en_proceso">
@@ -250,38 +328,6 @@ export default function ProjectEdit({ project, associations }) {
                                 />
                                 <InputError
                                     message={errors.budget}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Asociación */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="association_id"
-                                    value="Asociación"
-                                />
-                                <select
-                                    id="association_id"
-                                    value={data.association_id}
-                                    onChange={(e) =>
-                                        setData(
-                                            "association_id",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                >
-                                    <option value="">
-                                        Selecciona una Asociación
-                                    </option>
-                                    {associations.map((assoc) => (
-                                        <option key={assoc.id} value={assoc.id}>
-                                            {assoc.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError
-                                    message={errors.association_id}
                                     className="mt-2"
                                 />
                             </div>

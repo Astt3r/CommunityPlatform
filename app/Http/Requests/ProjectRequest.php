@@ -22,16 +22,22 @@ class ProjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:projects,name,',
+            'name' => 'required|string|max:255',
             'description' => 'required|string|max:500',
-            'issue' => 'nullable|string|max:1000',
-            'start_date' => 'nullable|date',
+            'issue' => 'required|string|max:1000',
+            'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'required|string|max:100',
+            'status' => 'required|string|in:planeado,aprovado,en_proceso,completado,cancelado',
             'budget' => 'required|numeric|min:0',
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
+            'is_for_all_neighbors' => 'required|boolean',
+            'neighbor_ids' => 'nullable|array',
+            'neighbor_ids.*' => 'exists:neighbors,id',
+
         ];
     }
+
+
 
 
 
