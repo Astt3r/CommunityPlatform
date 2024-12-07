@@ -56,7 +56,6 @@ class Neighbor extends Model
     public function projects()
     {
         return $this->belongsToMany(Project::class, 'neighbor_project')
-            ->withPivot('access_type', 'remarks')
             ->withTimestamps();
     }
 

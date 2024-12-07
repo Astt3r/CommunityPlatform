@@ -126,6 +126,9 @@ class ProjectController extends Controller
             $validated['association_id'] = $neighbor->neighborhood_association_id;
         }
 
+        // Inicializar changes con fecha de creacion y fase incial
+        $validated['changes'] = "Proyecto creado el " . now()->format('Y-m-d H:i:s');
+
         // Crear el proyecto
         $project = Project::create($validated);
 
@@ -178,14 +181,14 @@ class ProjectController extends Controller
     {
         $associations = NeighborhoodAssociation::all(['id', 'name']);
         $neighbors = Neighbor::where('neighborhood_association_id', $project->association_id)
-            ->with('user') // Asegúrate de cargar la relación con los usuarios
+            ->with('user') // Ensure the user relationship is loaded
             ->get();
         $assignedNeighbors = $project->neighbors()->get();
 
         return Inertia::render('Projects/Edit', [
             'project' => $project->load('files'),
             'associations' => $associations,
-            'neighbors' => $neighbors, // Aquí se pasan los vecinos
+            'neighbors' => $neighbors,
             'assignedNeighbors' => $assignedNeighbors,
         ]);
     }
@@ -197,6 +200,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        // Validate incoming data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:500',
@@ -206,19 +210,29 @@ class ProjectController extends Controller
             'status' => 'nullable|string|max:100',
             'budget' => 'nullable|numeric|min:0',
             'association_id' => 'nullable|exists:neighborhood_associations,id',
+            'neighbor_ids' => 'nullable|array', // Ensure it's an array
+            'neighbor_ids.*' => 'exists:neighbors,id', // Validate each ID exists
         ]);
 
-        // Verificar si el estado ha cambiado
+        // Check if the status has changed
         if (isset($validated['status']) && $validated['status'] !== $project->status) {
             $currentDateTime = now()->format('Y-m-d H:i:s');
             $newChange = "Estado cambiado de '{$project->status}' a '{$validated['status']}' el {$currentDateTime}";
 
-            // Concatenar el nuevo cambio al historial existente
+            // Append new change to the existing history
             $project->changes .= ($project->changes ? "\n" : "") . $newChange;
         }
 
-        // Actualizar el proyecto con los nuevos datos
+        // Update project fields
         $project->update($validated);
+
+        // Sync the neighbor IDs with the pivot table
+        if (isset($validated['neighbor_ids'])) {
+            $project->neighbors()->sync($validated['neighbor_ids']);
+        } else {
+            // If no neighbor_ids provided, detach all neighbors
+            $project->neighbors()->detach();
+        }
 
         return response()->json(['message' => 'Proyecto actualizado correctamente.'], 200);
     }

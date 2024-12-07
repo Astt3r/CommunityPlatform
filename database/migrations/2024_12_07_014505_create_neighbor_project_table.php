@@ -14,8 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('neighbor_id')->constrained()->onDelete('cascade');
-            $table->enum('access_type', ['viewer', 'contributor', 'admin'])->default('viewer');
-            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }

@@ -1,5 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useForm } from "@inertiajs/react";
+import { useEffect } from "react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -80,8 +81,12 @@ export default function ProjectEdit({ project, associations, neighbors }) {
     };
 
     const handleNeighborChange = (neighborId, isChecked) => {
-        setData("neighbor_ids", (prev) => {
-            const updatedIds = Array.isArray(prev) ? [...prev] : [];
+        setData((prevData) => {
+            // Safely handle neighbor_ids update
+            const updatedIds = Array.isArray(prevData.neighbor_ids)
+                ? [...prevData.neighbor_ids]
+                : [];
+
             if (isChecked) {
                 if (!updatedIds.includes(neighborId)) {
                     updatedIds.push(neighborId);
@@ -92,13 +97,24 @@ export default function ProjectEdit({ project, associations, neighbors }) {
                     updatedIds.splice(index, 1);
                 }
             }
-            return updatedIds;
+
+            console.log("Updated neighbor_ids:", updatedIds);
+
+            // Return the entire updated state
+            return {
+                ...prevData,
+                neighbor_ids: updatedIds,
+            };
         });
     };
 
     const handleCancel = () => {
         router.visit(route("projects.index"));
     };
+
+    useEffect(() => {
+        console.log("Current data state:", data);
+    }, [data]);
 
     return (
         <AuthenticatedLayout
