@@ -12,13 +12,16 @@ export default function EditNeighborWithUser({
     userAssociationId,
     userAssociationName,
 }) {
+    // Obtener la fecha actual en formato YYYY-MM-DD
+    const today = new Date().toISOString().split("T")[0];
+
     const { data, setData, put, processing, errors, reset } = useForm({
         // Neighbor fields
         address: neighbor.address || "",
         identification_number: neighbor.identification_number || "",
-        registration_date: neighbor.registration_date || "",
+        registration_date: neighbor.registration_date || today, // Si no hay fecha de registro, usa la fecha actual
         birth_date: neighbor.birth_date || "",
-        status: neighbor.status || "inactive", // Default to inactive
+        status: neighbor.status || "inactive", // Estado por defecto
         neighborhood_association_id:
             neighbor.neighborhood_association_id || userAssociationId || "",
 
@@ -27,7 +30,7 @@ export default function EditNeighborWithUser({
         email: neighbor.user ? neighbor.user.email : "",
         password: "",
         password_confirmation: "",
-        role: neighbor.user ? neighbor.user.role : "resident", // Default to resident
+        role: neighbor.user ? neighbor.user.role : "resident", // Rol por defecto
     });
 
     const isBoardMember = !!userAssociationId; // Determinar si el usuario es board_member
@@ -104,53 +107,6 @@ export default function EditNeighborWithUser({
                                 />
                             </div>
 
-                            {/* Contraseña */}
-                            {/* <div>
-                                <InputLabel
-                                    htmlFor="password"
-                                    value="Contraseña (Opcional)"
-                                />
-                                <TextInput
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    value={data.password}
-                                    onChange={(e) =>
-                                        setData("password", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.password}
-                                    className="mt-2"
-                                />
-                            </div> */}
-
-                            {/* Confirmar Contraseña */}
-                            {/* <div>
-                                <InputLabel
-                                    htmlFor="password_confirmation"
-                                    value="Confirmar Contraseña (Opcional)"
-                                />
-                                <TextInput
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    value={data.password_confirmation}
-                                    onChange={(e) =>
-                                        setData(
-                                            "password_confirmation",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                    className="mt-2"
-                                />
-                            </div> */}
-
                             {/* Dirección */}
                             <div>
                                 <InputLabel
@@ -219,7 +175,7 @@ export default function EditNeighborWithUser({
                                         )
                                     }
                                     className="mt-1 block w-full"
-                                    max={new Date().toISOString().split("T")[0]}
+                                    max={today} // Bloquea días posteriores a hoy
                                     required
                                 />
                                 <InputError
@@ -243,7 +199,7 @@ export default function EditNeighborWithUser({
                                         setData("birth_date", e.target.value)
                                     }
                                     className="mt-1 block w-full"
-                                    max={new Date().toISOString().split("T")[0]}
+                                    max={today} // Bloquea días posteriores a hoy
                                     required
                                 />
                                 <InputError

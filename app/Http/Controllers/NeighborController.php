@@ -226,7 +226,7 @@ class NeighborController extends Controller
     }
 
 
-    
+
 
 
 
@@ -313,29 +313,32 @@ class NeighborController extends Controller
 
     public function destroy(Neighbor $neighbor)
     {
-        // Verificar que el usuario autenticado no pueda eliminar su propio registro
-        if (Auth::id() === $neighbor->user_id) {
-            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar tu propio registro. Inicia Sesión con la cuenta Debug');
+        // Verificar si el vecino pertenece a la directiva
+        if ($neighbor->user && $neighbor->user->role === 'board_member') {
+            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar un miembro de la directiva.');
         }
 
-        // Obtener la asociación antes de eliminar el vecino
+        // Verificar que el usuario autenticado no pueda eliminar su propio registro
+        if (Auth::id() === $neighbor->user_id) {
+            return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar tu propio registro.');
+        }
+
+        // Si pasa todas las validaciones, eliminar
         $association = $neighbor->neighborhoodAssociation;
 
         DB::transaction(function () use ($neighbor, $association) {
-            // Eliminar el usuario asociado
             if ($neighbor->user) {
                 $neighbor->user->delete();
             }
-
-            // Eliminar el vecino
             $neighbor->delete();
-
-            // Actualizar el número de miembros de la asociación
             $association->updateNumberOfMembers();
         });
 
-        return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario asociado eliminados exitosamente.');
+        return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado correctamente.');
     }
+
+
+
 
 
     private function isValidRUT($rut)

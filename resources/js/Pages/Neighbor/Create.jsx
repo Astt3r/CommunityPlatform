@@ -11,13 +11,16 @@ export default function CreateNeighborWithUser({
     userAssociationId,
     userAssociationName,
 }) {
+    // Obtener la fecha actual en formato YYYY-MM-DD
+    const today = new Date().toISOString().split("T")[0];
+
     const { data, setData, post, processing, errors, reset } = useForm({
         // Neighbor fields
         address: "",
         identification_number: "",
-        registration_date: "",
+        registration_date: today, // Fecha de registro predefinida
         birth_date: "",
-        status: "inactive", // Default to inactive
+        status: "inactive", // Estado por defecto
         neighborhood_association_id: userAssociationId || "", // Preseleccionada si es board_member
 
         // User fields
@@ -25,7 +28,7 @@ export default function CreateNeighborWithUser({
         email: "",
         password: "",
         password_confirmation: "",
-        role: "resident", // Default to resident
+        role: "resident", // Rol por defecto
     });
 
     const isBoardMember = !!userAssociationId; // Determinar si el usuario es board_member
@@ -202,6 +205,7 @@ export default function CreateNeighborWithUser({
                             </div>
 
                             {/* Fecha de Registro */}
+                            {/* Fecha de Registro */}
                             <div>
                                 <InputLabel
                                     htmlFor="registration_date"
@@ -219,7 +223,7 @@ export default function CreateNeighborWithUser({
                                         )
                                     }
                                     className="mt-1 block w-full"
-                                    max={new Date().toISOString().split("T")[0]} // Restringe hasta el día actual
+                                    max={today} // Bloquea días posteriores a hoy
                                     required
                                 />
                                 <InputError

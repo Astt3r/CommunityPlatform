@@ -108,12 +108,17 @@ class MeetingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Meeting $meeting)
+    public function edit($id)
     {
-        return Inertia::render('Meetings/Edit', [
-            'meeting' => $meeting, // Se pasa directamente al componente Edit.jsx
+        // Encuentra la reunión por su ID
+        $meeting = Meeting::findOrFail($id);
+
+        // Pasa los datos de la reunión a la vista
+        return inertia('Meetings/Edit', [
+            'meeting' => $meeting,
         ]);
     }
+
 
 
     /**
