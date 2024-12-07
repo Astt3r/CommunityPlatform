@@ -71,6 +71,7 @@ export default function NeighborhoodAssociationCreate() {
                                         );
                                     }}
                                     maxLength={255}
+                                    placeholder="Nombre de la Junta de Vecinos"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -102,6 +103,7 @@ export default function NeighborhoodAssociationCreate() {
                                         );
                                     }}
                                     maxLength={255}
+                                    placeholder="Dirección de la Junta de Vecinos"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -129,6 +131,7 @@ export default function NeighborhoodAssociationCreate() {
                                         setData("phone", e.target.value);
                                     }}
                                     maxLength={9}
+                                    placeholder="Número de teléfono"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -148,6 +151,7 @@ export default function NeighborhoodAssociationCreate() {
                                     onChange={(e) =>
                                         setData("email", e.target.value)
                                     }
+                                    placeholder="Correo electrónico"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -160,7 +164,7 @@ export default function NeighborhoodAssociationCreate() {
                             <div>
                                 <InputLabel
                                     htmlFor="website_url"
-                                    value="URL del Sitio Web"
+                                    value="URL del Sitio Web (Incluir http:// o https://)"
                                 />
                                 <TextInput
                                     id="website_url"
@@ -170,6 +174,7 @@ export default function NeighborhoodAssociationCreate() {
                                     onChange={(e) =>
                                         setData("website_url", e.target.value)
                                     }
+                                    placeholder="URL del sitio web"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -195,6 +200,7 @@ export default function NeighborhoodAssociationCreate() {
                                             e.target.value
                                         )
                                     }
+                                    placeholder="Fecha de fundación"
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -217,6 +223,7 @@ export default function NeighborhoodAssociationCreate() {
                                     onChange={(e) =>
                                         setData("is_active", e.target.checked)
                                     }
+                                    placeholder="¿Está activa?"
                                     className="mt-1 block"
                                 />
                                 <InputError

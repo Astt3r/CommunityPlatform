@@ -7,8 +7,9 @@ export default forwardRef(function TextInput(
         isFocused = false,
         error = false,
         disabled = false,
-        isProcessing = false, // New prop for processing state
+        isProcessing = false,
         value = "",
+        placeholder = "", // Add placeholder prop here
         ...props
     },
     ref
@@ -49,8 +50,9 @@ export default forwardRef(function TextInput(
             type={type}
             className={computedClassName.trim()}
             ref={localRef}
-            disabled={disabled} // Keeps disabled logic separate
+            disabled={disabled}
             value={value}
+            placeholder={placeholder} // Pass placeholder here
         />
     );
 });
