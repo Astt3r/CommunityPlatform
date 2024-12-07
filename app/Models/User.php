@@ -79,7 +79,18 @@ class User extends Authenticatable
     public function neighbor()
     {
         return $this->hasOne(Neighbor::class, 'user_id');
+        return $this->hasOne(Neighbor::class);
     }
+    public function boardMember()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class, 'neighborhood_association_id');
+    }
+    public function neighborhoodAssociation()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class, 'neighborhood_association_id');
+    }
+
+
 
     
 

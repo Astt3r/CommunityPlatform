@@ -8,7 +8,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { parseISO } from "date-fns";
 
-export default function MeetingIndex({ allAssociations }) {
+export default function MeetingIndex({ allAssociations, userRole }) {
     const { meetings, filters, flash } = usePage().props;
     const { data, setData, get } = useForm({
         main_topic: filters.main_topic || "",
@@ -108,30 +108,32 @@ export default function MeetingIndex({ allAssociations }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Reuniones
                     </h2>
-                    <div className="flex items-center gap-4">
-                        <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
-                            Filtrar por Junta:
-                        </label>
-                        <select
-                            id="neighborhood_filter"
-                            value={data.neighborhood_association_id}
-                            onChange={handleAssociationChange}
-                            className="px-4 py-2 border rounded"
-                        >
-                            <option value="">Todas las Juntas</option>
-                            {allAssociations.map((association) => (
-                                <option key={association.id} value={association.id}>
-                                    {association.name}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={handleSearch}
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                            Filtrar
-                        </button>
-                    </div>
+                    {userRole !== "board_member" && (
+                        <div className="flex items-center gap-4">
+                            <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
+                                Filtrar por Junta:
+                            </label>
+                            <select
+                                id="neighborhood_filter"
+                                value={data.neighborhood_association_id}
+                                onChange={handleAssociationChange}
+                                className="px-4 py-2 border rounded"
+                            >
+                                <option value="">Todas las Juntas</option>
+                                {allAssociations.map((association) => (
+                                    <option key={association.id} value={association.id}>
+                                        {association.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                onClick={handleSearch}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                Filtrar
+                            </button>
+                        </div>
+                    )}
                 </div>
             }
         >

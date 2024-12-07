@@ -3,9 +3,8 @@ import { useForm, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-import PrimaryButton from "@/Components/PrimaryButton";
 
-export default function CreateMeeting({ associations }) {
+export default function CreateMeeting({ userRole, associations }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         meeting_date: "",
         main_topic: "",
@@ -14,7 +13,7 @@ export default function CreateMeeting({ associations }) {
         organized_by: "",
         result: "",
         status: "scheduled", // Valor predeterminado
-        neighborhood_association_id: "", // Nueva propiedad
+        neighborhood_association_id: userRole === "board_member" ? associations[0]?.id : "",
     });
 
     const handleChange = (field, value) => {
@@ -43,7 +42,7 @@ export default function CreateMeeting({ associations }) {
                         Crear Reunión
                     </h2>
                     <p className="text-sm text-gray-600">
-                        Los campos marcados con {" "}
+                        Los campos marcados con{" "}
                         <span className="text-red-500">*</span> son
                         obligatorios.
                     </p>
@@ -71,6 +70,7 @@ export default function CreateMeeting({ associations }) {
                                         )
                                     }
                                     className="mt-1 block w-full"
+                                    required
                                 />
                                 <InputError
                                     message={errors.meeting_date}
@@ -95,6 +95,7 @@ export default function CreateMeeting({ associations }) {
                                         )
                                     }
                                     className="mt-1 block w-full"
+                                    required
                                 />
                                 <InputError
                                     message={errors.main_topic}
@@ -127,10 +128,7 @@ export default function CreateMeeting({ associations }) {
                             </div>
 
                             <div>
-                                <InputLabel
-                                    htmlFor="location"
-                                    value="Lugar *"
-                                />
+                                <InputLabel htmlFor="location" value="Lugar *" />
                                 <TextInput
                                     id="location"
                                     type="text"
@@ -140,6 +138,7 @@ export default function CreateMeeting({ associations }) {
                                         handleChange("location", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    required
                                 />
                                 <InputError
                                     message={errors.location}
@@ -164,6 +163,7 @@ export default function CreateMeeting({ associations }) {
                                         )
                                     }
                                     className="mt-1 block w-full"
+                                    required
                                 />
                                 <InputError
                                     message={errors.organized_by}
@@ -172,10 +172,7 @@ export default function CreateMeeting({ associations }) {
                             </div>
 
                             <div>
-                                <InputLabel
-                                    htmlFor="result"
-                                    value="Resultado"
-                                />
+                                <InputLabel htmlFor="result" value="Resultado" />
                                 <TextInput
                                     id="result"
                                     type="text"
@@ -202,13 +199,10 @@ export default function CreateMeeting({ associations }) {
                                         handleChange("status", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    required
                                 >
-                                    <option value="scheduled">
-                                        Programada
-                                    </option>
-                                    <option value="completed">
-                                        Completada
-                                    </option>
+                                    <option value="scheduled">Programada</option>
+                                    <option value="completed">Completada</option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
                                 <InputError
@@ -232,11 +226,16 @@ export default function CreateMeeting({ associations }) {
                                             e.target.value
                                         )
                                     }
-                                    className="mt-1 block w-full"
+                                    className={`mt-1 block w-full ${
+                                        userRole === "board_member"
+                                            ? "bg-gray-100 cursor-not-allowed"
+                                            : ""
+                                    }`}
+                                    disabled={userRole === "board_member"}
                                     required
                                 >
                                     <option value="">
-                                        Seleccione una Asociación
+                                        Seleccione una asociación
                                     </option>
                                     {associations.map((association) => (
                                         <option

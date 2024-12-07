@@ -9,6 +9,7 @@ use App\Http\Requests\MeetingRequest;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use App\Models\NeighborhoodAssociation;
+use App\Models\Neighbor;
 
 class MeetingController extends Controller
 {
@@ -17,6 +18,7 @@ class MeetingController extends Controller
      */
     public function index(Request $request)
     {
+        $user = $request->user();
         $filters = $request->only('main_topic', 'status', 'neighborhood_association_id');
 
         $meetingsQuery = Meeting::query()
@@ -27,18 +29,39 @@ class MeetingController extends Controller
                 $query->where('status', $status);
             });
 
-        // Filtrar por neighborhood_association_id si el filtro está presente
-        if ($filters['neighborhood_association_id'] ?? null) {
-            $meetingsQuery->where('neighborhood_association_id', $filters['neighborhood_association_id']);
+        if ($user->role === 'board_member') {
+            // Acceder al vecino asociado al usuario
+            $neighbor = $user->neighbor()->with('neighborhoodAssociation')->first();
+
+            if ($neighbor && $neighbor->neighborhoodAssociation) {
+                $associationId = $neighbor->neighborhoodAssociation->id;
+
+                // Filtrar reuniones de la junta del vecino y reuniones generales
+                $meetingsQuery->where(function ($query) use ($associationId) {
+                    $query->where('neighborhood_association_id', $associationId)
+                        ->orWhereNull('neighborhood_association_id');
+                });
+            } else {
+                // Si no tiene una junta asignada, mostrar solo reuniones generales
+                $meetingsQuery->whereNull('neighborhood_association_id');
+            }
+
+            $allAssociations = collect(); // No mostrar el dropdown para board_members
+        } else {
+            // Filtrar por neighborhood_association_id si está presente
+            if ($filters['neighborhood_association_id'] ?? null) {
+                $meetingsQuery->where('neighborhood_association_id', $filters['neighborhood_association_id']);
+            }
+            $allAssociations = NeighborhoodAssociation::select('id', 'name')->get();
         }
 
         $meetings = $meetingsQuery->paginate(10);
-        $allAssociations = NeighborhoodAssociation::select('id', 'name')->get();
 
         return inertia('Meetings/Index', [
             'meetings' => $meetings,
             'filters' => $filters,
             'allAssociations' => $allAssociations,
+            'userRole' => $user->role,
         ]);
     }
 
@@ -48,21 +71,54 @@ class MeetingController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $associations = NeighborhoodAssociation::all(['id', 'name']); // Solo los campos necesarios
+        $user = $request->user();
+
+        // Obtener el vecino asociado al usuario (si aplica)
+        $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+        if ($user->role === 'board_member') {
+            // Solo cargar la asociación asignada al vecino
+            if (!$neighbor || !$neighbor->neighborhood_association_id) {
+                abort(403, 'No tienes una asociación asignada.');
+            }
+
+            $association = NeighborhoodAssociation::find($neighbor->neighborhood_association_id, ['id', 'name']);
+            if (!$association) {
+                abort(403, 'No tienes una asociación válida.');
+            }
+
+            $associations = collect([$association]); // Convertir a colección
+
+        } elseif ($user->role === 'admin') {
+            // Los administradores pueden ver todas las asociaciones
+            $associations = NeighborhoodAssociation::all(['id', 'name']);
+        } else {
+            abort(403, 'No tienes permiso para crear reuniones.');
+        }
+
         return Inertia::render('Meetings/Create', [
+            'userRole' => $user->role, // Pasar el rol del usuario
             'associations' => $associations,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
+
+
     public function store(Request $request)
     {
-        // Validar los datos ingresados
-        $validator = Validator::make($request->all(), [
+        $user = $request->user();
+
+        // Obtener el vecino asociado al usuario
+        $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+        if (!$neighbor) {
+            abort(403, 'No estás asociado a ninguna junta de vecinos.');
+        }
+
+        $rules = [
             'meeting_date' => 'required|date|after:now',
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
@@ -70,15 +126,21 @@ class MeetingController extends Controller
             'organized_by' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
-            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id', // Validación de la asociación
-        ]);
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
+        ];
 
-        // Enviar respuesta con error si falla la validación
+        // Ajustar validación para los board_members
+        if ($user->role === 'board_member') {
+            $rules['neighborhood_association_id'] .= '|in:' . $neighbor->neighborhood_association_id;
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Crear la nueva reunión
+        // Crear reunión
         $meeting = new Meeting();
         $meeting->meeting_date = Carbon::parse($request->input('meeting_date'))->toDateTimeString();
         $meeting->main_topic = $request->input('main_topic');
@@ -87,12 +149,12 @@ class MeetingController extends Controller
         $meeting->organized_by = $request->input('organized_by');
         $meeting->result = $request->input('result');
         $meeting->status = $request->input('status');
-        $meeting->neighborhood_association_id = $request->input('neighborhood_association_id'); // Asignar la ID de la junta vecinal
+        $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
         $meeting->save();
 
-        // Redirigir con un mensaje de éxito
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
+
 
 
 
@@ -131,31 +193,24 @@ class MeetingController extends Controller
      */
     public function edit($id)
     {
-        // Encuentra la reunión por su ID
         $meeting = Meeting::findOrFail($id);
-
-        // Obtén todas las juntas vecinales para el dropdown
         $associations = NeighborhoodAssociation::all(['id', 'name']);
+        $userRole = auth()->user()->role;
 
-        // Pasa los datos de la reunión y las juntas vecinales a la vista
-        return inertia('Meetings/Edit', [
+        return Inertia::render('Meetings/Edit', [
             'meeting' => $meeting,
             'associations' => $associations,
+            'userRole' => $userRole, // Enviar el rol del usuario
         ]);
     }
-
-
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
-        // Buscar la reunión que se va a actualizar
         $meeting = Meeting::findOrFail($id);
 
-        // Validar los datos ingresados
         $validator = Validator::make($request->all(), [
             'meeting_date' => 'required|date|after:now',
             'main_topic' => 'required|string|max:255',
@@ -164,26 +219,22 @@ class MeetingController extends Controller
             'organized_by' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
-            'neighborhood_association_id' => 'nullable|exists:neighborhood_associations,id', // Permitir nulo
+            'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ]);
 
-        // Enviar respuesta con error si falla la validación
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Actualizar los campos de la reunión
-        $meeting->meeting_date = Carbon::parse($request->input('meeting_date'))->toDateTimeString();
-        $meeting->main_topic = $request->input('main_topic');
-        $meeting->description = $request->input('description');
-        $meeting->location = $request->input('location');
-        $meeting->organized_by = $request->input('organized_by');
-        $meeting->result = $request->input('result');
-        $meeting->status = $request->input('status');
-        $meeting->neighborhood_association_id = $request->input('neighborhood_association_id'); // Asignar null si no se selecciona
-        $meeting->save();
+        // Prevenir cambios de la junta de vecinos para board_member
+        if (auth()->user()->role === 'board_member') {
+            $request->merge([
+                'neighborhood_association_id' => $meeting->neighborhood_association_id,
+            ]);
+        }
 
-        // Redirigir con un mensaje de éxito
+        $meeting->update($request->all());
+
         return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
 

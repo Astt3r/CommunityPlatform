@@ -4,7 +4,7 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function EditMeeting({ meeting, associations }) {
+export default function EditMeeting({ meeting, associations, userRole }) {
     const { data, setData, put, processing, errors } = useForm({
         meeting_date: meeting.meeting_date || "",
         main_topic: meeting.main_topic || "",
@@ -12,8 +12,8 @@ export default function EditMeeting({ meeting, associations }) {
         location: meeting.location || "",
         organized_by: meeting.organized_by || "",
         result: meeting.result || "",
-        status: meeting.status || "scheduled", // Valor por defecto
-        neighborhood_association_id: meeting.neighborhood_association_id || "", // Asociación de vecindario
+        status: meeting.status || "scheduled",
+        neighborhood_association_id: meeting.neighborhood_association_id || "",
     });
 
     const handleSubmit = (e) => {
@@ -155,6 +155,7 @@ export default function EditMeeting({ meeting, associations }) {
                                         setData("neighborhood_association_id", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    disabled={userRole === "board_member"} // Deshabilitar si el usuario es board_member
                                 >
                                     <option value="">Seleccione una junta</option>
                                     {associations.map((association) => (
@@ -168,6 +169,7 @@ export default function EditMeeting({ meeting, associations }) {
                                     className="mt-2"
                                 />
                             </div>
+
 
                             <div className="flex justify-end space-x-4 mt-4">
                                 <Link
