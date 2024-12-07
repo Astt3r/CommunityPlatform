@@ -42,6 +42,10 @@ class Project extends Model
         return $this->belongsTo(NeighborhoodAssociation::class);
     }
 
+    public function neighbors()
+    {
+        return $this->belongsToMany(Neighbor::class, 'neighbor_project');
+    }
     public function setChangesAttribute($value)
     {
         $this->attributes['changes'] = trim($value);
