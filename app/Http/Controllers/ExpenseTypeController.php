@@ -8,17 +8,47 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExpenseTypeRequest;
 use Inertia\Inertia;
+use App\Models\Neighbor;
 
 
 class ExpenseTypeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $expenseTypes = ExpenseType::paginate(10);
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+                abort(403, 'No estás asociado a ninguna junta de vecinos.');
+            }
+
+            $associationId = $neighbor->neighborhoodAssociation->id;
+
+            // Filtrar tipos de gasto por asociación
+            $expenseTypes = ExpenseType::where('association_id', $associationId)
+                ->latest()
+                ->paginate(10);
+        } else {
+            // Administradores ven todos los tipos, incluso los sin asociación
+            $expenseTypes = ExpenseType::latest()->paginate(10);
+        }
+
         return Inertia::render('Finance/ExpenseTypes/Index', [
             'expenseTypes' => $expenseTypes,
         ]);
     }
+
+
+
+
+
+
+
+
+
 
     public function create()
     {
@@ -27,18 +57,35 @@ class ExpenseTypeController extends Controller
 
     public function store(ExpenseTypeRequest $request)
     {
-        // Los datos ya están validados por ExpenseTypeRequest
+        $user = $request->user();
+
+        // Determinar si el usuario es admin o pertenece a una asociación
+        $associationId = null; // Por defecto, null para administradores
+
+        if ($user->role !== 'admin') {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+                abort(403, 'No estás asociado a ninguna junta de vecinos.');
+            }
+
+            $associationId = $neighbor->neighborhoodAssociation->id;
+        }
+
+        // Validar los datos
         $validated = $request->validated();
 
-        // Agregar el campo `created_by` automáticamente
+        // Asignar el creador y la asociación
         $validated['created_by'] = auth()->id();
+        $validated['association_id'] = $associationId;
 
         // Crear el tipo de gasto
         ExpenseType::create($validated);
 
-        // Redirigir con un mensaje de éxito
         return redirect()->route('expense-types.index')->with('message', 'Tipo de gasto creado exitosamente.');
     }
+
+
 
 
     public function edit(ExpenseType $expenseType)

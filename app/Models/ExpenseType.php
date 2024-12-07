@@ -10,15 +10,16 @@ class ExpenseType extends Model
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "description",
-        "code",
-        "status",
-        "created_by",
-        "updated_by",
-        "effective_date",
-        "end_date",
+        'name',
+        'description',
+        'code',
+        'status',
+        'effective_date',
+        'end_date',
+        'created_by',
+        'association_id', // Asegúrate de que este campo esté aquí
     ];
+
 
     public function user()
     {
@@ -35,4 +36,5 @@ class ExpenseType extends Model
     {
         return $this->hasMany(Expense::class, 'type_id');
     }
+
 }

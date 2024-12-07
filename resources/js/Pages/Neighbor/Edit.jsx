@@ -12,16 +12,18 @@ export default function EditNeighborWithUser({
     userAssociationId,
     userAssociationName,
 }) {
-    // Obtener la fecha actual en formato YYYY-MM-DD
     const today = new Date().toISOString().split("T")[0];
 
     const { data, setData, put, processing, errors, reset } = useForm({
         // Neighbor fields
         address: neighbor.address || "",
         identification_number: neighbor.identification_number || "",
-        registration_date: neighbor.registration_date || today, // Si no hay fecha de registro, usa la fecha actual
+        registration_date: neighbor.registration_date || today,
         birth_date: neighbor.birth_date || "",
-        status: neighbor.status || "inactive", // Estado por defecto
+        phone: neighbor.phone || "",
+        status: neighbor.status || "inactive",
+        last_participation_date: neighbor.last_participation_date || "",
+        notes: neighbor.notes || "",
         neighborhood_association_id:
             neighbor.neighborhood_association_id || userAssociationId || "",
 
@@ -30,10 +32,10 @@ export default function EditNeighborWithUser({
         email: neighbor.user ? neighbor.user.email : "",
         password: "",
         password_confirmation: "",
-        role: neighbor.user ? neighbor.user.role : "resident", // Rol por defecto
+        role: neighbor.user ? neighbor.user.role : "resident",
     });
 
-    const isBoardMember = !!userAssociationId; // Determinar si el usuario es board_member
+    const isBoardMember = !!userAssociationId;
 
     const submit = (e) => {
         e.preventDefault();
@@ -107,6 +109,31 @@ export default function EditNeighborWithUser({
                                 />
                             </div>
 
+                            {/* Rol */}
+                            <div>
+                                <InputLabel htmlFor="role" value="Rol *" />
+                                <select
+                                    id="role"
+                                    name="role"
+                                    value={data.role}
+                                    onChange={(e) =>
+                                        setData("role", e.target.value)
+                                    }
+                                    className="mt-1 block w-full"
+                                    required
+                                >
+                                    <option value="resident">Residente</option>
+                                    <option value="board_member">
+                                        Miembro de la Junta
+                                    </option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                                <InputError
+                                    message={errors.role}
+                                    className="mt-2"
+                                />
+                            </div>
+
                             {/* Dirección */}
                             <div>
                                 <InputLabel
@@ -175,7 +202,7 @@ export default function EditNeighborWithUser({
                                         )
                                     }
                                     className="mt-1 block w-full"
-                                    max={today} // Bloquea días posteriores a hoy
+                                    max={today}
                                     required
                                 />
                                 <InputError
@@ -199,40 +226,11 @@ export default function EditNeighborWithUser({
                                         setData("birth_date", e.target.value)
                                     }
                                     className="mt-1 block w-full"
-                                    max={today} // Bloquea días posteriores a hoy
+                                    max={today}
                                     required
                                 />
                                 <InputError
                                     message={errors.birth_date}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Estado */}
-                            <div>
-                                <InputLabel htmlFor="status" value="Estado *" />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setData(
-                                            "status",
-                                            data.status === "active"
-                                                ? "inactive"
-                                                : "active"
-                                        )
-                                    }
-                                    className={`w-full md:w-auto px-4 py-2 rounded ${
-                                        data.status === "active"
-                                            ? "bg-green-500"
-                                            : "bg-red-500"
-                                    } text-white hover:opacity-80`}
-                                >
-                                    {data.status === "active"
-                                        ? "Activo"
-                                        : "Inactivo"}
-                                </button>
-                                <InputError
-                                    message={errors.status}
                                     className="mt-2"
                                 />
                             </div>

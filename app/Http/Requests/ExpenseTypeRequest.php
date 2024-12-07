@@ -22,12 +22,13 @@ class ExpenseTypeRequest extends FormRequest
         return [
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:255',
-            'code' => 'required|string|max:20|unique:expense_types,code',
+            'code' => 'required|string|max:20|unique:expense_types',
             'status' => 'required|in:active,inactive',
             'effective_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
+            'end_date' => 'nullable|date|after:effective_date',
         ];
     }
+
 
     /**
      * Custom error messages.

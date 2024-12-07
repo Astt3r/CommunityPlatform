@@ -18,12 +18,17 @@ class IncomeType extends Model
         "updated_by",
         "effective_date",
         "end_date",
+        "association_id", // Nuevo campo
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-        // return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function association()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class, 'association_id');
     }
 
     public function scopeActive($query)
@@ -31,3 +36,4 @@ class IncomeType extends Model
         return $query->where('status', 'active');
     }
 }
+

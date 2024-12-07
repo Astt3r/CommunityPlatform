@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('source', 255);
             $table->date('date');
             $table->string('responsible', 255);
-            $table->decimal('amount', 10, 2);
+            $table->integer('amount')->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->foreignId('type_id')->constrained('income_types');
             $table->foreignId('association_id')->constrained('neighborhood_associations');
