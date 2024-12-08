@@ -73,12 +73,22 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
 });
 
 
+//
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/contributions', [ContributionController::class, 'store'])->name('contributions.store');
+    Route::delete('/contributions/{id}', [ContributionController::class, 'destroy'])->name('contributions.destroy');
+
+});
 
 // Projects
+
 Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::post('/projects/{project}/upload-file', [ProjectController::class, 'uploadFile'])->name('projects.uploadFile');
     Route::get('/projects/{project}/contributions', [ContributionController::class, 'indexByProject'])->name('projects.contributions');
+    Route::get('/projects/{projectId}/neighbors', [ContributionController::class, 'neighborsByProject'])->name('projects.neighbors');
+    Route::get('/projects/{projectId}/individual-contribution', [ContributionController::class, 'individualContribution'])->name('projects.individualContribution');
 });
 
 // Meetings
