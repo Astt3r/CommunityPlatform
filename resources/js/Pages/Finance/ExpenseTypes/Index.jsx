@@ -2,9 +2,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import React, { useState } from "react";
 
-export default function Index({ expenseTypes, flash }) {
+export default function Index({ expenseTypes, flash, auth }) {
     const { delete: destroy, processing } = useForm();
     const [showAlert, setShowAlert] = useState(!!flash?.success);
+
+    const userRole = auth.user.role; // Acceder al rol del usuario
 
     const handleDelete = (id) => {
         if (
@@ -44,12 +46,14 @@ export default function Index({ expenseTypes, flash }) {
             )}
 
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <Link
-                    href={route("expense-types.create")}
-                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
-                >
-                    Crear Tipo de Gasto
-                </Link>
+                {userRole !== "resident" && ( // Ocultar para "resident"
+                    <Link
+                        href={route("expense-types.create")}
+                        className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
+                    >
+                        Crear Tipo de Gasto
+                    </Link>
+                )}
             </div>
 
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
@@ -84,25 +88,31 @@ export default function Index({ expenseTypes, flash }) {
                                         : "Inactivo"}
                                 </td>
                                 <td className="px-6 py-3 flex flex-col md:flex-row gap-2">
-                                    {/* Editar */}
-                                    <Link
-                                        href={route(
-                                            "expense-types.edit",
-                                            type.id
-                                        )}
-                                        className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
-                                    >
-                                        Editar
-                                    </Link>
+                                    {userRole !== "resident" && ( // Ocultar para "resident"
+                                        <>
+                                            {/* Editar */}
+                                            <Link
+                                                href={route(
+                                                    "expense-types.edit",
+                                                    type.id
+                                                )}
+                                                className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
+                                            >
+                                                Editar
+                                            </Link>
 
-                                    {/* Eliminar */}
-                                    <button
-                                        onClick={() => handleDelete(type.id)}
-                                        disabled={processing}
-                                        className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
-                                    >
-                                        Eliminar
-                                    </button>
+                                            {/* Eliminar */}
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(type.id)
+                                                }
+                                                disabled={processing}
+                                                className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}

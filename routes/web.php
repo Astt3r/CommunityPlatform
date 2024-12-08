@@ -95,7 +95,7 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
 });
 
 // Finance
-Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
     Route::get('finance', function () {
         return Inertia::render('Finance/Index'); // Renderiza la vista central de Finanzas
     })->name('finance.index');
