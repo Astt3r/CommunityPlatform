@@ -77,15 +77,17 @@ class MeetingAttendanceController extends Controller
 
         // Obtener vecinos activos de la misma junta de vecinos de la reunión
         $neighbors = Neighbor::where('neighborhood_association_id', $meeting->neighborhood_association_id)
-                             ->active() // Filtro de vecinos activos
-                             ->with('user:id,name') // Cargar usuario relacionado
-                             ->get();
+                            ->active() // Filtro de vecinos activos
+                            ->with('user:id,name') // Cargar usuario relacionado
+                            ->get();
 
         return inertia('MeetingAttendance/ShowAttendance', [
             'meetingId' => $meetingId,
             'neighbors' => $neighbors,
+            'mainTopic' => $meeting->main_topic, // Corregido: Usar -> para acceder a la propiedad
         ]);
     }
+
 
     public function showSummary($meetingId)
     {
@@ -100,9 +102,10 @@ class MeetingAttendanceController extends Controller
             ->get();
 
         return inertia('MeetingAttendance/ShowAttendanceSummary', [
-            'meetingId' => $meetingId,
-            'attendances' => $attendances,
-        ]);
+        'meetingId' => $meetingId,
+        'mainTopic' => $meeting->main_topic, // Corregido para incluir el tema principal
+        'attendances' => $attendances,
+    ]);
     }
 
 

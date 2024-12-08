@@ -2,7 +2,7 @@ import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
 
-export default function ShowAttendanceSummary({ meetingId }) {
+export default function ShowAttendanceSummary({ meetingId, mainTopic }) {
     const { attendances } = usePage().props;
 
     return (
@@ -18,16 +18,16 @@ export default function ShowAttendanceSummary({ meetingId }) {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white shadow sm:rounded-lg p-6 space-y-4">
-                        <h3 className="text-lg font-semibold">Reunión ID: {meetingId}</h3>
-                        <table className="min-w-full table-auto border-collapse border border-gray-200">
+                        <h3 className="text-lg font-semibold">Reunión: {mainTopic}</h3>
+                        <table className="min-w-full border-collapse rounded-lg shadow">
                             <thead>
-                                <tr>
-                                    <th className="border border-gray-300 px-4 py-2">Vecino</th>
-                                    <th className="border border-gray-300 px-4 py-2">Asistencia</th>
-                                    <th className="border border-gray-300 px-4 py-2">Motivo de Ausencia</th>
-                                </tr>
+                            <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal rounded-lg">
+                                <th className="px-6 py-3 text-left">Vecino</th>
+                                <th className="px-6 py-3 text-left">Asistencia</th>
+                                <th className="px-6 py-3 text-left">Motivo de Ausencia</th>
+                            </tr>
                             </thead>
-                            <tbody>
+                             <tbody className="text-gray-600 text-sm font-light">
                                 {attendances.map((attendance) => (
                                     <tr key={attendance.id}>
                                         <td className="border border-gray-300 px-4 py-2">
