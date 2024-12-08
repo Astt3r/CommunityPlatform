@@ -73,20 +73,26 @@ class MeetingAttendanceController extends Controller
 
     public function showAttendance($meetingId)
     {
+        // Verificar si el usuario tiene el rol permitido
+        if (!in_array(auth()->user()->role, ['admin', 'board_member'])) {
+            abort(403, 'No tienes permiso para acceder a esta página.');
+        }
+
         $meeting = Meeting::findOrFail($meetingId);
 
         // Obtener vecinos activos de la misma junta de vecinos de la reunión
         $neighbors = Neighbor::where('neighborhood_association_id', $meeting->neighborhood_association_id)
-                            ->active() // Filtro de vecinos activos
-                            ->with('user:id,name') // Cargar usuario relacionado
-                            ->get();
+            ->active() // Filtro de vecinos activos
+            ->with('user:id,name') // Cargar usuario relacionado
+            ->get();
 
         return inertia('MeetingAttendance/ShowAttendance', [
             'meetingId' => $meetingId,
             'neighbors' => $neighbors,
-            'mainTopic' => $meeting->main_topic, // Corregido: Usar -> para acceder a la propiedad
+            'mainTopic' => $meeting->main_topic,
         ]);
     }
+
 
 
     public function showSummary($meetingId)

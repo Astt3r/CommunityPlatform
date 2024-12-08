@@ -137,7 +137,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Reuniones
                     </h2>
-                    {userRole !== "board_member" && (
+                    {userRole !== "board_member" && userRole !== "resident" && (
                         <div className="flex items-center gap-4">
                             <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
                                 Filtrar por Junta:
@@ -181,21 +181,23 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 </div>
             )}
 
-            <div className="mb-4 flex justify-end">
-                <Link
-                    href={route("meetings.create")}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                >
-                    Crear Reunión
-                </Link>
-            </div>
+            {userRole !== "resident" && (
+                <div className="mb-4 flex justify-end">
+                    <Link
+                        href={route("meetings.create")}
+                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                        Crear Reunión
+                    </Link>
+                </div>
+            )}
 
             <div className="mb-8 relative">
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     events={events}
-                    dateClick={handleDateClick}
+                    dateClick={userRole !== "resident" ? handleDateClick : undefined}
                     eventClick={handleEventClick}
                     locale="es"
                 />
@@ -213,7 +215,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                     >
                         Cerrar
                     </button>
-                    {showCreateButton ? (
+                    {showCreateButton && userRole !== "resident" ? (
                         <>
                             <p className="mb-2">Crear reunión para el día seleccionado:</p>
                             <Link
@@ -233,18 +235,22 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                 >
                                     Ver
                                 </Link>
-                                <Link
-                                    href={`/meetings/${selectedMeeting.id}/edit`}
-                                    className="block px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                                >
-                                    Editar
-                                </Link>
-                                <button
-                                    onClick={() => handleDelete(selectedMeeting.id)}
-                                    className="block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                                >
-                                    Eliminar
-                                </button>
+                                {userRole !== "resident" && (
+                                    <>
+                                        <Link
+                                            href={`/meetings/${selectedMeeting.id}/edit`}
+                                            className="block px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                                        >
+                                            Editar
+                                        </Link>
+                                        <button
+                                            onClick={() => handleDelete(selectedMeeting.id)}
+                                            className="block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </>
                     ) : null}
@@ -288,18 +294,22 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                     >
                                         Ver
                                     </Link>
-                                    <Link
-                                        href={`/meetings/${meeting.id}/edit`}
-                                        className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
-                                    >
-                                        Editar
-                                    </Link>
-                                    <button
-                                        onClick={() => handleDelete(meeting.id)}
-                                        className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
-                                    >
-                                        Eliminar
-                                    </button>
+                                    {userRole !== "resident" && (
+                                        <>
+                                            <Link
+                                                href={`/meetings/${meeting.id}/edit`}
+                                                className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
+                                            >
+                                                Editar
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(meeting.id)}
+                                                className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}

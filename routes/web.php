@@ -75,17 +75,22 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
 });
 
 // Meetings
-Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
+    Route::resource('meetings', MeetingController::class)->only(['index', 'show']); // Restricción para Resident
+    Route::resource('minutes', MinutesController::class);
     Route::resource('meetings', MeetingController::class);
-    Route::get('/meetings/{meeting}/generate-pdf', [MinutesController::class, 'generatePdf']);
+});
+
+// MeetingsAttendance
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+    Route::resource('meeting-attendances', MeetingAttendanceController::class);
+    Route::get('/meetings/{meeting}/generate-pdf', [MinutesController::class, 'generatePdf'])->middleware('role:admin,board_member');
     Route::get('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'showAttendance'])->name('meetings.attendance');
     Route::post('/meetings/{meeting}/attendance', [MeetingAttendanceController::class, 'storeAttendance'])->name('meetings.attendance.store');
-    Route::get('/meetings/{meeting}/attendance-summary', [MeetingAttendanceController::class, 'showSummary'])
-        ->name('meetings.attendance.summary');
-    Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
-    Route::resource('meeting-attendances', MeetingAttendanceController::class);
-    Route::resource('minutes', MinutesController::class);
+    Route::get('/meetings/{meeting}/attendance-summary', [MeetingAttendanceController::class, 'showSummary'])->name('meetings.attendance.summary');
+    
 });
+
 
 // Finance
 Route::middleware(['auth', 'role:admin,board_member'])->group(function () {

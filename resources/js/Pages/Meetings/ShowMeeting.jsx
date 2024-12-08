@@ -98,13 +98,15 @@ const MeetingPdfDocument = ({ meeting }) => {
   );
 };
 
-export default function ShowMeeting({ meeting }) {
+export default function ShowMeeting({ meeting, userRole = "guest" }) {
   // Formatear la fecha de la reunión en UTC
   const formattedDate = meeting.meeting_date ? (() => {
     const parsedDate = parseISO(meeting.meeting_date);
     const zonedDate = parsedDate; // Asumimos que la fecha ya es UTC
     return isValid(zonedDate) ? format(zonedDate, "dd/MM/yyyy HH:mm 'UTC'") : "No especificado";
   })() : "No especificado";
+
+  const isResident = userRole === "resident";
 
   return (
     <AuthenticatedLayout
@@ -162,24 +164,35 @@ export default function ShowMeeting({ meeting }) {
                 Volver a la lista de reuniones
               </a>
             </div>
-            <div className="mt-4">
-                <a
-                    href={`/meetings/${meeting.id}/attendance`}
-                    className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                >
-                    Registrar Asistencias
-                </a>
-            </div>
 
-            <div className="mt-4">
-              <PDFDownloadLink
-                document={<MeetingPdfDocument meeting={meeting} />}
-                fileName={`Acta_Reunion_${meeting.main_topic}.pdf`}
-                className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                {({ loading }) => loading ? 'Generando PDF...' : 'Generar Acta de Reunión en PDF'}
-              </PDFDownloadLink>
-            </div>
+            {!isResident && (
+              <div className="mt-4">
+                  <a
+                      href={`/meetings/${meeting.id}/attendance`}
+                      className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  >
+                      Registrar Asistencias
+                  </a>
+              </div>
+            )}
+
+            {!isResident && (
+              <div className="mt-4">
+                <PDFDownloadLink
+                  document={<MeetingPdfDocument meeting={meeting} />}
+                  fileName={`Acta_Reunion_${meeting.main_topic}.pdf`}
+                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  {({ loading }) => loading ? 'Generando PDF...' : 'Generar Acta de Reunión en PDF'}
+                </PDFDownloadLink>
+              </div>
+            )}
+
+            {isResident && (
+              <div className="mt-4">
+                <p className="text-gray-500">Como residente, no tienes permisos para generar actas ni registrar asistencias.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

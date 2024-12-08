@@ -175,10 +175,13 @@ class MeetingController extends Controller
                 'description' => $meeting->description,
                 'status' => $meeting->status,
                 'result' => $meeting->result,
-                'neighborhood_association' => $meeting->neighborhoodAssociation ? $meeting->neighborhoodAssociation->name : null, // Junta vecinal o null
+                'neighborhood_association' => $meeting->neighborhoodAssociation ? $meeting->neighborhoodAssociation->name : null,
             ],
+            'userRole' => auth()->user()->role, // Pasar directamente el rol del usuario
         ]);
     }
+
+
 
 
 

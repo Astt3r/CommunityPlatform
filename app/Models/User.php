@@ -54,7 +54,7 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-
+    
 
     /**
      * Check if the user has a board member role.
@@ -70,6 +70,7 @@ class User extends Authenticatable
     public function isResident(): bool
     {
         return $this->role === 'resident';
+
     }
 
     public function association()
@@ -88,6 +89,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(NeighborhoodAssociation::class, 'neighborhood_association_id');
     }
+    
 
 
 
