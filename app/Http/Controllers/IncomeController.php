@@ -73,8 +73,6 @@ class IncomeController extends Controller
         ]);
     }
 
-
-
     /**
      * Store a newly created resource in storage.
      */
@@ -139,4 +137,72 @@ class IncomeController extends Controller
 
         return redirect()->route('incomes.index')->with('message', 'Ingreso eliminado correctamente.');
     }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Income $income, Request $request)
+    {
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (
+                !$neighbor ||
+                $income->association_id !== $neighbor->neighborhoodAssociation->id
+            ) {
+                abort(403, 'No tienes permiso para editar este ingreso.');
+            }
+        }
+
+        $income->load('type'); // Cargar relación del tipo de ingreso
+
+        // Obtener los tipos de ingresos disponibles
+        $incomeTypes = IncomeType::where('association_id', $income->association_id)->get();
+
+        return Inertia::render('Finance/Incomes/Edit', [
+            'income' => $income,
+            'incomeTypes' => $incomeTypes,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Income $income)
+    {
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (
+                !$neighbor ||
+                $income->association_id !== $neighbor->neighborhoodAssociation->id
+            ) {
+                abort(403, 'No tienes permiso para actualizar este ingreso.');
+            }
+        }
+
+        // Validar los datos enviados
+        $validated = $request->validate([
+            'source' => 'required|string|max:255',
+            'responsible' => 'required|string|max:100',
+            'date' => 'required|date',
+            'amount' => 'required|integer|min:0', // Validar como entero
+            'type_id' => 'required|exists:income_types,id',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        // Actualizar el ingreso
+        $income->update($validated);
+
+        return redirect()->route('incomes.index')->with('message', 'Ingreso actualizado correctamente.');
+    }
+
+    
+
 }

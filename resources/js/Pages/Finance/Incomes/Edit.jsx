@@ -29,12 +29,6 @@ export default function EditIncome({ income, incomeTypes }) {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Editar Ingreso
                     </h2>
-                    <Link
-                        href={route("incomes.index")}
-                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                    >
-                        Volver
-                    </Link>
                 </div>
             }
         >
@@ -49,24 +43,37 @@ export default function EditIncome({ income, incomeTypes }) {
                                     id="source"
                                     type="text"
                                     value={data.source}
-                                    onChange={(e) => setData("source", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("source", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                     autoFocus
                                 />
-                                <InputError message={errors.source} className="mt-2" />
+                                <InputError
+                                    message={errors.source}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Responsable */}
                             <div>
-                                <InputLabel htmlFor="responsible" value="Responsable" />
+                                <InputLabel
+                                    htmlFor="responsible"
+                                    value="Responsable"
+                                />
                                 <TextInput
                                     id="responsible"
                                     type="text"
                                     value={data.responsible}
-                                    onChange={(e) => setData("responsible", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("responsible", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.responsible} className="mt-2" />
+                                <InputError
+                                    message={errors.responsible}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Fecha */}
@@ -76,10 +83,15 @@ export default function EditIncome({ income, incomeTypes }) {
                                     id="date"
                                     type="date"
                                     value={data.date}
-                                    onChange={(e) => setData("date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.date} className="mt-2" />
+                                <InputError
+                                    message={errors.date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Monto */}
@@ -90,19 +102,29 @@ export default function EditIncome({ income, incomeTypes }) {
                                     type="number"
                                     step="0.01"
                                     value={data.amount}
-                                    onChange={(e) => setData("amount", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("amount", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.amount} className="mt-2" />
+                                <InputError
+                                    message={errors.amount}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Tipo de Ingreso */}
                             <div>
-                                <InputLabel htmlFor="type_id" value="Tipo de Ingreso" />
+                                <InputLabel
+                                    htmlFor="type_id"
+                                    value="Tipo de Ingreso"
+                                />
                                 <select
                                     id="type_id"
                                     value={data.type_id}
-                                    onChange={(e) => setData("type_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("type_id", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
                                 >
                                     <option value="">Seleccione un tipo</option>
@@ -112,7 +134,10 @@ export default function EditIncome({ income, incomeTypes }) {
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.type_id} className="mt-2" />
+                                <InputError
+                                    message={errors.type_id}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Estado */}
@@ -121,13 +146,18 @@ export default function EditIncome({ income, incomeTypes }) {
                                 <select
                                     id="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
                                 >
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Botones */}
