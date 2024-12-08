@@ -25,7 +25,6 @@ class MeetingRequest extends FormRequest
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
-            'organized_by' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
         ];
@@ -48,9 +47,6 @@ class MeetingRequest extends FormRequest
             'location.required' => 'El lugar de la reunión es obligatorio.',
             'location.string' => 'El lugar debe ser un texto válido.',
             'location.max' => 'El lugar no puede exceder los 255 caracteres.',
-            'organized_by.required' => 'El campo "Convocada por" es obligatorio.',
-            'organized_by.string' => 'El organizador debe ser un texto válido.',
-            'organized_by.max' => 'El organizador no puede exceder los 255 caracteres.',
             'result.string' => 'El resultado debe ser un texto válido.',
             'result.max' => 'El resultado no puede exceder los 1000 caracteres.',
             'status.required' => 'El estado de la reunión es obligatorio.',

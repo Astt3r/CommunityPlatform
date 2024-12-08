@@ -257,7 +257,6 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         <tr>
                             <th className="px-6 py-3">Fecha</th>
                             <th className="px-6 py-3">Tema Principal</th>
-                            <th className="px-6 py-3">Organizador</th>
                             <th className="px-6 py-3">Estado</th>
                             <th className="px-6 py-3">Acciones</th>
                         </tr>
@@ -271,7 +270,6 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                     })}
                                 </td>
                                 <td className="px-4 py-2">{meeting.main_topic}</td>
-                                <td className="px-4 py-2">{meeting.organized_by || "N/A"}</td>
                                 <td
                                     className={`px-4 py-2 ${
                                         meeting.status === "scheduled"

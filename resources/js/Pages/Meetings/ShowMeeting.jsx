@@ -61,7 +61,6 @@ const MeetingPdfDocument = ({ meeting }) => {
   // Asegurarse de que todos los valores estén definidos
   const mainTopic = meeting.main_topic || "No especificado";
   const location = meeting.location || "No especificado";
-  const organizedBy = meeting.organized_by || "No especificado";
   const description = meeting.description || "Sin descripción";
   const status = meeting.status || "No especificado";
 
@@ -85,10 +84,6 @@ const MeetingPdfDocument = ({ meeting }) => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Lugar</Text>
           <Text style={styles.sectionContent}>{location}</Text>
-        </View>
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Organizada por</Text>
-          <Text style={styles.sectionContent}>{organizedBy}</Text>
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Descripción</Text>
@@ -139,10 +134,6 @@ export default function ShowMeeting({ meeting }) {
             <div>
               <h3 className="text-lg font-semibold">Lugar:</h3>
               <p>{meeting.location || "No especificado"}</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Organizada Por:</h3>
-              <p>{meeting.organized_by || "No especificado"}</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold">Estado:</h3>
