@@ -7,6 +7,7 @@ use App\Models\Neighbor;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use App\Models\Meeting;
 
 class MeetingAttendanceController extends Controller
 {
@@ -70,36 +71,32 @@ class MeetingAttendanceController extends Controller
             ->with('message', 'Asistencias registradas correctamente.');
     }
 
-
-
-
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(MeetingAttendance $meetingAttendance)
-    {
-        //
-    }
     public function showAttendance($meetingId)
     {
-        // Obtener vecinos activos con sus usuarios
-        $neighbors = Neighbor::where('status', 'active')
-                            ->with('user:id,name') // Cargar el usuario relacionado
-                            ->get();
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Obtener vecinos activos de la misma junta de vecinos de la reunión
+        $neighbors = Neighbor::where('neighborhood_association_id', $meeting->neighborhood_association_id)
+                             ->active() // Filtro de vecinos activos
+                             ->with('user:id,name') // Cargar usuario relacionado
+                             ->get();
 
         return inertia('MeetingAttendance/ShowAttendance', [
             'meetingId' => $meetingId,
             'neighbors' => $neighbors,
         ]);
-        
     }
+
     public function showSummary($meetingId)
     {
-        // Obtener las asistencias y sus razones para la reunión especificada
-        $attendances = MeetingAttendance::with('neighbor.user')
-            ->where('meeting_id', $meetingId)
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Filtrar asistencias por vecinos de la misma junta de vecinos
+        $attendances = MeetingAttendance::where('meeting_id', $meetingId)
+            ->whereHas('neighbor', function ($query) use ($meeting) {
+                $query->where('neighborhood_association_id', $meeting->neighborhood_association_id);
+            })
+            ->with('neighbor.user') // Cargar datos del vecino y usuario relacionado
             ->get();
 
         return inertia('MeetingAttendance/ShowAttendanceSummary', [
@@ -107,6 +104,7 @@ class MeetingAttendanceController extends Controller
             'attendances' => $attendances,
         ]);
     }
+
 
 
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { usePage, Link, useForm } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -7,6 +7,17 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { parseISO } from "date-fns";
+
+// Mapeo para traducir estados
+const traducirEstado = (estado) => {
+    const estadosTraduccion = {
+        scheduled: "Agendado",
+        completed: "Completado",
+        cancelled: "Cancelado",
+        in_progress: "En Progreso",
+    };
+    return estadosTraduccion[estado] || estado;
+};
 
 export default function MeetingIndex({ allAssociations, userRole }) {
     const { meetings, filters, flash } = usePage().props;
@@ -19,7 +30,8 @@ export default function MeetingIndex({ allAssociations, userRole }) {
     const [selectedMeeting, setSelectedMeeting] = useState(null);
     const [showPanel, setShowPanel] = useState(false);
     const [showCreateButton, setShowCreateButton] = useState(false);
-    const [events, setEvents] = useState([]); // Estado para eventos del calendario
+    const [events, setEvents] = useState([]);
+    const panelRef = useRef(null); // Referencia al panel de creación/visualización
 
     useEffect(() => {
         // Actualizar eventos del calendario cada vez que las reuniones cambien
@@ -95,6 +107,23 @@ export default function MeetingIndex({ allAssociations, userRole }) {
         setShowPanel(false);
     };
 
+    // Cierra el panel al hacer clic fuera de este
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (panelRef.current && !panelRef.current.contains(event.target)) {
+                setShowPanel(false);
+            }
+        };
+
+        if (showPanel) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showPanel]);
+
     useEffect(() => {
         if (flash.success) {
             setShowAlert(true);
@@ -152,10 +181,10 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 </div>
             )}
 
-            <div className="mb-4 flex justify-between">
+            <div className="mb-4 flex justify-end">
                 <Link
                     href={route("meetings.create")}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                 >
                     Crear Reunión
                 </Link>
@@ -165,7 +194,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
-                    events={events} // Usar el estado `events` para los datos del calendario
+                    events={events}
                     dateClick={handleDateClick}
                     eventClick={handleEventClick}
                     locale="es"
@@ -173,7 +202,11 @@ export default function MeetingIndex({ allAssociations, userRole }) {
             </div>
 
             {showPanel && (
-                <div id="calendarPanel" className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white shadow-lg z-50 p-6 rounded-lg mt-4">
+                <div
+                    ref={panelRef}
+                    id="calendarPanel"
+                    className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white shadow-lg z-50 p-6 rounded-lg mt-4"
+                >
                     <button
                         onClick={handleClosePanel}
                         className="text-red-500 hover:text-red-700 mb-4"
@@ -218,15 +251,15 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 </div>
             )}
 
-            <div className="overflow-x-auto">
-                <table className="table-auto w-full mt-4 text-sm md:text-base">
-                    <thead>
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+                <table className="table-auto w-full text-left text-gray-600">
+                    <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
                         <tr>
-                            <th className="px-4 py-2">Fecha</th>
-                            <th className="px-4 py-2">Tema Principal</th>
-                            <th className="px-4 py-2">Organizador</th>
-                            <th className="px-4 py-2">Estado</th>
-                            <th className="px-4 py-2">Acciones</th>
+                            <th className="px-6 py-3">Fecha</th>
+                            <th className="px-6 py-3">Tema Principal</th>
+                            <th className="px-6 py-3">Organizador</th>
+                            <th className="px-6 py-3">Estado</th>
+                            <th className="px-6 py-3">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -248,24 +281,24 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                             : "text-red-500"
                                     }`}
                                 >
-                                    {meeting.status}
+                                    {traducirEstado(meeting.status)}
                                 </td>
                                 <td className="px-4 py-2 flex flex-col md:flex-row gap-2">
                                     <Link
                                         href={route("meetings.show", meeting.id)}
-                                        className="text-blue-500 hover:text-blue-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 text-center"
                                     >
                                         Ver
                                     </Link>
                                     <Link
                                         href={`/meetings/${meeting.id}/edit`}
-                                        className="text-yellow-500 hover:text-yellow-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
                                     >
                                         Editar
                                     </Link>
                                     <button
                                         onClick={() => handleDelete(meeting.id)}
-                                        className="text-red-500 hover:text-red-700"
+                                        className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
                                     >
                                         Eliminar
                                     </button>
