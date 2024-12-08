@@ -15,13 +15,14 @@ class Contribution extends Model
         'project_id',
     ];
 
-    public function neighbor()
-    {
-        return $this->belongsTo(Neighbor::class, 'neighbor_id');
-    }
-
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id');
+        return $this->belongsTo(Project::class);
     }
+
+    public function neighbor()
+    {
+        return $this->belongsTo(Neighbor::class);
+    }
+
 }

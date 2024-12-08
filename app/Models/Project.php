@@ -34,14 +34,6 @@ class Project extends Model
     }
 
     /**
-     * Relación con las contribuciones.
-     */
-    public function contributions()
-    {
-        return $this->hasMany(Contribution::class);
-    }
-
-    /**
      * Relación con la junta de vecinos asociada.
      */
     public function neighborhoodAssociation()
@@ -73,4 +65,10 @@ class Project extends Model
     {
         $this->attributes['changes'] = trim($value);
     }
+
+    public function contributions()
+    {
+        return $this->hasMany(Contribution::class);
+    }
+
 }

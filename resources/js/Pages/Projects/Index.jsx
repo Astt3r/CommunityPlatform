@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePage, Link } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -6,39 +6,83 @@ import { Head } from "@inertiajs/react";
 import axios from "axios";
 
 export default function ProjectsIndex() {
-    const { projects = { data: [], links: [] }, auth } = usePage().props; // Incluye auth para verificar el rol
+    const { projects = { data: [], links: [] }, auth } = usePage().props;
     const [modalOpen, setModalOpen] = useState(false);
     const [contributions, setContributions] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
-    const [amount, setAmount] = useState("");
+    const [neighbors, setNeighbors] = useState([]);
+    const [selectedNeighbor, setSelectedNeighbor] = useState("");
+    const [individualContribution, setIndividualContribution] = useState(0);
+    const [remainingAmount, setRemainingAmount] = useState(0);
 
-    const isResident = auth.user.role === "resident"; // Verificar si el usuario es vecino
+    const isResident = auth.user.role === "resident";
 
-    const fetchContributions = async (projectId) => {
+    const fetchContributions = async (project) => {
         try {
+            if (!modalOpen) setModalOpen(true);
+
             const response = await axios.get(
-                `/projects/${projectId}/contributions`
+                `/projects/${project.id}/contributions`
             );
             setContributions(response.data);
-            setSelectedProject(projectId);
-            setModalOpen(true); // Abre el modal después de cargar las contribuciones
+
+            setSelectedProject({
+                id: project.id,
+                name: project.name,
+                budget: project.budget, // Incluye el presupuesto para cálculos
+            });
+
+            // Calcular el monto restante con los datos actuales
+            const totalContributed = response.data.reduce(
+                (total, contribution) =>
+                    total + parseInt(contribution.amount, 10), // Suma de contribuciones
+                0
+            );
+
+            const remaining = Math.max(0, project.budget - totalContributed);
+            setRemainingAmount(remaining);
         } catch (error) {
             console.error("Error al cargar las contribuciones:", error);
+            alert("Error al cargar las contribuciones.");
+            setModalOpen(false);
         }
     };
 
+    const availableNeighbors = neighbors.filter((neighbor) => {
+        return !contributions.some(
+            (contribution) => contribution.neighbor_id === neighbor.id
+        );
+    });
+
     const handleContribute = async (projectId) => {
+        if (!selectedNeighbor) {
+            alert("Debes seleccionar un vecino.");
+            return;
+        }
+
         try {
             const response = await axios.post("/contributions", {
                 project_id: projectId,
-                amount, // Asegúrate de que este valor no esté vacío
+                neighbor_id: selectedNeighbor,
+                amount: individualContribution,
             });
-            alert("Contribución realizada con éxito");
-            setAmount(""); // Limpia el campo de monto
-            setContributions([...contributions, response.data.contribution]); // Actualiza la lista
+
+            alert("Contribución registrada con éxito.");
+            setContributions([...contributions, response.data.contribution]);
+            setSelectedNeighbor("");
+
+            // Recalcular el monto restante
+            const newRemaining = Math.max(
+                0,
+                remainingAmount - individualContribution
+            );
+            setRemainingAmount(newRemaining);
         } catch (error) {
-            console.error("Error al realizar la contribución:", error);
-            alert("Error al realizar la contribución");
+            const errorMessage =
+                error.response?.data?.message ||
+                "Error al registrar la contribución.";
+            alert(errorMessage);
+            console.error("Error al registrar la contribución:", error);
         }
     };
 
@@ -48,10 +92,81 @@ export default function ProjectsIndex() {
         }
     };
 
+    const handleDeleteContribution = async (contributionId) => {
+        if (
+            !confirm("¿Estás seguro de que deseas eliminar esta contribución?")
+        ) {
+            return;
+        }
+
+        try {
+            await axios.delete(`/contributions/${contributionId}`);
+            alert("Contribución eliminada con éxito.");
+            setContributions(
+                contributions.filter((c) => c.id !== contributionId)
+            );
+
+            // Recalcular el monto restante
+            const totalContributed = contributions
+                .filter((c) => c.id !== contributionId)
+                .reduce((total, c) => total + parseInt(c.amount, 10), 0);
+            const remaining = Math.max(
+                0,
+                selectedProject.budget - totalContributed
+            );
+            setRemainingAmount(remaining);
+        } catch (error) {
+            console.error("Error al eliminar la contribución:", error);
+            alert("Error al eliminar la contribución.");
+        }
+    };
+
     const closeModal = () => {
         setModalOpen(false);
         setContributions([]);
         setSelectedProject(null);
+        setIndividualContribution(0);
+        setNeighbors([]);
+        setSelectedNeighbor("");
+        setRemainingAmount(0);
+    };
+
+    useEffect(() => {
+        if (selectedProject && modalOpen) {
+            fetchNeighbors(selectedProject.id);
+            fetchIndividualContribution(selectedProject.id);
+            fetchContributions(selectedProject);
+        }
+    }, [selectedProject, modalOpen]);
+
+    const fetchNeighbors = async (projectId) => {
+        try {
+            const response = await axios.get(
+                `/projects/${projectId}/neighbors`
+            );
+            setNeighbors(response.data);
+        } catch (error) {
+            console.error(
+                "Error al cargar los vecinos:",
+                error.response?.data || error.message
+            );
+        }
+    };
+
+    const fetchIndividualContribution = async (projectId) => {
+        try {
+            const response = await axios.get(
+                `/projects/${projectId}/individual-contribution`
+            );
+
+            const contribution = response.data.individual_contribution;
+            setIndividualContribution(contribution);
+        } catch (error) {
+            console.error(
+                "Error al calcular la contribución individual:",
+                error.response?.data || error.message
+            );
+        }
     };
 
     return (
@@ -62,7 +177,6 @@ export default function ProjectsIndex() {
         >
             <Head title="Proyectos" />
 
-            {/* Botón para Crear Proyecto */}
             <div className="flex justify-between items-center mb-6">
                 {!isResident && (
                     <Link
@@ -74,7 +188,6 @@ export default function ProjectsIndex() {
                 )}
             </div>
 
-            {/* Tabla de Proyectos */}
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table className="table-auto w-full text-left text-gray-600">
                     <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
@@ -116,7 +229,7 @@ export default function ProjectsIndex() {
                                     </Link>
                                     <button
                                         onClick={() =>
-                                            fetchContributions(project.id)
+                                            fetchContributions(project)
                                         }
                                         className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-700 text-center"
                                     >
@@ -150,17 +263,17 @@ export default function ProjectsIndex() {
                 </table>
             </div>
 
-            {/* Modal de Contribuciones */}
             {modalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl">
                         <div className="flex justify-between items-center border-b p-4">
                             <h2 className="text-lg font-bold text-gray-800">
-                                Contribuciones del Proyecto {selectedProject}
+                                Contribuciones del Proyecto{" "}
+                                {selectedProject?.name}
                             </h2>
                             <button
                                 onClick={closeModal}
-                                className="text-gray-500 hover:text-gray-700"
+                                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
                             >
                                 &times;
                             </button>
@@ -175,6 +288,9 @@ export default function ProjectsIndex() {
                                             </th>
                                             <th className="px-6 py-3">Monto</th>
                                             <th className="px-6 py-3">Fecha</th>
+                                            <th className="px-6 py-3">
+                                                Acciones
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -201,6 +317,18 @@ export default function ProjectsIndex() {
                                                             contribution.created_at
                                                         ).toLocaleDateString()}
                                                     </td>
+                                                    <td className="px-6 py-3">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteContribution(
+                                                                    contribution.id
+                                                                )
+                                                            }
+                                                            className="text-red-500 hover:text-red-700"
+                                                        >
+                                                            &times;
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             )
                                         )}
@@ -213,35 +341,53 @@ export default function ProjectsIndex() {
                             )}
                         </div>
 
-                        {isResident && (
+                        {!isResident && (
                             <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
-                                    handleContribute(selectedProject);
+                                    handleContribute(selectedProject.id);
                                 }}
                                 className="mt-4 p-4 border-t"
                             >
+                                {individualContribution && (
+                                    <p className="text-gray-700 mb-2">
+                                        Monto individual calculado: $
+                                        {individualContribution}
+                                    </p>
+                                )}
+                                <p className="text-gray-700 mb-2">
+                                    Monto restante para cumplir el presupuesto:
+                                    ${remainingAmount}
+                                </p>
                                 <label
-                                    htmlFor="amount"
+                                    htmlFor="neighbor"
                                     className="block text-sm text-gray-700"
                                 >
-                                    Realizar una Contribución:
+                                    Seleccionar Vecino:
                                 </label>
-                                <input
-                                    type="number"
-                                    id="amount"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
+                                <select
+                                    id="neighbor"
+                                    onChange={(e) =>
+                                        setSelectedNeighbor(e.target.value)
+                                    }
                                     className="w-full px-4 py-2 border rounded mt-2"
-                                    placeholder="Ingresa el monto"
                                     required
-                                    min="1"
-                                />
+                                >
+                                    <option value="">Seleccionar</option>
+                                    {availableNeighbors.map((neighbor) => (
+                                        <option
+                                            key={neighbor.id}
+                                            value={neighbor.id}
+                                        >
+                                            {neighbor.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <button
                                     type="submit"
                                     className="w-full mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
                                 >
-                                    Enviar Contribución
+                                    Registrar Contribución
                                 </button>
                             </form>
                         )}

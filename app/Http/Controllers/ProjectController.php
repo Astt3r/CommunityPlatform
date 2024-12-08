@@ -265,6 +265,39 @@ class ProjectController extends Controller
         return response()->json(['message' => 'Archivo subido correctamente.'], 200);
     }
 
+    public function neighborsByProject($projectId)
+    {
+        try {
+            $project = Project::findOrFail($projectId);
+
+            if ($project->is_for_all_neighbors) {
+                $neighbors = Neighbor::where('neighborhood_association_id', $project->association_id)
+                    ->with('user')
+                    ->get();
+            } else {
+                $neighbors = $project->neighbors()->with('user')->get();
+            }
+
+            return response()->json(
+                $neighbors->map(function ($neighbor) {
+                    return [
+                        'id' => $neighbor->id,
+                        'name' => $neighbor->user->name ?? 'Sin nombre',
+                    ];
+                }),
+                200
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al cargar los vecinos del proyecto.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+
 
 
 
