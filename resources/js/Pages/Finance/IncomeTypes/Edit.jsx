@@ -29,12 +29,6 @@ export default function EditIncomeType({ incomeType }) {
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Editar Tipo de Ingreso
                     </h2>
-                    <Link
-                        href={route("income-types.index")}
-                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                    >
-                        Volver
-                    </Link>
                 </div>
             }
         >
@@ -49,24 +43,37 @@ export default function EditIncomeType({ incomeType }) {
                                     id="name"
                                     type="text"
                                     value={data.name}
-                                    onChange={(e) => setData("name", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("name", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                     autoFocus
                                 />
-                                <InputError message={errors.name} className="mt-2" />
+                                <InputError
+                                    message={errors.name}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Descripción */}
                             <div>
-                                <InputLabel htmlFor="description" value="Descripción" />
+                                <InputLabel
+                                    htmlFor="description"
+                                    value="Descripción"
+                                />
                                 <TextInput
                                     id="description"
                                     type="text"
                                     value={data.description}
-                                    onChange={(e) => setData("description", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("description", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.description} className="mt-2" />
+                                <InputError
+                                    message={errors.description}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Código */}
@@ -76,10 +83,15 @@ export default function EditIncomeType({ incomeType }) {
                                     id="code"
                                     type="text"
                                     value={data.code}
-                                    onChange={(e) => setData("code", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("code", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.code} className="mt-2" />
+                                <InputError
+                                    message={errors.code}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Estado */}
@@ -88,13 +100,18 @@ export default function EditIncomeType({ incomeType }) {
                                 <select
                                     id="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
                                 >
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Fecha de inicio */}
@@ -108,7 +125,10 @@ export default function EditIncomeType({ incomeType }) {
                                     type="date"
                                     value={data.effective_date}
                                     onChange={(e) =>
-                                        setData("effective_date", e.target.value)
+                                        setData(
+                                            "effective_date",
+                                            e.target.value
+                                        )
                                     }
                                     className="mt-1 block w-full"
                                 />
@@ -120,15 +140,23 @@ export default function EditIncomeType({ incomeType }) {
 
                             {/* Fecha de fin */}
                             <div>
-                                <InputLabel htmlFor="end_date" value="Fecha de Fin" />
+                                <InputLabel
+                                    htmlFor="end_date"
+                                    value="Fecha de Fin"
+                                />
                                 <TextInput
                                     id="end_date"
                                     type="date"
                                     value={data.end_date}
-                                    onChange={(e) => setData("end_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("end_date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.end_date} className="mt-2" />
+                                <InputError
+                                    message={errors.end_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             {/* Botones */}

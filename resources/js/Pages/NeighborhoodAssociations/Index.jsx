@@ -102,7 +102,7 @@ export default function NeighborhoodAssociationsIndex() {
                     href="/neighborhood-associations/create"
                     className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
                 >
-                    Crear Nueva Asociación
+                    Crear Nueva Junta de Vecinos
                 </Link>
 
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
