@@ -81,12 +81,16 @@ class MeetingController extends Controller
         if ($user->role === 'board_member') {
             // Solo cargar la asociación asignada al vecino
             if (!$neighbor || !$neighbor->neighborhood_association_id) {
-                abort(403, 'No tienes una asociación asignada.');
+                return back()->withInput()->withErrors([
+                    'error' => 'No tienes una asociación asignada.',
+                ]);
             }
 
             $association = NeighborhoodAssociation::find($neighbor->neighborhood_association_id, ['id', 'name']);
             if (!$association) {
-                abort(403, 'No tienes una asociación válida.');
+                return back()->withInput()->withErrors([
+                    'error' => 'No tienes una asociación válida.',
+                ]);
             }
 
             $associations = collect([$association]); // Convertir a colección
@@ -95,14 +99,18 @@ class MeetingController extends Controller
             // Los administradores pueden ver todas las asociaciones
             $associations = NeighborhoodAssociation::all(['id', 'name']);
         } else {
-            abort(403, 'No tienes permiso para crear reuniones.');
+            return back()->withInput()->withErrors([
+                'error' => 'No tienes permiso para crear reuniones.',
+            ]);
         }
 
         return Inertia::render('Meetings/Create', [
             'userRole' => $user->role, // Pasar el rol del usuario
             'associations' => $associations,
+            'oldInput' => $request->old(), // Pasar los datos antiguos al frontend
         ]);
     }
+
 
 
 
@@ -193,14 +201,25 @@ class MeetingController extends Controller
      */
     public function edit($id)
     {
+        $user = auth()->user();
+
+        // Obtener la reunión
         $meeting = Meeting::findOrFail($id);
-        $associations = NeighborhoodAssociation::all(['id', 'name']);
-        $userRole = auth()->user()->role;
+
+        // Verificar si el usuario tiene permisos para editar reuniones
+        if (!in_array($user->role, ['admin', 'board_member'])) {
+            abort(403, 'No tienes permiso para editar reuniones.');
+        }
+
+        // Cargar asociaciones según el rol
+        $associations = $user->role === 'admin'
+            ? NeighborhoodAssociation::all(['id', 'name'])
+            : NeighborhoodAssociation::where('id', $user->neighbor->neighborhood_association_id ?? null)->get(['id', 'name']);
 
         return Inertia::render('Meetings/Edit', [
             'meeting' => $meeting,
             'associations' => $associations,
-            'userRole' => $userRole, // Enviar el rol del usuario
+            'userRole' => $user->role, // Enviar el rol del usuario
         ]);
     }
 

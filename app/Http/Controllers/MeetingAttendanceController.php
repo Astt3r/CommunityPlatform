@@ -97,6 +97,11 @@ class MeetingAttendanceController extends Controller
 
     public function showSummary($meetingId)
     {
+        // Verificar si el usuario tiene el rol permitido
+        if (!in_array(auth()->user()->role, ['admin', 'board_member'])) {
+            abort(403, 'No tienes permiso para acceder a esta página.');
+        }
+
         $meeting = Meeting::findOrFail($meetingId);
 
         // Filtrar asistencias por vecinos de la misma junta de vecinos
