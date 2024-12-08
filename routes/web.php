@@ -58,14 +58,21 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 // Neighbors
-Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
     Route::resource('neighbors', NeighborController::class);
 });
+// Comittees
+Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
+    Route::resource('committees', CommitteeController::class);
+});
+
 
 // Committee Members
 Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committee-members', CommitteeMemberController::class);
 });
+
+
 
 // Projects
 Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {

@@ -14,10 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->string('name', 50);
             $table->string('description', 255);
-            $table->string('code', 20)->unique()->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->date('effective_date')->nullable();
-            $table->date('end_date')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();

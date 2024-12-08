@@ -25,13 +25,13 @@ class NeighborRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $userId, // Ignorar el usuario actual
-            'password' => $this->isMethod('post') ? 'required|string|confirmed|min:8' : 'nullable|string|confirmed|min:8', // Obligatorio solo al crear
+            'password' => $this->isMethod('post') ? 'required|string|confirmed|min:8' : 'nullable|string|confirmed|min:8',
             'role' => 'nullable|string|in:resident,board_member,admin',
-            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId, // Ignorar la dirección actual
+            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId,
             'identification_number' => [
                 'required',
                 'max:50',
-                'unique:neighbors,identification_number,' . $neighborId, // Ignorar el vecino actual
+                'unique:neighbors,identification_number,' . $neighborId,
                 function ($attribute, $value, $fail) {
                     if (!$this->isValidRUT($value)) {
                         $fail('El RUT ingresado no tiene un formato válido.');
@@ -42,12 +42,34 @@ class NeighborRequest extends FormRequest
             'birth_date' => [
                 'required',
                 'date',
-                'before:today', // Fecha de nacimiento debe ser en el pasado
-                'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), // Validación para mayor de 18 años
+                'before:today',
+                'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), // Mayor de 18 años
             ],
             'status' => 'required|in:active,inactive',
             'last_participation_date' => 'nullable|date|after_or_equal:registration_date',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
+
+            // Nueva regla para directiva
+            'committee_id' => [
+                'nullable',
+                'exists:committees,id',
+                function ($attribute, $value, $fail) use ($userId) {
+                    if ($value) {
+                        // Validar si el usuario ya tiene un cargo activo en otra directiva
+                        $hasActiveRole = \App\Models\CommitteeMember::where('user_id', $userId)
+                            ->where('status', 'active')
+                            ->where(function ($query) {
+                            $query->whereNull('left_date')
+                                ->orWhere('left_date', '>', now());
+                        })
+                            ->exists();
+
+                        if ($hasActiveRole) {
+                            $fail('Este vecino ya tiene un cargo activo en otra directiva.');
+                        }
+                    }
+                },
+            ],
         ];
     }
 
@@ -55,6 +77,10 @@ class NeighborRequest extends FormRequest
 
 
 
+
+    /**
+     * Custom error messages.
+     */
     /**
      * Custom error messages.
      */
@@ -83,8 +109,14 @@ class NeighborRequest extends FormRequest
             'last_participation_date.after_or_equal' => 'La fecha de última participación debe ser igual o posterior a la fecha de registro.',
             'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
             'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no es válida.',
+
+            // Nuevos mensajes para committee_id
+            'committee_id.exists' => 'La directiva seleccionada no es válida.',
+            'committee_id.nullable' => 'El campo directiva es opcional.', // Si es necesario aclararlo
+            'committee_id.active_role' => 'Este vecino ya tiene un cargo activo en otra directiva.', // Mensaje de error personalizado
         ];
     }
+
 
 
     /**

@@ -48,19 +48,19 @@ export default function Authenticated({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gob-grey-70 transition duration-150 ease-in-out hover:text-gob-primary-base focus:outline-none"
                                             >
-                                                {auth.user.name}
                                                 {auth.neighborhood_association
                                                     ?.name && (
                                                     <>
-                                                        {" "}
-                                                        |{" "}
+                                                        Perteneces a:{" "}
                                                         {
                                                             auth
                                                                 .neighborhood_association
                                                                 .name
-                                                        }
+                                                        }{" "}
+                                                        |{" "}
                                                     </>
                                                 )}
+                                                {auth.user.name}
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
