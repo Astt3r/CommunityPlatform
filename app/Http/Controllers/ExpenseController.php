@@ -155,4 +155,68 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('message', 'Gasto eliminado correctamente.');
     }
 
+    public function edit(Expense $expense, Request $request)
+    {
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (
+                !$neighbor ||
+                $expense->association_id !== $neighbor->neighborhoodAssociation->id
+            ) {
+                abort(403, 'No tienes permiso para editar este gasto.');
+            }
+        }
+
+        $expense->load('type'); // Cargar relación de tipo de gasto
+
+        $expenseTypes = ExpenseType::where('association_id', $expense->association_id)->get();
+
+        // Añadir los posibles estados al formulario
+        $statuses = ['approved', 'pending', 'rejected'];
+
+        return Inertia::render('Finance/Expenses/Edit', [
+            'expense' => $expense,
+            'expenseTypes' => $expenseTypes,
+            'statuses' => $statuses, // Enviar los estados posibles
+        ]);
+    }
+
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(ExpenseRequest $request, Expense $expense)
+    {
+        $user = $request->user();
+        $isAdmin = $user->role === 'admin';
+
+        if (!$isAdmin) {
+            $neighbor = Neighbor::where('user_id', $user->id)->first();
+
+            if (
+                !$neighbor ||
+                $expense->association_id !== $neighbor->neighborhoodAssociation->id
+            ) {
+                abort(403, 'No tienes permiso para actualizar este gasto.');
+            }
+        }
+
+        $validated = $request->validated();
+
+        // Manejar archivo de recibo (opcional)
+        if ($request->hasFile('receipt')) {
+            $validated['receipt'] = $request->file('receipt')->store('receipts', 'public');
+        }
+
+        $expense->update($validated);
+
+        return redirect()->route('expenses.index')->with('message', 'Gasto actualizado correctamente.');
+    }
+
 }
+
+

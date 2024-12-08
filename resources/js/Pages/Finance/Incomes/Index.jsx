@@ -1,14 +1,18 @@
+import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
+import { formatDate } from "@/Components/formatDate";
 
-export default function IncomeIndex({ incomes }) {
-    const { delete: destroy } = useForm();
+export default function IncomeIndex({ incomes, flash }) {
+    const { delete: destroy, processing } = useForm();
+    const [showAlert, setShowAlert] = useState(!!flash?.success);
 
     const handleDelete = (id) => {
         if (confirm("¿Estás seguro de que deseas eliminar este ingreso?")) {
             destroy(route("incomes.destroy", id), {
-                onSuccess: () => console.log("Ingreso eliminado correctamente."),
-                onError: (error) => console.error("Error al eliminar ingreso:", error),
+                onSuccess: () => setShowAlert(true),
+                onError: (error) =>
+                    console.error("Error al eliminar ingreso:", error),
             });
         }
     };
@@ -16,125 +20,132 @@ export default function IncomeIndex({ incomes }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Ingresos
-                    </h2>
-                    <Link
-                        href={route("incomes.create")}
-                        className="bg-blue-600 text-white px-4 py-2 rounded"
-                    >
-                        Crear Nuevo Ingreso
-                    </Link>
-                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Ingresos</h2>
             }
         >
             <Head title="Ingresos" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        {incomes.data.length > 0 ? (
-                            <table className="w-full border-collapse border border-gray-200">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Fuente
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Responsable
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Fecha
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Monto
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Tipo
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-left">
-                                            Estado
-                                        </th>
-                                        <th className="border border-gray-300 px-4 py-2 text-center">
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {incomes.data.map((income) => (
-                                        <tr key={income.id} className="hover:bg-gray-50">
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                {income.source}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                {income.responsible}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                {income.date}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                ${income.amount.toFixed(2)}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                {income.type?.name || "No especificado"}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2">
-                                                {income.status === "active" ? "Activo" : "Inactivo"}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2 text-center">
-                                                <div className="flex justify-center space-x-4">
-                                                    <Link
-                                                        href={route(
-                                                            "incomes.edit",
-                                                            income.id
-                                                        )}
-                                                        className="text-blue-500 hover:underline"
-                                                    >
-                                                        Editar
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleDelete(income.id)}
-                                                        className="text-red-500 hover:underline"
-                                                    >
-                                                        Eliminar
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        ) : (
-                            <p className="text-center text-gray-600">
-                                No hay ingresos registrados.
-                            </p>
-                        )}
-
-                        <div className="mt-4">
-                            {incomes.links && (
-                                <div className="flex justify-between">
-                                    {incomes.links.prev && (
-                                        <Link
-                                            href={incomes.links.prev}
-                                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded"
-                                        >
-                                            Anterior
-                                        </Link>
-                                    )}
-                                    {incomes.links.next && (
-                                        <Link
-                                            href={incomes.links.next}
-                                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded"
-                                        >
-                                            Siguiente
-                                        </Link>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            {/* Alerta de éxito */}
+            {showAlert && (
+                <div
+                    className="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg flex justify-between"
+                    role="alert"
+                >
+                    <span>{flash.success}</span>
+                    <button
+                        type="button"
+                        onClick={() => setShowAlert(false)}
+                        className="text-green-700 hover:text-green-900"
+                    >
+                        ✖
+                    </button>
                 </div>
+            )}
+
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <Link
+                    href={route("incomes.create")}
+                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
+                >
+                    Crear Nuevo Ingreso
+                </Link>
+            </div>
+
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+                {incomes.data.length > 0 ? (
+                    <table className="table-auto w-full text-left text-gray-600">
+                        <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
+                            <tr>
+                                <th className="px-6 py-3">Fuente</th>
+                                <th className="px-6 py-3">Responsable</th>
+                                <th className="px-6 py-3">Fecha</th>
+                                <th className="px-6 py-3">Monto</th>
+                                <th className="px-6 py-3">Tipo</th>
+                                <th className="px-6 py-3">Estado</th>
+                                <th className="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {incomes.data.map((income, index) => (
+                                <tr
+                                    key={income.id}
+                                    className={`border-t ${
+                                        index % 2 === 0 ? "bg-gray-50" : ""
+                                    }`}
+                                >
+                                    <td className="px-6 py-3">
+                                        {income.source}
+                                    </td>
+                                    <td className="px-6 py-3">
+                                        {income.responsible}
+                                    </td>
+                                    <td className="px-6 py-3">
+                                        {formatDate(income.date)}
+                                    </td>
+                                    <td className="px-6 py-3">
+                                        ${income.amount.toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-3">
+                                        {income.type?.name || "No especificado"}
+                                    </td>
+                                    <td
+                                        className={`px-6 py-3 ${
+                                            income.status === "active"
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }`}
+                                    >
+                                        {income.status === "active"
+                                            ? "Activo"
+                                            : "Inactivo"}
+                                    </td>
+                                    <td className="px-6 py-3 flex flex-col md:flex-row gap-2">
+                                        <Link
+                                            href={route(
+                                                "incomes.edit",
+                                                income.id
+                                            )}
+                                            className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
+                                        >
+                                            Editar
+                                        </Link>
+                                        <button
+                                            onClick={() =>
+                                                handleDelete(income.id)
+                                            }
+                                            disabled={processing}
+                                            className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="p-6 text-center bg-gray-50 rounded-lg shadow">
+                        <p className="text-lg font-semibold text-gray-600">
+                            No hay ingresos registrados.
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Paginación */}
+            <div className="mt-6 flex justify-center gap-2">
+                {incomes.links.map((link, index) => (
+                    <Link
+                        key={index}
+                        href={link.url || ""}
+                        className={`px-4 py-2 border rounded ${
+                            link.active
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                    ></Link>
+                ))}
             </div>
         </AuthenticatedLayout>
     );
