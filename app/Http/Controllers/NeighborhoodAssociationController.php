@@ -67,6 +67,9 @@ class NeighborhoodAssociationController extends Controller
         // Inicializar el número de miembros en 0
         $validated['number_of_members'] = 0;
 
+        // Inicializar el estado en activo
+        $validated['is_active'] = true;
+
         // Crear la junta de vecinos
         $association = NeighborhoodAssociation::create($validated);
 
@@ -138,7 +141,7 @@ class NeighborhoodAssociationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id) 
+    public function destroy(string $id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
 
@@ -151,8 +154,9 @@ class NeighborhoodAssociationController extends Controller
         // Actualizar las reuniones relacionadas para que tengan neighborhood_association_id en null
         $association->meetings()->update(['neighborhood_association_id' => null]);
 
-        // Proceder con la eliminación de la asociación
-        $association->delete();
+        // Cambiar estado de la junta de vecinos a false en vez de eliminar
+        $association->is_active = false;
+        $association->save();
 
         return redirect()->route('neighborhood-associations.index')
             ->with('success', 'Asociación eliminada exitosamente.');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
+use App\Models\Committee;
+use App\Models\CommitteeMember;
 use App\Http\Requests\NeighborRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -22,47 +24,39 @@ class NeighborController extends Controller
      */
     public function index(Request $request)
     {
-        // Obtener el usuario autenticado desde el request
         $user = $request->user();
-
-        // Verificar si el usuario es administrador
         $isAdmin = $user->role === 'admin';
 
-        // Si no es administrador, obtener su Neighbor relacionado
         if (!$isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            // Validar que el usuario tenga un registro como Neighbor
             if (!$neighbor || !$neighbor->neighborhoodAssociation) {
                 abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
             }
 
-            // Obtener el ID de la junta de vecinos del Neighbor
             $neighborhoodAssociationId = $neighbor->neighborhoodAssociation->id;
         }
 
-        // Query para obtener los vecinos
         $query = Neighbor::with(['user', 'neighborhoodAssociation']);
 
-        // Si no es administrador, filtrar por junta de vecinos
         if (!$isAdmin) {
             $query->where('neighborhood_association_id', $neighborhoodAssociationId);
         }
 
-        // Aplicar filtro por nombre si está presente
         if ($request->has("name")) {
             $query->whereHas('user', function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->input('name') . '%');
             });
         }
 
-        // Paginación de resultados
-        $neighbors = $query->paginate(10)->withQueryString();
+        // If the user is a resident, only show active neighbors
+        if ($user->role === 'resident') {
+            $query->where('status', 'active');
+        }
 
-        // Obtener todas las juntas de vecinos (opcional, si es relevante para la vista)
+        $neighbors = $query->paginate(10)->withQueryString();
         $juntasDeVecinos = NeighborhoodAssociation::all();
 
-        // Añadir información sobre si el vecino es miembro de la directiva
         return Inertia::render("Neighbor/Index", [
             'neighbors' => $neighbors->through(function ($neighbor) {
                 $isBoardMember = $neighbor->user && $neighbor->user->role === 'board_member';
@@ -83,7 +77,7 @@ class NeighborController extends Controller
                         'id' => $neighbor->user->id,
                         'name' => $neighbor->user->name,
                         'email' => $neighbor->user->email,
-                        'role' => $neighbor->user->role, // Incluimos el rol para más flexibilidad
+                        'role' => $neighbor->user->role,
                     ] : null,
                     'is_board_member' => $isBoardMember,
                 ];
@@ -236,12 +230,22 @@ class NeighborController extends Controller
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
 
+        // Obtener el rol activo del vecino en una directiva
+        $activeCommitteeMembership = $neighbor->committeeMemberships()
+            ->where('status', 'active')
+            ->with('committee')
+            ->first();
+
+
         // Verificar que el usuario autenticado no pueda editar su propio registro
         if (Auth::id() === $neighbor->user_id) {
             return redirect()->route('neighbors.index')->with('error', 'No puedes editar tu propio registro.');
         }
 
         $associations = NeighborhoodAssociation::all(['id', 'name']);
+
+        $committees = Committee::all(['id', 'name']); // Directivas disponibles
+
         $users = User::all(['id', 'name', 'email']); // Obtenemos todos los usuarios con su ID, nombre y correo electrónico
 
         return Inertia::render('Neighbor/Edit', [
@@ -260,14 +264,16 @@ class NeighborController extends Controller
                     'id' => $neighbor->user->id,
                     'role' => $neighbor->user->role, // Agregar rol del usuario
                 ] : null,
+                'committee_id' => $activeCommitteeMembership?->committee_id,
+                'committee_role' => $activeCommitteeMembership?->role, // Rol actual en la directiva
+                'joined_date' => $activeCommitteeMembership?->joined_date,
+                'left_date' => $activeCommitteeMembership?->left_date,
             ],
             'associations' => $associations,
+            'committees' => $committees,
             'users' => $users, // Enviamos los usuarios para el dropdown
         ]);
     }
-
-
-
 
     public function update(NeighborRequest $request, Neighbor $neighbor)
     {
@@ -281,10 +287,7 @@ class NeighborController extends Controller
                 'role' => $validatedData['role'],
             ]);
 
-            // Verificar si cambió de asociación
-            $oldAssociation = $neighbor->neighborhoodAssociation;
-
-            // Actualizar el vecino
+            // Actualizar información del vecino
             $neighbor->update([
                 'address' => $validatedData['address'],
                 'identification_number' => $validatedData['identification_number'],
@@ -294,21 +297,46 @@ class NeighborController extends Controller
                 'neighborhood_association_id' => $validatedData['neighborhood_association_id'],
             ]);
 
-            // Si cambió de asociación, actualizar ambas
-            if ($oldAssociation->id !== $neighbor->neighborhood_association_id) {
-                $oldAssociation->updateNumberOfMembers();
-                $neighbor->neighborhoodAssociation->updateNumberOfMembers();
+            // Gestionar relación con la directiva
+            if (!empty($validatedData['committee_id'])) {
+                // Si selecciona una directiva, actualizar o crear registro en `CommitteeMember`
+                $committeeMember = CommitteeMember::updateOrCreate(
+                    [
+                        'user_id' => $neighbor->user_id,
+                        'committee_id' => $validatedData['committee_id'],
+                    ],
+                    [
+                        'status' => 'active',
+                        'joined_date' => now(),
+                        'left_date' => null, // Restablecer si previamente tenía una fecha de salida
+                    ]
+                );
+
+                // Cambiar rol del usuario a 'board_member'
+                $neighbor->user->update(['role' => 'board_member']);
+            } else {
+                // Si desmarca la opción "Es directiva", marcar registros como inactivos
+                CommitteeMember::where('user_id', $neighbor->user_id)
+                    ->where('status', 'active')
+                    ->update([
+                        'status' => 'inactive',
+                        'left_date' => now(),
+                    ]);
+
+                // Verificar si tiene otros registros activos
+                $hasActiveRoles = CommitteeMember::where('user_id', $neighbor->user_id)
+                    ->where('status', 'active')
+                    ->exists();
+
+                // Si no tiene otros cargos activos, cambiar rol a 'resident'
+                if (!$hasActiveRoles) {
+                    $neighbor->user->update(['role' => 'resident']);
+                }
             }
         });
 
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
-
-
-
-
-
-
 
 
     public function destroy(Neighbor $neighbor)

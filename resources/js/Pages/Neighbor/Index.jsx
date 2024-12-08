@@ -6,19 +6,15 @@ import { Head } from "@inertiajs/react";
 import { formatDate } from "@/Components/formatDate"; // Importa la función formatDate
 
 export default function NeighborIndex() {
-    const {
-        neighbors,
-        filters,
-        flash,
-        userRole,
-        juntasDeVecinos = [],
-    } = usePage().props;
+    const { neighbors, filters, flash, juntasDeVecinos = [] } = usePage().props;
     const { data, setData, get } = useForm({
         name: filters.name || "",
         junta_de_vecino_id: filters.junta_de_vecino_id || "",
         is_board_member: filters.is_board_member || false,
     });
     const [showAlert, setShowAlert] = useState(!!flash.success);
+
+    const userRole = usePage().props.auth.user.role;
 
     const handleDelete = (id) => {
         if (
@@ -54,6 +50,8 @@ export default function NeighborIndex() {
         return matchesJunta && matchesBoardMember;
     });
 
+    console.log("Current userRole:", userRole); // Debugging line
+
     return (
         <AuthenticatedLayout
             header={
@@ -79,12 +77,14 @@ export default function NeighborIndex() {
             )}
 
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <Link
-                    href={route("neighbors.create")}
-                    className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
-                >
-                    Crear Nuevo Vecino
-                </Link>
+                {userRole !== "resident" && (
+                    <Link
+                        href={route("neighbors.create")}
+                        className="w-full md:w-auto px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 text-center"
+                    >
+                        Crear Nuevo Vecino
+                    </Link>
+                )}
 
                 <form
                     onSubmit={handleSearch}
@@ -97,20 +97,30 @@ export default function NeighborIndex() {
                         onChange={(e) => setData("name", e.target.value)}
                         className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
                     />
-                    <select
-                        value={data.junta_de_vecino_id}
-                        onChange={(e) =>
-                            setData("junta_de_vecino_id", e.target.value)
-                        }
-                        className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
-                    >
-                        <option value="">Todas las Juntas de Vecinos</option>
-                        {juntasDeVecinos.map((junta) => (
-                            <option key={junta.id} value={junta.id}>
-                                {junta.name}
+                    {userRole !== "resident" && userRole !== "board_member" && (
+                        <select
+                            value={data.junta_de_vecino_id}
+                            onChange={(e) =>
+                                setData("junta_de_vecino_id", e.target.value)
+                            }
+                            className="w-full md:w-auto px-4 py-2 border rounded focus:ring focus:ring-blue-200"
+                        >
+                            <option value="">
+                                Todas las Juntas de Vecinos
                             </option>
-                        ))}
-                    </select>
+                            {juntasDeVecinos.map((junta) => (
+                                <option key={junta.id} value={junta.id}>
+                                    {junta.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    <button
+                        type="submit"
+                        className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                    >
+                        Buscar
+                    </button>
                     <label className="flex items-center gap-2 w-full md:w-auto">
                         <input
                             type="checkbox"
@@ -120,14 +130,8 @@ export default function NeighborIndex() {
                             }
                             className="form-checkbox"
                         />
-                        Miembro de Directiva
+                        Miembros de Directiva
                     </label>
-                    <button
-                        type="submit"
-                        className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                    >
-                        Buscar
-                    </button>
                 </form>
             </div>
 
@@ -137,8 +141,12 @@ export default function NeighborIndex() {
                         <tr>
                             <th className="px-6 py-3">Rut</th>
                             <th className="px-6 py-3">Usuario Asignado</th>
-                            <th className="px-6 py-3">Junta de Vecinos</th>
-                            <th className="px-6 py-3">Estado</th>
+                            {!userRole.includes("resident") && (
+                                <th className="px-6 py-3">Junta de Vecinos</th>
+                            )}
+                            {!userRole.includes("resident") && (
+                                <th className="px-6 py-3">Estado</th>
+                            )}
                             <th className="px-6 py-3">Dirección</th>
                             <th className="px-6 py-3">Fecha de Registro</th>
                             <th className="px-6 py-3">Fecha de Nacimiento</th>
@@ -162,22 +170,27 @@ export default function NeighborIndex() {
                                         ? neighbor.user.name
                                         : "--USUARIO POR ASIGNAR--"}
                                 </td>
-                                <td className="px-6 py-3">
-                                    {neighbor.neighborhood_association
-                                        ? neighbor.neighborhood_association.name
-                                        : "--NO ASIGNADO--"}
-                                </td>
-                                <td
-                                    className={`px-6 py-3 ${
-                                        neighbor.status === "active"
-                                            ? "text-green-500"
-                                            : "text-red-500"
-                                    }`}
-                                >
-                                    {neighbor.status === "active"
-                                        ? "Activo"
-                                        : "Inactivo"}
-                                </td>
+                                {!userRole.includes("resident") && (
+                                    <td className="px-6 py-3">
+                                        {neighbor.neighborhood_association
+                                            ? neighbor.neighborhood_association
+                                                  .name
+                                            : "--NO ASIGNADO--"}
+                                    </td>
+                                )}
+                                {!userRole.includes("resident") && (
+                                    <td
+                                        className={`px-6 py-3 ${
+                                            neighbor.status === "active"
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }`}
+                                    >
+                                        {neighbor.status === "active"
+                                            ? "Activo"
+                                            : "Inactivo"}
+                                    </td>
+                                )}
                                 <td className="px-6 py-3">
                                     {neighbor.address}
                                 </td>
@@ -199,20 +212,24 @@ export default function NeighborIndex() {
                                     >
                                         Ver
                                     </Link>
-                                    <Link
-                                        href={`/neighbors/${neighbor.id}/edit`}
-                                        className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
-                                    >
-                                        Editar
-                                    </Link>
-                                    <button
-                                        onClick={() =>
-                                            handleDelete(neighbor.id)
-                                        }
-                                        className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
-                                    >
-                                        Eliminar
-                                    </button>
+                                    {userRole !== "resident" && (
+                                        <>
+                                            <Link
+                                                href={`/neighbors/${neighbor.id}/edit`}
+                                                className="w-full md:w-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-700 text-center"
+                                            >
+                                                Editar
+                                            </Link>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(neighbor.id)
+                                                }
+                                                className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}

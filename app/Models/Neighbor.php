@@ -70,6 +70,11 @@ class Neighbor extends Model
         ];
     }
 
+    public function committeeMemberships()
+    {
+        return $this->hasMany(CommitteeMember::class, 'user_id', 'user_id');
+    }
+
 
 
 
