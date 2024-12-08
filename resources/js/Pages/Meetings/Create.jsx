@@ -10,7 +10,7 @@ export default function CreateMeeting({ userRole, associations }) {
         main_topic: "",
         description: "",
         location: "",
-        organized_by: "",
+
         result: "",
         status: "scheduled", // Valor predeterminado
         neighborhood_association_id: userRole === "board_member" ? associations[0]?.id : "",
@@ -142,31 +142,6 @@ export default function CreateMeeting({ userRole, associations }) {
                                 />
                                 <InputError
                                     message={errors.location}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div>
-                                <InputLabel
-                                    htmlFor="organized_by"
-                                    value="Convocada Por *"
-                                />
-                                <TextInput
-                                    id="organized_by"
-                                    type="text"
-                                    name="organized_by"
-                                    value={data.organized_by}
-                                    onChange={(e) =>
-                                        handleChange(
-                                            "organized_by",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="mt-1 block w-full"
-                                    required
-                                />
-                                <InputError
-                                    message={errors.organized_by}
                                     className="mt-2"
                                 />
                             </div>

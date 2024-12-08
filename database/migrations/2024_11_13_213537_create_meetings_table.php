@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('main_topic', 100);
             $table->text('description')->nullable();
             $table->string('location', 255)->nullable();
-            $table->string('organized_by', 100)->nullable();
             $table->string('result', 255)->nullable();
             $table->enum('status', ['scheduled', 'completed', 'canceled'])->default('scheduled');
             $table->foreignId('neighborhood_association_id')->constrained('neighborhood_associations')->onDelete('cascade'); // Required association

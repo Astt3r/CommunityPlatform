@@ -10,7 +10,6 @@ export default function EditMeeting({ meeting, associations, userRole }) {
         main_topic: meeting.main_topic || "",
         description: meeting.description || "",
         location: meeting.location || "",
-        organized_by: meeting.organized_by || "",
         result: meeting.result || "",
         status: meeting.status || "scheduled",
         neighborhood_association_id: meeting.neighborhood_association_id || "",
@@ -100,18 +99,6 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                 <InputError message={errors.location} className="mt-2" />
                             </div>
 
-                            <div>
-                                <InputLabel htmlFor="organized_by" value="Convocada Por" />
-                                <TextInput
-                                    id="organized_by"
-                                    type="text"
-                                    name="organized_by"
-                                    value={data.organized_by}
-                                    onChange={(e) => setData("organized_by", e.target.value)}
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError message={errors.organized_by} className="mt-2" />
-                            </div>
 
                             <div>
                                 <InputLabel htmlFor="result" value="Resultado" />

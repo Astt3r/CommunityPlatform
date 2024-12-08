@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useForm, Head, usePage } from "@inertiajs/react";
 
-export default function ShowAttendance({ meetingId }) {
+export default function ShowAttendance({ meetingId, mainTopic }) {
     const { neighbors } = usePage().props;
 
     const { data, setData, post, processing } = useForm({
@@ -58,9 +58,9 @@ export default function ShowAttendance({ meetingId }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+
         console.log("Enviando datos de asistencia:", data);
-    
+
         // Asegurarse de que los datos sean correctos antes de enviarlos
         const formattedData = {
             attendance: Object.keys(data.attendance).reduce((acc, key) => {
@@ -69,7 +69,7 @@ export default function ShowAttendance({ meetingId }) {
             }, {}),
             absenceReasons: data.absenceReasons,
         };
-    
+
         post(`/meetings/${meetingId}/attendance`, {
             data: formattedData,
             onSuccess: () => {
@@ -82,7 +82,6 @@ export default function ShowAttendance({ meetingId }) {
             },
         });
     };
-    
 
     return (
         <AuthenticatedLayout
@@ -97,17 +96,17 @@ export default function ShowAttendance({ meetingId }) {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white shadow sm:rounded-lg p-6 space-y-4">
-                        <h3 className="text-lg font-semibold">Reunión ID: {meetingId}</h3>
+                        <h3 className="text-lg font-semibold">Reunión: {mainTopic}</h3>
                         <form onSubmit={handleSubmit}>
-                            <table className="min-w-full table-auto border-collapse border border-gray-200">
+                            <table className="min-w-full border-collapse rounded-lg shadow">
                                 <thead>
-                                    <tr>
-                                        <th className="border border-gray-300 px-4 py-2">Vecino</th>
-                                        <th className="border border-gray-300 px-4 py-2">Asistencia</th>
-                                        <th className="border border-gray-300 px-4 py-2">Razón de Ausencia</th>
-                                    </tr>
+                                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal rounded-lg">
+                                    <th className="px-6 py-3 text-left">Vecino</th>
+                                    <th className="px-6 py-3 text-left">Asistencia</th>
+                                    <th className="px-6 py-3 text-left">Motivo de Ausencia</th>
+                                </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="text-gray-600 text-sm font-light">
                                     {neighbors.map((neighbor) => (
                                         <tr key={neighbor.id}>
                                             <td className="border border-gray-300 px-4 py-2">
@@ -121,24 +120,23 @@ export default function ShowAttendance({ meetingId }) {
                                                 />
                                             </td>
                                             <td className="border border-gray-300 px-4 py-2">
-                                            <input
-                                                type="text"
-                                                value={data.absenceReasons[neighbor.id] || ""}
-                                                onChange={(e) =>
-                                                    handleAbsenceReasonChange(
-                                                        neighbor.id,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Motivo de ausencia"
-                                                className={`w-full border rounded p-2 ${
-                                                    data.attendance[neighbor.id]
-                                                        ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                                        : "bg-white"
-                                                }`}
-                                                disabled={data.attendance[neighbor.id]} // Deshabilitar si está marcado
-                                            />
-
+                                                <input
+                                                    type="text"
+                                                    value={data.absenceReasons[neighbor.id] || ""}
+                                                    onChange={(e) =>
+                                                        handleAbsenceReasonChange(
+                                                            neighbor.id,
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Motivo de ausencia"
+                                                    className={`w-full border rounded p-2 ${
+                                                        data.attendance[neighbor.id]
+                                                            ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                                            : "bg-white"
+                                                    }`}
+                                                    disabled={data.attendance[neighbor.id]} // Deshabilitar si está marcado
+                                                />
                                             </td>
                                         </tr>
                                     ))}

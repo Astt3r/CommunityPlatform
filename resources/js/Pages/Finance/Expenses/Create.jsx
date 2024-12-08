@@ -158,6 +158,30 @@ export default function CreateExpense({ expenseTypes }) {
                             </div>
 
                             <div>
+                                <InputLabel htmlFor="status" value="Estado *" />
+                                <select
+                                    id="status"
+                                    name="status"
+                                    value={data.status}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                >
+                                    <option value="">
+                                        Seleccione un estado
+                                    </option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="approved">Aprobado</option>
+                                    <option value="rejected">Rechazado</option>
+                                </select>
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
+                            </div>
+
+                            <div>
                                 <InputLabel
                                     htmlFor="receipt"
                                     value="Recibo (opcional)"

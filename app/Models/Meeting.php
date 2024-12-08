@@ -19,7 +19,6 @@ class Meeting extends Model
         'main_topic',
         'description',
         'location',
-        'organized_by',
         'result',
         'status',
     ];

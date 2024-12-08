@@ -59,7 +59,7 @@ class ProjectController extends Controller
     {
         $user = $request->user();
 
-        // Verificar el vecino asociado
+        // Verificar el vecino asociado al usuario actual
         $neighbor = Neighbor::where('user_id', $user->id)->first();
 
         if (!$neighbor) {
@@ -68,29 +68,36 @@ class ProjectController extends Controller
 
         // Obtener vecinos según el rol del usuario
         if ($user->role === 'board_member') {
+            // Vecinos asociados a la misma asociación vecinal
             $neighbors = Neighbor::where('neighborhood_association_id', $neighbor->neighborhood_association_id)
-                ->get(['id', 'name']);
+                ->with('user:id,name') // Relación con el modelo User
+                ->get()
+                ->map(function ($neighbor) {
+                    return [
+                        'id' => $neighbor->id,
+                        'name' => $neighbor->user->name,
+                    ];
+                });
         } elseif ($user->role === 'admin') {
-            $neighbors = Neighbor::all(['id', 'name']);
+            // Todos los vecinos
+            $neighbors = Neighbor::with('user:id,name')
+                ->get()
+                ->map(function ($neighbor) {
+                    return [
+                        'id' => $neighbor->id,
+                        'name' => $neighbor->user->name,
+                    ];
+                });
         } else {
             abort(403, 'No tienes permiso para crear proyectos.');
         }
 
+        // Renderizar la vista con los datos necesarios
         return Inertia::render('Projects/Create', [
             'user' => $user,
-            'neighbors' => $neighbors, // Asegúrate de enviar esto
+            'neighbors' => $neighbors,
         ]);
     }
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -151,27 +158,20 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyecto creado exitosamente.');
     }
 
-
-
-
-
-
-
-
-
-
     /**
      * Display the specified resource.
      */
     public function show(Project $project)
     {
-        $project->load('files'); // Cargar relación de archivos asociados
+        // Cargar relaciones necesarias
+        $project->load(['files', 'neighbors.user']); // Cargar vecinos y los datos de usuario asociados
 
         return Inertia::render('Projects/Show', [
             'project' => $project,
             'changes' => nl2br($project->changes), // Mostrar cambios con saltos de línea
         ]);
     }
+
 
 
     /**
@@ -181,17 +181,21 @@ class ProjectController extends Controller
     {
         $associations = NeighborhoodAssociation::all(['id', 'name']);
         $neighbors = Neighbor::where('neighborhood_association_id', $project->association_id)
-            ->with('user') // Ensure the user relationship is loaded
+            ->with('user') // Asegúrate de cargar la relación `user`
             ->get();
-        $assignedNeighbors = $project->neighbors()->get();
+
+        // Vecinos asignados al proyecto
+        $assignedNeighborIds = $project->neighbors()->pluck('neighbors.id')->toArray();
 
         return Inertia::render('Projects/Edit', [
             'project' => $project->load('files'),
             'associations' => $associations,
             'neighbors' => $neighbors,
-            'assignedNeighbors' => $assignedNeighbors,
+            'assignedNeighborIds' => $assignedNeighborIds, // Pasar los IDs asignados
         ]);
     }
+
+
 
 
 

@@ -123,7 +123,6 @@ class MeetingController extends Controller
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
-            'organized_by' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
@@ -146,7 +145,6 @@ class MeetingController extends Controller
         $meeting->main_topic = $request->input('main_topic');
         $meeting->description = $request->input('description');
         $meeting->location = $request->input('location');
-        $meeting->organized_by = $request->input('organized_by');
         $meeting->result = $request->input('result');
         $meeting->status = $request->input('status');
         $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
@@ -175,7 +173,6 @@ class MeetingController extends Controller
                 'meeting_date' => $meeting->meeting_date,
                 'location' => $meeting->location,
                 'description' => $meeting->description,
-                'organized_by' => $meeting->organized_by,
                 'status' => $meeting->status,
                 'result' => $meeting->result,
                 'neighborhood_association' => $meeting->neighborhoodAssociation ? $meeting->neighborhoodAssociation->name : null, // Junta vecinal o null
@@ -219,7 +216,6 @@ class MeetingController extends Controller
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
-            'organized_by' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
             'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
