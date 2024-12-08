@@ -181,6 +181,15 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 </div>
             )}
 
+            <div className="mb-4 flex justify-end">
+                <Link
+                    href={route("meetings.create")}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                    Crear Reunión
+                </Link>
+            </div>
+
             <div className="mb-8 relative">
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
