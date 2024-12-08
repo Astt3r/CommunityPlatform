@@ -2,7 +2,10 @@ import React from "react";
 import { usePage, Link } from "@inertiajs/react";
 
 export default function ProjectShow() {
-    const { project } = usePage().props;
+    const { project, auth } = usePage().props; // Incluye las props de autenticación
+
+    // Verifica si el usuario tiene rol de residente
+    const isResident = auth.user.role === "resident";
 
     return (
         <div className="container mx-auto p-4">
@@ -100,12 +103,15 @@ export default function ProjectShow() {
                 >
                     Volver a la lista
                 </Link>
-                <Link
-                    href={`/projects/${project.id}/edit`}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700"
-                >
-                    Editar Proyecto
-                </Link>
+                {/* Mostrar el botón Editar solo si el usuario NO es residente */}
+                {!isResident && (
+                    <Link
+                        href={`/projects/${project.id}/edit`}
+                        className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+                    >
+                        Editar Proyecto
+                    </Link>
+                )}
             </div>
         </div>
     );

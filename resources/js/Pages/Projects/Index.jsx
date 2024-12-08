@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { usePage, Link } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+
 import axios from "axios";
 
 export default function ProjectsIndex() {
@@ -14,45 +15,59 @@ export default function ProjectsIndex() {
     const [selectedNeighbor, setSelectedNeighbor] = useState("");
     const [individualContribution, setIndividualContribution] = useState(0);
     const [remainingAmount, setRemainingAmount] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const isResident = auth.user.role === "resident";
+    const isBoardMember = auth.user.role === "board_member";
 
-    const fetchContributions = async (project) => {
+    const openModal = async (project) => {
+        setModalOpen(true);
+        setSelectedProject(project);
+
         try {
-            if (!modalOpen) setModalOpen(true);
+            setIsLoading(true);
 
-            const response = await axios.get(
-                `/projects/${project.id}/contributions`
-            );
-            setContributions(response.data);
+            const [contributionsRes, neighborsRes, contributionRes] =
+                await Promise.all([
+                    axios.get(`/projects/${project.id}/contributions`),
+                    axios.get(`/projects/${project.id}/neighbors`),
+                    axios.get(
+                        `/projects/${project.id}/individual-contribution`
+                    ),
+                ]);
 
-            setSelectedProject({
-                id: project.id,
-                name: project.name,
-                budget: project.budget, // Incluye el presupuesto para cálculos
-            });
+            setContributions(contributionsRes.data);
+            setNeighbors(neighborsRes.data);
 
-            // Calcular el monto restante con los datos actuales
-            const totalContributed = response.data.reduce(
+            const totalContributed = contributionsRes.data.reduce(
                 (total, contribution) =>
-                    total + parseInt(contribution.amount, 10), // Suma de contribuciones
+                    total + parseInt(contribution.amount, 10),
                 0
             );
 
             const remaining = Math.max(0, project.budget - totalContributed);
             setRemainingAmount(remaining);
+
+            setIndividualContribution(
+                Math.ceil(contributionRes.data.individual_contribution)
+            );
         } catch (error) {
-            console.error("Error al cargar las contribuciones:", error);
-            alert("Error al cargar las contribuciones.");
-            setModalOpen(false);
+            console.error("Error al cargar datos del modal:", error);
+            alert("Error al cargar los datos del proyecto.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const availableNeighbors = neighbors.filter((neighbor) => {
-        return !contributions.some(
-            (contribution) => contribution.neighbor_id === neighbor.id
-        );
-    });
+    const closeModal = () => {
+        setModalOpen(false);
+        setContributions([]);
+        setSelectedProject(null);
+        setIndividualContribution(0);
+        setNeighbors([]);
+        setSelectedNeighbor("");
+        setRemainingAmount(0);
+    };
 
     const handleContribute = async (projectId) => {
         if (!selectedNeighbor) {
@@ -102,14 +117,15 @@ export default function ProjectsIndex() {
         try {
             await axios.delete(`/contributions/${contributionId}`);
             alert("Contribución eliminada con éxito.");
+
             setContributions(
                 contributions.filter((c) => c.id !== contributionId)
             );
 
-            // Recalcular el monto restante
             const totalContributed = contributions
                 .filter((c) => c.id !== contributionId)
                 .reduce((total, c) => total + parseInt(c.amount, 10), 0);
+
             const remaining = Math.max(
                 0,
                 selectedProject.budget - totalContributed
@@ -118,54 +134,6 @@ export default function ProjectsIndex() {
         } catch (error) {
             console.error("Error al eliminar la contribución:", error);
             alert("Error al eliminar la contribución.");
-        }
-    };
-
-    const closeModal = () => {
-        setModalOpen(false);
-        setContributions([]);
-        setSelectedProject(null);
-        setIndividualContribution(0);
-        setNeighbors([]);
-        setSelectedNeighbor("");
-        setRemainingAmount(0);
-    };
-
-    useEffect(() => {
-        if (selectedProject && modalOpen) {
-            fetchNeighbors(selectedProject.id);
-            fetchIndividualContribution(selectedProject.id);
-            fetchContributions(selectedProject);
-        }
-    }, [selectedProject, modalOpen]);
-
-    const fetchNeighbors = async (projectId) => {
-        try {
-            const response = await axios.get(
-                `/projects/${projectId}/neighbors`
-            );
-            setNeighbors(response.data);
-        } catch (error) {
-            console.error(
-                "Error al cargar los vecinos:",
-                error.response?.data || error.message
-            );
-        }
-    };
-
-    const fetchIndividualContribution = async (projectId) => {
-        try {
-            const response = await axios.get(
-                `/projects/${projectId}/individual-contribution`
-            );
-
-            const contribution = response.data.individual_contribution;
-            setIndividualContribution(contribution);
-        } catch (error) {
-            console.error(
-                "Error al calcular la contribución individual:",
-                error.response?.data || error.message
-            );
         }
     };
 
@@ -228,9 +196,7 @@ export default function ProjectsIndex() {
                                         Ver
                                     </Link>
                                     <button
-                                        onClick={() =>
-                                            fetchContributions(project)
-                                        }
+                                        onClick={() => openModal(project)}
                                         className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-700 text-center"
                                     >
                                         Contribuciones
@@ -267,7 +233,7 @@ export default function ProjectsIndex() {
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl">
                         <div className="flex justify-between items-center border-b p-4">
-                            <h2 className="text-lg font-bold text-gray-800">
+                            <h2 className="text-lg font-bold">
                                 Contribuciones del Proyecto{" "}
                                 {selectedProject?.name}
                             </h2>
@@ -279,118 +245,133 @@ export default function ProjectsIndex() {
                             </button>
                         </div>
                         <div className="p-4">
-                            {contributions.length > 0 ? (
-                                <table className="table-auto w-full text-left text-gray-600">
-                                    <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
-                                        <tr>
-                                            <th className="px-6 py-3">
-                                                Vecino
-                                            </th>
-                                            <th className="px-6 py-3">Monto</th>
-                                            <th className="px-6 py-3">Fecha</th>
-                                            <th className="px-6 py-3">
-                                                Acciones
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {contributions.map(
-                                            (contribution, index) => (
-                                                <tr
-                                                    key={contribution.id}
-                                                    className={`border-t ${
-                                                        index % 2 === 0
-                                                            ? "bg-gray-50"
-                                                            : ""
-                                                    }`}
-                                                >
-                                                    <td className="px-6 py-3">
-                                                        {
-                                                            contribution.neighbor_name
-                                                        }
-                                                    </td>
-                                                    <td className="px-6 py-3">
-                                                        ${contribution.amount}
-                                                    </td>
-                                                    <td className="px-6 py-3">
-                                                        {new Date(
-                                                            contribution.created_at
-                                                        ).toLocaleDateString()}
-                                                    </td>
-                                                    <td className="px-6 py-3">
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDeleteContribution(
-                                                                    contribution.id
-                                                                )
-                                                            }
-                                                            className="text-red-500 hover:text-red-700"
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            )
-                                        )}
-                                    </tbody>
-                                </table>
+                            {isLoading ? (
+                                <p>Cargando...</p>
                             ) : (
-                                <p className="text-gray-700">
-                                    No hay contribuciones registradas.
-                                </p>
+                                <>
+                                    <table className="table-auto w-full text-left text-gray-600">
+                                        <thead className="bg-gray-200 text-gray-700 uppercase text-sm">
+                                            <tr>
+                                                <th className="px-6 py-3">
+                                                    Vecino
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    Monto
+                                                </th>
+                                                <th className="px-6 py-3">
+                                                    Fecha
+                                                </th>
+                                                {isBoardMember && (
+                                                    <th className="px-6 py-3">
+                                                        Acciones
+                                                    </th>
+                                                )}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {contributions.map(
+                                                (contribution, index) => (
+                                                    <tr
+                                                        key={contribution.id}
+                                                        className={`border-t ${
+                                                            index % 2 === 0
+                                                                ? "bg-gray-50"
+                                                                : ""
+                                                        }`}
+                                                    >
+                                                        <td className="px-6 py-3">
+                                                            {
+                                                                contribution.neighbor_name
+                                                            }
+                                                        </td>
+                                                        <td className="px-6 py-3">
+                                                            $
+                                                            {
+                                                                contribution.amount
+                                                            }
+                                                        </td>
+                                                        <td className="px-6 py-3">
+                                                            {new Date(
+                                                                contribution.created_at
+                                                            ).toLocaleDateString()}
+                                                        </td>
+                                                        {isBoardMember && (
+                                                            <td className="px-6 py-3">
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleDeleteContribution(
+                                                                            contribution.id
+                                                                        )
+                                                                    }
+                                                                    className="text-red-500 hover:text-red-700"
+                                                                >
+                                                                    &times;
+                                                                </button>
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                )
+                                            )}
+                                        </tbody>
+                                    </table>
+                                    {isBoardMember && (
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                handleContribute(
+                                                    selectedProject.id
+                                                );
+                                            }}
+                                            className="mt-4"
+                                        >
+                                            <p className="text-gray-700 mb-2">
+                                                Monto Individual Calculado: $
+                                                {individualContribution}
+                                            </p>
+                                            <p className="text-gray-700 mb-2">
+                                                Monto Restante: $
+                                                {remainingAmount}
+                                            </p>
+                                            <label
+                                                htmlFor="neighbor"
+                                                className="block text-sm text-gray-700"
+                                            >
+                                                Seleccionar Vecino:
+                                            </label>
+                                            <select
+                                                id="neighbor"
+                                                value={selectedNeighbor}
+                                                onChange={(e) =>
+                                                    setSelectedNeighbor(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="w-full px-4 py-2 border rounded mt-2"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Seleccionar
+                                                </option>
+                                                {neighbors.map((neighbor) => (
+                                                    <option
+                                                        key={neighbor.id}
+                                                        value={neighbor.id}
+                                                    >
+                                                        {neighbor.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                type="submit"
+                                                className="w-full mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                                            >
+                                                Registrar Contribución
+                                            </button>
+                                        </form>
+                                    )}
+                                </>
                             )}
                         </div>
-
-                        {!isResident && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleContribute(selectedProject.id);
-                                }}
-                                className="mt-4 p-4 border-t"
-                            >
-                                {individualContribution && (
-                                    <p className="text-gray-700 mb-2">
-                                        Monto individual calculado: $
-                                        {individualContribution}
-                                    </p>
-                                )}
-                                <p className="text-gray-700 mb-2">
-                                    Monto restante para cumplir el presupuesto:
-                                    ${remainingAmount}
-                                </p>
-                                <label
-                                    htmlFor="neighbor"
-                                    className="block text-sm text-gray-700"
-                                >
-                                    Seleccionar Vecino:
-                                </label>
-                                <select
-                                    id="neighbor"
-                                    onChange={(e) =>
-                                        setSelectedNeighbor(e.target.value)
-                                    }
-                                    className="w-full px-4 py-2 border rounded mt-2"
-                                    required
-                                >
-                                    <option value="">Seleccionar</option>
-                                    {availableNeighbors.map((neighbor) => (
-                                        <option
-                                            key={neighbor.id}
-                                            value={neighbor.id}
-                                        >
-                                            {neighbor.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button
-                                    type="submit"
-                                    className="w-full mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
-                                >
-                                    Registrar Contribución
-                                </button>
-                            </form>
-                        )}
                         <div className="border-t p-4 flex justify-end">
                             <button
                                 onClick={closeModal}
