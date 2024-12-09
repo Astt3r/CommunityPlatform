@@ -18,10 +18,12 @@ export default function ResidentShow() {
                     <strong>Dirección:</strong> {resident.address}
                 </p>
                 <p className="mb-2">
-                    <strong>Número de Identificación:</strong> {resident.identification_number}
+                    <strong>Número de Identificación:</strong>{" "}
+                    {resident.identification_number}
                 </p>
                 <p className="mb-2">
-                    <strong>Fecha de Registro:</strong> {resident.registration_date}
+                    <strong>Fecha de Registro:</strong>{" "}
+                    {resident.registration_date}
                 </p>
                 <p className="mb-2">
                     <strong>Fecha de Nacimiento:</strong> {resident.birth_date}
@@ -30,10 +32,12 @@ export default function ResidentShow() {
                     <strong>Estado:</strong> {resident.status}
                 </p>
                 <p className="mb-2">
-                    <strong>Última Participación:</strong> {resident.last_participation_date}
+                    <strong>Última Participación:</strong>{" "}
+                    {resident.last_participation_date}
                 </p>
                 <p className="mb-2">
-                    <strong>Asociación Vecinal:</strong> {resident.neighborhood_association_name || 'N/A'}
+                    <strong>Junta de Vecinos:</strong>{" "}
+                    {resident.neighborhood_association_name || "N/A"}
                 </p>
             </div>
 

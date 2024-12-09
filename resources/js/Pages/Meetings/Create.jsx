@@ -13,7 +13,8 @@ export default function CreateMeeting({ userRole, associations }) {
 
         result: "",
         status: "scheduled", // Valor predeterminado
-        neighborhood_association_id: userRole === "board_member" ? associations[0]?.id : "",
+        neighborhood_association_id:
+            userRole === "board_member" ? associations[0]?.id : "",
     });
 
     const handleChange = (field, value) => {
@@ -128,7 +129,10 @@ export default function CreateMeeting({ userRole, associations }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="location" value="Lugar *" />
+                                <InputLabel
+                                    htmlFor="location"
+                                    value="Lugar *"
+                                />
                                 <TextInput
                                     id="location"
                                     type="text"
@@ -147,7 +151,10 @@ export default function CreateMeeting({ userRole, associations }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="result" value="Resultado" />
+                                <InputLabel
+                                    htmlFor="result"
+                                    value="Resultado"
+                                />
                                 <TextInput
                                     id="result"
                                     type="text"
@@ -176,8 +183,12 @@ export default function CreateMeeting({ userRole, associations }) {
                                     className="mt-1 block w-full"
                                     required
                                 >
-                                    <option value="scheduled">Programada</option>
-                                    <option value="completed">Completada</option>
+                                    <option value="scheduled">
+                                        Programada
+                                    </option>
+                                    <option value="completed">
+                                        Completada
+                                    </option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
                                 <InputError
@@ -189,7 +200,7 @@ export default function CreateMeeting({ userRole, associations }) {
                             <div>
                                 <InputLabel
                                     htmlFor="neighborhood_association_id"
-                                    value="Asociación Vecinal *"
+                                    value="Junta de Vecinos"
                                 />
                                 <select
                                     id="neighborhood_association_id"

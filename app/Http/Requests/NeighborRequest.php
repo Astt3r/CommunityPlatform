@@ -107,8 +107,8 @@ class NeighborRequest extends FormRequest
             'status.in' => 'El estado debe ser "activo" o "inactivo".',
             'last_participation_date.date' => 'La fecha de última participación debe ser una fecha válida.',
             'last_participation_date.after_or_equal' => 'La fecha de última participación debe ser igual o posterior a la fecha de registro.',
-            'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
-            'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no es válida.',
+            'neighborhood_association_id.required' => 'La junta de vecinos es obligatoria.',
+            'neighborhood_association_id.exists' => 'La junta de vecinos seleccionada no es válida.',
 
             // Nuevos mensajes para committee_id
             'committee_id.exists' => 'La directiva seleccionada no es válida.',

@@ -45,7 +45,10 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <InputLabel htmlFor="meeting_date" value="Fecha de la Reunión" />
+                                <InputLabel
+                                    htmlFor="meeting_date"
+                                    value="Fecha de la Reunión"
+                                />
                                 <TextInput
                                     id="meeting_date"
                                     type="datetime-local"
@@ -57,33 +60,52 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                     className="mt-1 block w-full"
                                 />
 
-                                <InputError message={errors.meeting_date} className="mt-2" />
+                                <InputError
+                                    message={errors.meeting_date}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="main_topic" value="Tema Principal" />
+                                <InputLabel
+                                    htmlFor="main_topic"
+                                    value="Tema Principal"
+                                />
                                 <TextInput
                                     id="main_topic"
                                     type="text"
                                     name="main_topic"
                                     value={data.main_topic}
-                                    onChange={(e) => setData("main_topic", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("main_topic", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.main_topic} className="mt-2" />
+                                <InputError
+                                    message={errors.main_topic}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="description" value="Descripción" />
+                                <InputLabel
+                                    htmlFor="description"
+                                    value="Descripción"
+                                />
                                 <TextInput
                                     id="description"
                                     type="text"
                                     name="description"
                                     value={data.description}
-                                    onChange={(e) => setData("description", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("description", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.description} className="mt-2" />
+                                <InputError
+                                    message={errors.description}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
@@ -93,24 +115,36 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                     type="text"
                                     name="location"
                                     value={data.location}
-                                    onChange={(e) => setData("location", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("location", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.location} className="mt-2" />
+                                <InputError
+                                    message={errors.location}
+                                    className="mt-2"
+                                />
                             </div>
 
-
                             <div>
-                                <InputLabel htmlFor="result" value="Resultado" />
+                                <InputLabel
+                                    htmlFor="result"
+                                    value="Resultado"
+                                />
                                 <TextInput
                                     id="result"
                                     type="text"
                                     name="result"
                                     value={data.result}
-                                    onChange={(e) => setData("result", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("result", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.result} className="mt-2" />
+                                <InputError
+                                    message={errors.result}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
@@ -119,46 +153,62 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                     id="status"
                                     name="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 >
-                                    <option value="scheduled">Programada</option>
-                                    <option value="completed">Completada</option>
+                                    <option value="scheduled">
+                                        Programada
+                                    </option>
+                                    <option value="completed">
+                                        Completada
+                                    </option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
                                 <InputLabel
                                     htmlFor="neighborhood_association_id"
-                                    value="Junta Vecinal"
+                                    value="Junta de Vecinos"
                                 />
                                 <select
                                     id="neighborhood_association_id"
                                     name="neighborhood_association_id"
                                     value={data.neighborhood_association_id}
-                                    onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "neighborhood_association_id",
+                                            e.target.value
+                                        )
+                                    }
                                     className={`mt-1 block w-full ${
-                                        userRole === "board_member" ? "bg-gray-100 cursor-not-allowed" : ""
+                                        userRole === "board_member"
+                                            ? "bg-gray-100 cursor-not-allowed"
+                                            : ""
                                     }`}
                                     disabled={userRole === "board_member"}
                                 >
                                     {associations.map((association) => (
-                                        <option key={association.id} value={association.id}>
+                                        <option
+                                            key={association.id}
+                                            value={association.id}
+                                        >
                                             {association.name}
                                         </option>
                                     ))}
                                 </select>
-
-
 
                                 <InputError
                                     message={errors.neighborhood_association_id}
                                     className="mt-2"
                                 />
                             </div>
-
 
                             <div className="flex justify-end space-x-4 mt-4">
                                 <Link

@@ -243,7 +243,7 @@ export default function EditNeighborWithUser({
                                 <div>
                                     <InputLabel
                                         htmlFor="neighborhood_association_id"
-                                        value="Asociación Vecinal *"
+                                        value="Junta de Vecinos"
                                     />
                                     {isBoardMemberDeprecated ? (
                                         <div className="mt-1">

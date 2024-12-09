@@ -289,7 +289,7 @@ export default function CreateNeighborWithUser({
                             <div>
                                 <InputLabel
                                     htmlFor="neighborhood_association_id"
-                                    value="Asociación Vecinal *"
+                                    value="Junta de Vecinos"
                                 />
                                 {isBoardMember ? (
                                     <div className="mt-1">

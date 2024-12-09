@@ -46,7 +46,9 @@ export default function ResidentEdit() {
                     <input
                         type="text"
                         value={data.identification_number}
-                        onChange={(e) => setData("identification_number", e.target.value)}
+                        onChange={(e) =>
+                            setData("identification_number", e.target.value)
+                        }
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.identification_number && (
@@ -63,7 +65,9 @@ export default function ResidentEdit() {
                     <input
                         type="date"
                         value={data.registration_date}
-                        onChange={(e) => setData("registration_date", e.target.value)}
+                        onChange={(e) =>
+                            setData("registration_date", e.target.value)
+                        }
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.registration_date && (
@@ -114,7 +118,9 @@ export default function ResidentEdit() {
                     <input
                         type="date"
                         value={data.last_participation_date}
-                        onChange={(e) => setData("last_participation_date", e.target.value)}
+                        onChange={(e) =>
+                            setData("last_participation_date", e.target.value)
+                        }
                         className="border rounded px-2 py-1 w-full"
                     />
                     {errors.last_participation_date && (
@@ -126,11 +132,16 @@ export default function ResidentEdit() {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        Asociación Vecinal
+                        Junta de Vecinos
                     </label>
                     <select
                         value={data.neighborhood_association_id}
-                        onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                        onChange={(e) =>
+                            setData(
+                                "neighborhood_association_id",
+                                e.target.value
+                            )
+                        }
                         className="border rounded px-2 py-1 w-full"
                     >
                         <option value="">Seleccione una asociación</option>

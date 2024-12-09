@@ -41,16 +41,24 @@ export default function CreateResident({ associations }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <form onSubmit={submit} className="space-y-4">
                             <div>
-                                <InputLabel htmlFor="address" value="Dirección" />
+                                <InputLabel
+                                    htmlFor="address"
+                                    value="Dirección"
+                                />
                                 <TextInput
                                     id="address"
                                     type="text"
                                     name="address"
                                     value={data.address}
-                                    onChange={(e) => setData("address", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("address", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.address} className="mt-2" />
+                                <InputError
+                                    message={errors.address}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
@@ -63,7 +71,12 @@ export default function CreateResident({ associations }) {
                                     type="text"
                                     name="identification_number"
                                     value={data.identification_number}
-                                    onChange={(e) => setData("identification_number", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "identification_number",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -82,7 +95,12 @@ export default function CreateResident({ associations }) {
                                     type="date"
                                     name="registration_date"
                                     value={data.registration_date}
-                                    onChange={(e) => setData("registration_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "registration_date",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -101,7 +119,9 @@ export default function CreateResident({ associations }) {
                                     type="date"
                                     name="birth_date"
                                     value={data.birth_date}
-                                    onChange={(e) => setData("birth_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("birth_date", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -117,10 +137,15 @@ export default function CreateResident({ associations }) {
                                     type="text"
                                     name="status"
                                     value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.status} className="mt-2" />
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
@@ -133,7 +158,12 @@ export default function CreateResident({ associations }) {
                                     type="date"
                                     name="last_participation_date"
                                     value={data.last_participation_date}
-                                    onChange={(e) => setData("last_participation_date", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "last_participation_date",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 />
                                 <InputError
@@ -143,35 +173,59 @@ export default function CreateResident({ associations }) {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="neighborhood_association_id" value="Asociación Vecinal" />
+                                <InputLabel
+                                    htmlFor="neighborhood_association_id"
+                                    value="Junta de Vecinos"
+                                />
                                 <select
                                     id="neighborhood_association_id"
                                     name="neighborhood_association_id"
                                     value={data.neighborhood_association_id}
-                                    onChange={(e) => setData("neighborhood_association_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            "neighborhood_association_id",
+                                            e.target.value
+                                        )
+                                    }
                                     className="mt-1 block w-full"
                                 >
-                                    <option value="">Seleccione una Asociación</option>
+                                    <option value="">
+                                        Seleccione una Asociación
+                                    </option>
                                     {associations.map((association) => (
-                                        <option key={association.id} value={association.id}>
+                                        <option
+                                            key={association.id}
+                                            value={association.id}
+                                        >
                                             {association.name}
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.neighborhood_association_id} className="mt-2" />
+                                <InputError
+                                    message={errors.neighborhood_association_id}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="user_id" value="ID de Usuario (Opcional)" />
+                                <InputLabel
+                                    htmlFor="user_id"
+                                    value="ID de Usuario (Opcional)"
+                                />
                                 <TextInput
                                     id="user_id"
                                     type="number"
                                     name="user_id"
                                     value={data.user_id}
-                                    onChange={(e) => setData("user_id", e.target.value)}
+                                    onChange={(e) =>
+                                        setData("user_id", e.target.value)
+                                    }
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.user_id} className="mt-2" />
+                                <InputError
+                                    message={errors.user_id}
+                                    className="mt-2"
+                                />
                             </div>
 
                             <div className="flex justify-end space-x-4 mt-4">
