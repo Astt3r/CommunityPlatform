@@ -7,6 +7,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { parseISO } from "date-fns";
+import esLocale from "@fullcalendar/core/locales/es";
 
 // Mapeo para traducir estados
 const traducirEstado = (estado) => {
@@ -95,7 +96,9 @@ export default function MeetingIndex({ allAssociations, userRole }) {
     };
 
     const handleEventClick = (info) => {
-        const meeting = meetings.data.find((m) => m.id === parseInt(info.event.id));
+        const meeting = meetings.data.find(
+            (m) => m.id === parseInt(info.event.id)
+        );
         if (meeting) {
             setSelectedMeeting(meeting);
             setShowCreateButton(false);
@@ -138,11 +141,17 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         Reuniones
                     </h2>
                     <div className="text-lg font-medium text-gray-600">
-                        Mi Asistencia: <span className="text-blue-600">{userAttendance.percentage}%</span>
+                        Mi Asistencia:{" "}
+                        <span className="text-blue-600">
+                            {userAttendance.percentage}%
+                        </span>
                     </div>
                     {userRole !== "board_member" && userRole !== "resident" && (
                         <div className="flex items-center gap-4">
-                            <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
+                            <label
+                                htmlFor="neighborhood_filter"
+                                className="text-sm font-medium text-gray-700"
+                            >
                                 Filtrar por Junta:
                             </label>
                             <select
@@ -153,7 +162,10 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                             >
                                 <option value="">Todas las Juntas</option>
                                 {allAssociations.map((association) => (
-                                    <option key={association.id} value={association.id}>
+                                    <option
+                                        key={association.id}
+                                        value={association.id}
+                                    >
                                         {association.name}
                                     </option>
                                 ))}
@@ -200,9 +212,11 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     events={events}
-                    dateClick={userRole !== "resident" ? handleDateClick : undefined}
+                    dateClick={
+                        userRole !== "resident" ? handleDateClick : undefined
+                    }
                     eventClick={handleEventClick}
-                    locale="es"
+                    locale={esLocale}
                 />
             </div>
 
@@ -220,7 +234,9 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                     </button>
                     {showCreateButton && userRole !== "resident" ? (
                         <>
-                            <p className="mb-2">Crear reunión para el día seleccionado:</p>
+                            <p className="mb-2">
+                                Crear reunión para el día seleccionado:
+                            </p>
                             <Link
                                 href={route("meetings.create")}
                                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
@@ -230,10 +246,15 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         </>
                     ) : selectedMeeting ? (
                         <>
-                            <p className="font-bold mb-4">{selectedMeeting.main_topic}</p>
+                            <p className="font-bold mb-4">
+                                {selectedMeeting.main_topic}
+                            </p>
                             <div className="space-y-2">
                                 <Link
-                                    href={route("meetings.show", selectedMeeting.id)}
+                                    href={route(
+                                        "meetings.show",
+                                        selectedMeeting.id
+                                    )}
                                     className="block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
                                     Ver
@@ -247,7 +268,9 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                             Editar
                                         </Link>
                                         <button
-                                            onClick={() => handleDelete(selectedMeeting.id)}
+                                            onClick={() =>
+                                                handleDelete(selectedMeeting.id)
+                                            }
                                             className="block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                                         >
                                             Eliminar
@@ -274,11 +297,15 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         {meetings.data.map((meeting) => (
                             <tr key={meeting.id} className="border-t">
                                 <td className="px-4 py-2">
-                                    {new Date(meeting.meeting_date).toLocaleDateString("es-ES", {
+                                    {new Date(
+                                        meeting.meeting_date
+                                    ).toLocaleDateString("es-ES", {
                                         timeZone: "UTC",
                                     })}
                                 </td>
-                                <td className="px-4 py-2">{meeting.main_topic}</td>
+                                <td className="px-4 py-2">
+                                    {meeting.main_topic}
+                                </td>
                                 <td
                                     className={`px-4 py-2 ${
                                         meeting.status === "scheduled"
@@ -292,7 +319,10 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                 </td>
                                 <td className="px-4 py-2 flex flex-col md:flex-row gap-2">
                                     <Link
-                                        href={route("meetings.show", meeting.id)}
+                                        href={route(
+                                            "meetings.show",
+                                            meeting.id
+                                        )}
                                         className="w-full md:w-auto px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 text-center"
                                     >
                                         Ver
@@ -306,7 +336,9 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                                 Editar
                                             </Link>
                                             <button
-                                                onClick={() => handleDelete(meeting.id)}
+                                                onClick={() =>
+                                                    handleDelete(meeting.id)
+                                                }
                                                 className="w-full md:w-auto px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 text-center"
                                             >
                                                 Eliminar
