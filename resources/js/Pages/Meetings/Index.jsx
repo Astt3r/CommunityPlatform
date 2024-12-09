@@ -20,7 +20,7 @@ const traducirEstado = (estado) => {
 };
 
 export default function MeetingIndex({ allAssociations, userRole }) {
-    const { meetings, filters, flash } = usePage().props;
+    const { meetings, filters, flash, userAttendance } = usePage().props;
     const { data, setData, get } = useForm({
         main_topic: filters.main_topic || "",
         status: filters.status || "",
@@ -137,6 +137,9 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Reuniones
                     </h2>
+                    <div className="text-lg font-medium text-gray-600">
+                        Mi Asistencia: <span className="text-blue-600">{userAttendance.percentage}%</span>
+                    </div>
                     {userRole !== "board_member" && userRole !== "resident" && (
                         <div className="flex items-center gap-4">
                             <label htmlFor="neighborhood_filter" className="text-sm font-medium text-gray-700">
