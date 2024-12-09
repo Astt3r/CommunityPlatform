@@ -58,13 +58,12 @@ const MeetingPdfDocument = ({ meeting }) => {
     return null;
   }
 
-  // Asegurarse de que todos los valores estén definidos
   const mainTopic = meeting.main_topic || "No especificado";
   const location = meeting.location || "No especificado";
   const description = meeting.description || "Sin descripción";
   const status = meeting.status || "No especificado";
+  const neighborhoodAssociation = meeting.neighborhood_association || "Reunión General";
 
-  // Formatear la fecha de la reunión en UTC
   const formattedDate = meeting.meeting_date ? (() => {
     const dateObj = new Date(meeting.meeting_date);
     return isValid(dateObj) ? format(dateObj, "dd 'de' MMMM 'de' yyyy") : "No especificado";
@@ -93,10 +92,15 @@ const MeetingPdfDocument = ({ meeting }) => {
           <Text style={styles.sectionTitle}>Estado de la Reunión</Text>
           <Text style={styles.sectionContent}>{status}</Text>
         </View>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Junta Vecinal</Text>
+          <Text style={styles.sectionContent}>{neighborhoodAssociation}</Text>
+        </View>
       </Page>
     </Document>
   );
 };
+
 
 export default function ShowMeeting({ meeting, userRole = "guest" }) {
   // Formatear la fecha de la reunión en UTC
