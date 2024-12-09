@@ -176,12 +176,6 @@ class MeetingController extends Controller
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
 
-
-
-
-
-
-
     /**
      * Display the specified resource.
      */
@@ -203,12 +197,6 @@ class MeetingController extends Controller
             'userRole' => auth()->user()->role, // Pasar directamente el rol del usuario
         ]);
     }
-
-
-
-
-
-
 
 
     /**
@@ -233,9 +221,8 @@ class MeetingController extends Controller
     public function update(Request $request, $id)
     {
         $meeting = Meeting::findOrFail($id);
-
         $user = auth()->user();
-
+    
         // Definir reglas de validación
         $rules = [
             'meeting_date' => 'required|date|after:now',
@@ -246,32 +233,56 @@ class MeetingController extends Controller
             'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
-
+    
         // Si el usuario es un `board_member`, limitar la edición de la asociación
         if ($user->role === 'board_member') {
             $rules['neighborhood_association_id'] .= '|in:' . $meeting->neighborhood_association_id;
         }
-
+    
+        // Mensajes personalizados
+        $messages = [
+            'meeting_date.required' => 'La fecha de la reunión es obligatoria.',
+            'meeting_date.date' => 'La fecha de la reunión debe ser una fecha válida.',
+            'meeting_date.after' => 'La fecha de la reunión debe ser posterior a la fecha actual.',
+            'main_topic.required' => 'El tema principal es obligatorio.',
+            'main_topic.max' => 'El tema principal no debe exceder los 255 caracteres.',
+            'description.max' => 'La descripción no debe exceder los 1000 caracteres.',
+            'location.required' => 'La ubicación es obligatoria.',
+            'location.max' => 'La ubicación no debe exceder los 255 caracteres.',
+            'status.required' => 'El estado es obligatorio.',
+            'status.in' => 'El estado debe ser "scheduled", "completed" o "canceled".',
+            'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
+            'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no existe.',
+            'neighborhood_association_id.in' => 'No tienes permiso para cambiar la asociación vecinal.',
+        ];
+    
         // Validar los datos
-        $validator = Validator::make($request->all(), $rules);
-
+        $validator = Validator::make($request->all(), $rules, $messages);
+    
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->withInput();
+                // ->with('error', value: 'Hubo errores en los datos proporcionados. Por favor, corrígelos e inténtalo nuevamente.');
         }
-
+    
         // Asegurar que solo el `admin` pueda cambiar la asociación
         if ($user->role === 'admin') {
             $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
         }
-
+    
         // Actualizar el resto de los campos
         $meeting->update($request->except('neighborhood_association_id'));
-
+    
         // Guardar los cambios
         $meeting->save();
-
-        return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
+    
+        return redirect()
+            ->route('meetings.index')
+            ->with('success', 'Reunión actualizada exitosamente.');
     }
+    
 
 
 
