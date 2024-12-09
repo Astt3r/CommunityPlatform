@@ -35,7 +35,6 @@ export default function ProjectCreate() {
 
         post(route("projects.store"), {
             data: formData,
-            onFinish: () => reset(),
         });
     };
 
