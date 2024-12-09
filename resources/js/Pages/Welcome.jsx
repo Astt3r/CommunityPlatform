@@ -1,12 +1,11 @@
 import { Head, Link, usePage } from "@inertiajs/react";
 import PrimaryButton from "@/Components/PrimaryButton";
+import ApplicationLogo from "@/Components/ApplicationLogo";
 
 const Header = ({ auth }) => (
     <nav className="bg-white shadow-md w-full py-4 px-8 flex items-center justify-between">
         <div className="flex items-center">
-            <span className="text-lg font-bold text-black hidden md:block">
-                Junta Transparente
-            </span>
+            <ApplicationLogo className="w-16 h-auto" />
         </div>
         <div className="desktop-menu md:flex space-x-4">
             {auth.user ? (
