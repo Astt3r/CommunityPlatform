@@ -40,7 +40,18 @@ export default function ProjectCreate() {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl">Crear Proyecto</h2>}
+            header={
+                <div>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Crear Proyecto
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                        Los campos marcados con{" "}
+                        <span className="text-red-500">*</span> son
+                        obligatorios.
+                    </p>
+                </div>
+            }
         >
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">

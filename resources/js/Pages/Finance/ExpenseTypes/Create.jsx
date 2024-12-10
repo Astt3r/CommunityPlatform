@@ -175,7 +175,7 @@ export default function Create() {
                             <div>
                                 <InputLabel
                                     htmlFor="end_date"
-                                    value="Fecha de Fin (Opcional)"
+                                    value="Fecha de Fin"
                                 />
                                 <TextInput
                                     id="end_date"

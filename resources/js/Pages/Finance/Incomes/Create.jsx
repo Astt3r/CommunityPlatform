@@ -29,7 +29,7 @@ export default function CreateIncome({ incomeTypes }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
+                <div className="mb-4">
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Crear Ingreso
                     </h2>
