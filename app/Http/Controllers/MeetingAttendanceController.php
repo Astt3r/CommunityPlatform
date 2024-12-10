@@ -37,13 +37,18 @@ class MeetingAttendanceController extends Controller
 
     public function storeAttendance(Request $request, $meetingId)
     {
-        Log::info($request->all()); // Registrar los datos recibidos para depuración
+        // Verificar si la reunión está cancelada
+        $meeting = Meeting::findOrFail($meetingId);
+        if ($meeting->status === 'canceled') {
+            return redirect()->back()->with('error', 'No puedes registrar asistencia para una reunión cancelada.');
+        }
 
+        // Validar los datos de asistencia
         $validated = $request->validate([
             'attendance' => 'required|array',
-            'attendance.*' => 'boolean', // Cada valor debe ser booleano
+            'attendance.*' => 'boolean',
             'absenceReasons' => 'required|array',
-            'absenceReasons.*' => 'nullable|string', // Cada motivo de ausencia puede ser nulo o una cadena de texto
+            'absenceReasons.*' => 'nullable|string',
         ]);
 
         // Obtener IDs de vecinos activos
@@ -67,9 +72,18 @@ class MeetingAttendanceController extends Controller
             }
         }
 
-        return redirect()->route('meetings.attendance', $meetingId)
-            ->with('message', 'Asistencias registradas correctamente.');
+        // Marcar la reunión como completada
+        $meeting->update(['status' => 'completed']);
+
+        // Redirigir al show de la reunión con un mensaje de éxito
+        return redirect()->route('meetings.show', $meetingId)
+            ->with('message', 'Asistencias registradas correctamente y reunión marcada como completada.');
     }
+
+
+
+
+
 
     public function showAttendance($meetingId)
     {
@@ -90,8 +104,10 @@ class MeetingAttendanceController extends Controller
             'meetingId' => $meetingId,
             'neighbors' => $neighbors,
             'mainTopic' => $meeting->main_topic,
+            'meetingStatus' => $meeting->status, // Incluir el estado de la reunión
         ]);
     }
+
 
 
 

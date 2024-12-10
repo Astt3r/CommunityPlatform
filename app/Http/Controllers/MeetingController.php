@@ -147,7 +147,6 @@ class MeetingController extends Controller
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
-            'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
 
@@ -169,12 +168,13 @@ class MeetingController extends Controller
         $meeting->description = $request->input('description');
         $meeting->location = $request->input('location');
         $meeting->result = $request->input('result');
-        $meeting->status = $request->input('status');
+        $meeting->status = 'scheduled'; // Establecer estado por defecto
         $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
         $meeting->save();
 
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
+
 
     /**
      * Display the specified resource.
@@ -192,11 +192,13 @@ class MeetingController extends Controller
                 'description' => $meeting->description,
                 'status' => $meeting->status,
                 'result' => $meeting->result,
+                'is_canceled' => $meeting->status === 'canceled', // Validar si está cancelada
                 'neighborhood_association' => $meeting->neighborhoodAssociation ? $meeting->neighborhoodAssociation->name : null,
             ],
             'userRole' => auth()->user()->role, // Pasar directamente el rol del usuario
         ]);
     }
+
 
 
     /**
@@ -222,7 +224,7 @@ class MeetingController extends Controller
     {
         $meeting = Meeting::findOrFail($id);
         $user = auth()->user();
-    
+
         // Definir reglas de validación
         $rules = [
             'meeting_date' => 'required|date|after:now',
@@ -230,15 +232,19 @@ class MeetingController extends Controller
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
             'result' => 'nullable|string|max:1000',
-            'status' => 'required|in:scheduled,completed,canceled',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
-    
+
+        // Validar el campo 'status' solo si la reunión no está completada
+        if ($meeting->status !== 'completed') {
+            $rules['status'] = 'required|in:scheduled,canceled';
+        }
+
         // Si el usuario es un `board_member`, limitar la edición de la asociación
         if ($user->role === 'board_member') {
             $rules['neighborhood_association_id'] .= '|in:' . $meeting->neighborhood_association_id;
         }
-    
+
         // Mensajes personalizados
         $messages = [
             'meeting_date.required' => 'La fecha de la reunión es obligatoria.',
@@ -250,39 +256,53 @@ class MeetingController extends Controller
             'location.required' => 'La ubicación es obligatoria.',
             'location.max' => 'La ubicación no debe exceder los 255 caracteres.',
             'status.required' => 'El estado es obligatorio.',
-            'status.in' => 'El estado debe ser "scheduled", "completed" o "canceled".',
+            'status.in' => 'El estado debe ser "scheduled" o "canceled".',
             'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
             'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no existe.',
             'neighborhood_association_id.in' => 'No tienes permiso para cambiar la asociación vecinal.',
         ];
-    
-        // Validar los datos
-        $validator = Validator::make($request->all(), $rules, $messages);
-    
-        if ($validator->fails()) {
-            return redirect()
-                ->back()
-                ->withErrors($validator)
-                ->withInput();
-                // ->with('error', value: 'Hubo errores en los datos proporcionados. Por favor, corrígelos e inténtalo nuevamente.');
+
+        // Validar la solicitud
+        $validatedData = $request->validate($rules, $messages);
+
+        // Actualizar los datos permitidos
+        $updatableFields = [
+            'description',
+            'location',
+            'result',
+        ];
+
+        // Si la reunión no está completada, permitir actualizar los campos adicionales
+        if ($meeting->status !== 'completed') {
+            $updatableFields = array_merge($updatableFields, [
+                'meeting_date',
+                'main_topic',
+                'status',
+                'neighborhood_association_id',
+            ]);
         }
-    
-        // Asegurar que solo el `admin` pueda cambiar la asociación
-        if ($user->role === 'admin') {
-            $meeting->neighborhood_association_id = $request->input('neighborhood_association_id');
-        }
-    
-        // Actualizar el resto de los campos
-        $meeting->update($request->except('neighborhood_association_id'));
-    
-        // Guardar los cambios
-        $meeting->save();
-    
-        return redirect()
-            ->route('meetings.index')
-            ->with('success', 'Reunión actualizada exitosamente.');
+
+        $meeting->update(array_intersect_key($validatedData, array_flip($updatableFields)));
+
+        return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
-    
+
+
+    public function markAsCompleted($meetingId)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
+
+        // Verificar si la reunión no está cancelada antes de completarla
+        if ($meeting->status === 'canceled') {
+            return response()->json(['error' => 'No puedes completar una reunión cancelada.'], 403);
+        }
+
+        // Marcar la reunión como completada
+        $meeting->status = 'completed';
+        $meeting->save();
+
+        return response()->json(['message' => 'Reunión marcada como completada.'], 200);
+    }
 
 
 

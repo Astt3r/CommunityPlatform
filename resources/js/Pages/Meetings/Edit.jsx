@@ -1,5 +1,6 @@
+import React, { useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, Link } from "@inertiajs/react"; // Importar Link
+import { useForm, Link } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -17,20 +18,12 @@ export default function EditMeeting({ meeting, associations, userRole }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Obtener la fecha actual en formato UTC
-        const currentDate = new Date().toISOString();
-
-        // Validar si la fecha de la reunión es posterior a la actual
-        if (data.meeting_date <= currentDate) {
-            alert("La fecha de la reunión debe ser en el futuro.");
-            return;
-        }
-
         put(route("meetings.update", meeting.id), {
             onSuccess: () => alert("Reunión actualizada exitosamente."),
         });
     };
+
+    const isEditable = meeting.status !== "completed";
 
     return (
         <AuthenticatedLayout
@@ -43,6 +36,11 @@ export default function EditMeeting({ meeting, associations, userRole }) {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        {meeting.status === "completed" && (
+                            <p className="text-yellow-500 mb-4">
+                                Esta reunión está completada. Solo puedes modificar la descripción, el resultado y el lugar.
+                            </p>
+                        )}
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
                                 <InputLabel
@@ -58,8 +56,8 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                         setData("meeting_date", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    disabled={!isEditable}
                                 />
-
                                 <InputError
                                     message={errors.meeting_date}
                                     className="mt-2"
@@ -80,6 +78,7 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                         setData("main_topic", e.target.value)
                                     }
                                     className="mt-1 block w-full"
+                                    disabled={!isEditable}
                                 />
                                 <InputError
                                     message={errors.main_topic}
@@ -153,25 +152,15 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                     id="status"
                                     name="status"
                                     value={data.status}
-                                    onChange={(e) =>
-                                        setData("status", e.target.value)
-                                    }
+                                    onChange={(e) => setData("status", e.target.value)}
                                     className="mt-1 block w-full"
+                                    disabled={!isEditable}
                                 >
-                                    <option value="scheduled">
-                                        Programada
-                                    </option>
-                                    <option value="completed">
-                                        Completada
-                                    </option>
+                                    <option value="scheduled">Programada</option>
                                     <option value="canceled">Cancelada</option>
                                 </select>
-                                <InputError
-                                    message={errors.status}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.status} className="mt-2" />
                             </div>
-
                             <div>
                                 <InputLabel
                                     htmlFor="neighborhood_association_id"
@@ -192,7 +181,7 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                             ? "bg-gray-100 cursor-not-allowed"
                                             : ""
                                     }`}
-                                    disabled={userRole === "board_member"}
+                                    disabled={userRole === "board_member" || !isEditable}
                                 >
                                     {associations.map((association) => (
                                         <option

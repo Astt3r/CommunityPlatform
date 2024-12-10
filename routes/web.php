@@ -103,6 +103,12 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
     Route::resource('meeting-attendances', MeetingAttendanceController::class);
     Route::resource('minutes', MinutesController::class);
+    Route::post('/meetings/{meetingId}/mark-completed', [MeetingController::class, 'markAsCompleted'])
+    ->name('meetings.mark-completed');
+    Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
+    
+
+
 });
 
 
