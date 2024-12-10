@@ -266,11 +266,20 @@ export default function ProjectEdit({
                                                             e.target.checked
                                                         )
                                                     }
-                                                    className="mr-2"
+                                                    disabled={isFinalState} // Bloquear si el proyecto está en un estado final
+                                                    className={`mr-2 ${
+                                                        isFinalState
+                                                            ? "bg-gray-100 cursor-not-allowed"
+                                                            : ""
+                                                    }`} // Estilo visual si está deshabilitado
                                                 />
                                                 <label
                                                     htmlFor={`neighbor_${neighbor.id}`}
-                                                    className="text-gray-800"
+                                                    className={`text-gray-800 ${
+                                                        isFinalState
+                                                            ? "text-gray-500"
+                                                            : ""
+                                                    }`} // Estilo visual para etiqueta deshabilitada
                                                 >
                                                     {neighbor.user.name}
                                                 </label>
