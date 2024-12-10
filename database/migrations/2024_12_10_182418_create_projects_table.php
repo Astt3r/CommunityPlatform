@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->boolean('is_for_all_neighbors')->default(false); // Elimina "after description"
             $table->date('start_date');
             $table->date('end_date')->nullable();
-            $table->enum('status', ['planeado', 'aprovado', 'en_proceso', 'completado', 'cancelado'])->default('planeado');
+            $table->enum('status', ['planeado', 'aprobado', 'en proceso', 'completado', 'cancelado', 'rechazado'])->default('planeado'); // Incluye "rechazado"
             $table->integer('budget');
             $table->longText('changes');
             $table->foreignId('association_id')->constrained('neighborhood_associations')->onDelete('cascade');
@@ -35,7 +35,4 @@ return new class extends Migration {
             $table->dropColumn('is_for_all_neighbors');
         });
     }
-
-
-
 };

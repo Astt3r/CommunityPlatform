@@ -27,6 +27,10 @@ export default function ProjectEdit({
         neighbor_ids: assignedNeighborIds || [], // Usar los IDs asignados proporcionados por el backend
     });
 
+    const isFinalState = ["rechazado", "completado", "cancelado"].includes(
+        project.status
+    );
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -144,7 +148,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("name", e.target.value)
                                     }
-                                    className="mt-1 block w-full"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 />
                                 <InputError
                                     message={errors.name}
@@ -165,7 +174,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("description", e.target.value)
                                     }
-                                    className="mt-1 block w-full"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 />
                                 <InputError
                                     message={errors.description}
@@ -186,7 +200,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("issue", e.target.value)
                                     }
-                                    className="mt-1 block w-full"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 />
                                 <InputError
                                     message={errors.issue}
@@ -207,11 +226,19 @@ export default function ProjectEdit({
                                             e.target.checked
                                         )
                                     }
-                                    className="mr-2"
+                                    disabled={isFinalState} // Bloquear si el proyecto está en un estado final
+                                    className={`mr-2 ${
+                                        isFinalState
+                                            ? "bg-gray-100 cursor-not-allowed"
+                                            : ""
+                                    }`} // Agregar estilos visuales si está deshabilitado
                                 />
                                 <InputLabel
                                     htmlFor="is_for_all_neighbors"
                                     value="¿Proyecto para todos los vecinos?"
+                                    className={
+                                        isFinalState ? "text-gray-500" : ""
+                                    }
                                 />
                             </div>
 
@@ -255,6 +282,7 @@ export default function ProjectEdit({
 
                             {/* Fechas */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {/* Fecha de Inicio */}
                                 <div>
                                     <InputLabel
                                         htmlFor="start_date"
@@ -270,7 +298,12 @@ export default function ProjectEdit({
                                                 e.target.value
                                             )
                                         }
-                                        className="mt-1 block w-full"
+                                        disabled={isFinalState} // Bloquear si está en estado final
+                                        className={`mt-1 block w-full ${
+                                            isFinalState
+                                                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                                : ""
+                                        }`} // Estilo visual si está deshabilitado
                                     />
                                     <InputError
                                         message={errors.start_date}
@@ -278,6 +311,7 @@ export default function ProjectEdit({
                                     />
                                 </div>
 
+                                {/* Fecha de Finalización */}
                                 <div>
                                     <InputLabel
                                         htmlFor="end_date"
@@ -290,7 +324,12 @@ export default function ProjectEdit({
                                         onChange={(e) =>
                                             setData("end_date", e.target.value)
                                         }
-                                        className="mt-1 block w-full"
+                                        disabled={isFinalState} // Bloquear si está en estado final
+                                        className={`mt-1 block w-full ${
+                                            isFinalState
+                                                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                                : ""
+                                        }`} // Estilo visual si está deshabilitado
                                     />
                                     <InputError
                                         message={errors.end_date}
@@ -311,22 +350,60 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("status", e.target.value)
                                     }
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full border-gray-300 rounded-md ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 >
-                                    <option value="planeado">Planeado</option>
-                                    <option value="aprovado">Aprobado</option>
-                                    <option value="en_proceso">
-                                        En Proceso
-                                    </option>
-                                    <option value="completado">
-                                        Completado
-                                    </option>
-                                    <option value="cancelado">Cancelado</option>
+                                    {project.status === "planeado" && (
+                                        <>
+                                            <option value="planeado">
+                                                Planeado
+                                            </option>
+                                            <option value="aprobado">
+                                                Aprobado
+                                            </option>
+                                            <option value="rechazado">
+                                                Rechazado
+                                            </option>
+                                        </>
+                                    )}
+                                    {project.status === "aprobado" && (
+                                        <>
+                                            <option value="aprobado">
+                                                Aprobado
+                                            </option>
+                                            <option value="en proceso">
+                                                En Proceso
+                                            </option>
+                                        </>
+                                    )}
+                                    {project.status === "en proceso" && (
+                                        <>
+                                            <option value="en proceso">
+                                                En Proceso
+                                            </option>
+                                            <option value="completado">
+                                                Completado
+                                            </option>
+                                            <option value="cancelado">
+                                                Cancelado
+                                            </option>
+                                        </>
+                                    )}
+                                    {isFinalState && (
+                                        <option value={project.status}>
+                                            {project.status
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                project.status.slice(1)}
+                                        </option>
+                                    )}
                                 </select>
-                                <InputError
-                                    message={errors.status}
-                                    className="mt-2"
-                                />
+
+                                <InputError message={errors.status} />
                             </div>
 
                             {/* Presupuesto */}
@@ -342,7 +419,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("budget", e.target.value)
                                     }
-                                    className="mt-1 block w-full"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 />
                                 <InputError
                                     message={errors.budget}
@@ -374,7 +456,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("file", e.target.files[0])
                                     }
-                                    className="mt-1 block w-full"
+                                    disabled={isFinalState}
+                                    className={`mt-1 block w-full ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500"
+                                            : ""
+                                    }`}
                                 />
                                 <InputError
                                     message={errors.file}

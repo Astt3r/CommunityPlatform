@@ -35,9 +35,12 @@ class ProjectController extends Controller
 
         $query = Project::with('files');
 
+
+
         if (!$isAdmin) {
             $query->where('association_id', $associationId); // Usar la columna correcta
         }
+
 
         $projects = $query->latest()->paginate(10);
 
@@ -107,13 +110,14 @@ class ProjectController extends Controller
     {
         $user = $request->user();
 
+
+        // Reglas de validación
         $rules = [
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:500',
             'issue' => 'required|string|max:1000',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'required|string|in:planeado,aprovado,en_proceso,completado,cancelado',
             'budget' => 'required|numeric|min:0',
             'is_for_all_neighbors' => 'required|boolean',
             'neighbor_ids' => 'nullable|array',
@@ -127,6 +131,9 @@ class ProjectController extends Controller
 
         $validated = $request->validate($rules);
 
+        $validated['status'] = 'planeado';
+
+
         // Asignar automáticamente la junta vecinal
         if ($user->role === 'board_member') {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
@@ -138,6 +145,7 @@ class ProjectController extends Controller
 
         // Crear el proyecto
         $project = Project::create($validated);
+
 
         // Manejar relaciones con la tabla intermedia
         if (!$validated['is_for_all_neighbors'] && isset($validated['neighbor_ids'])) {
@@ -212,11 +220,11 @@ class ProjectController extends Controller
                 'issue' => 'required|string|max:1000',
                 'start_date' => 'required|date',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
-                'status' => 'required|string|in:planeado,aprovado,en_proceso,completado,cancelado',
                 'budget' => 'required|numeric|min:0',
                 'is_for_all_neighbors' => 'required|boolean',
                 'neighbor_ids' => 'nullable|array',
                 'neighbor_ids.*' => 'exists:neighbors,id',
+                'status' => 'required|string|in:planeado,aprobado,en proceso,completado,cancelado,rechazado',
             ],
             [
                 'name.required' => 'El nombre del proyecto es obligatorio.',
@@ -226,34 +234,70 @@ class ProjectController extends Controller
                 'start_date.date' => 'La fecha de inicio debe ser una fecha válida.',
                 'end_date.date' => 'La fecha de fin debe ser una fecha válida.',
                 'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-                'status.required' => 'El estado del proyecto es obligatorio.',
                 'budget.required' => 'El presupuesto es obligatorio.',
                 'budget.numeric' => 'El presupuesto debe ser un número.',
                 'is_for_all_neighbors.required' => 'Debe especificar si el proyecto es para todos los vecinos.',
                 'neighbor_ids.*.exists' => 'Algunos vecinos seleccionados no son válidos.',
+                'status.required' => 'El estado del proyecto es obligatorio.',
+                'status.in' => 'El estado seleccionado no es válido.',
             ]
         );
 
-        // Verifica si el estado ha cambiado
-        if (isset($validated['status']) && $validated['status'] !== $project->status) {
+        // Verificar restricciones según el estado actual del proyecto
+        switch ($project->status) {
+            case 'planeado':
+                if (!in_array($validated['status'], ['aprobado', 'rechazado'])) {
+                    return response()->json([
+                        'message' => 'Solo puedes cambiar el estado de "Planeado" a "Aprobado" o "Rechazado".'
+                    ], 403);
+                }
+                break;
+
+            case 'aprobado':
+                if ($validated['status'] !== 'en proceso') {
+                    return response()->json([
+                        'message' => 'Solo puedes cambiar el estado de "Aprobado" a "En Proceso".'
+                    ], 403);
+                }
+                break;
+
+            case 'en proceso':
+                if (!in_array($validated['status'], ['completado', 'cancelado'])) {
+                    return response()->json([
+                        'message' => 'Solo puedes cambiar el estado de "En Proceso" a "Completado" o "Cancelado".'
+                    ], 403);
+                }
+                break;
+
+            case 'completado':
+            case 'cancelado':
+            case 'rechazado':
+                return response()->json([
+                    'message' => 'No puedes editar un proyecto en estado "Completado", "Cancelado" o "Rechazado".'
+                ], 403);
+        }
+
+        // Verificar si el estado ha cambiado y registrar el cambio
+        if ($validated['status'] !== $project->status) {
             $currentDateTime = now()->format('Y-m-d H:i:s');
             $newChange = "Estado cambiado de '{$project->status}' a '{$validated['status']}' el {$currentDateTime}";
             $project->changes .= ($project->changes ? "\n" : "") . $newChange;
         }
 
-        // Actualiza los campos del proyecto
+        // Actualizar los campos del proyecto
         $project->update($validated);
 
-        // Sincroniza los IDs de vecinos
+        // Sincronizar vecinos si se incluye `neighbor_ids`
         if (isset($validated['neighbor_ids'])) {
             $project->neighbors()->sync($validated['neighbor_ids']);
         } else {
             $project->neighbors()->detach();
         }
 
-        // Retornar respuesta exitosa
         return response()->json(['message' => 'Proyecto actualizado correctamente.'], 200);
     }
+
+
 
 
 
@@ -309,36 +353,6 @@ class ProjectController extends Controller
             ], 500);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Remove the specified resource from storage.

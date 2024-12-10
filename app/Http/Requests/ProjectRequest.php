@@ -27,7 +27,7 @@ class ProjectRequest extends FormRequest
             'issue' => 'required|string|max:1000',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'required|string|in:planeado,aprovado,en_proceso,completado,cancelado',
+            'status' => 'required|string|in:planeado,aprobado,en proceso,completado,cancelado',
             'budget' => 'required|numeric|min:0',
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,png|max:20480',
             'is_for_all_neighbors' => 'required|boolean',

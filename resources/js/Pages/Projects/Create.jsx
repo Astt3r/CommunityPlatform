@@ -145,6 +145,7 @@ export default function ProjectCreate() {
                             </div>
 
                             {/* Estado */}
+                            {/* Estado (visible pero deshabilitado) */}
                             <div>
                                 <InputLabel
                                     htmlFor="status"
@@ -153,20 +154,10 @@ export default function ProjectCreate() {
                                 <select
                                     id="status"
                                     value={data.status}
-                                    onChange={(e) =>
-                                        setData("status", e.target.value)
-                                    }
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300"
+                                    disabled
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:border-blue-300 bg-gray-100 text-gray-500"
                                 >
                                     <option value="planeado">Planeado</option>
-                                    <option value="aprovado">Aprobado</option>
-                                    <option value="en_proceso">
-                                        En Proceso
-                                    </option>
-                                    <option value="completado">
-                                        Completado
-                                    </option>
-                                    <option value="cancelado">Cancelado</option>
                                 </select>
                                 <InputError message={errors.status} />
                             </div>
