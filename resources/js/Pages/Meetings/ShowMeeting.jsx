@@ -171,26 +171,36 @@ export default function ShowMeeting({ meeting, userRole = "guest" }) {
 
             {!isResident && (
               <div className="mt-4">
+              {meeting.status !== "canceled" && !isResident && (
+                <>
                   <a
-                      href={`/meetings/${meeting.id}/attendance`}
-                      className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    href={`/meetings/${meeting.id}/attendance`}
+                    className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   >
-                      Registrar Asistencias
+                    Registrar Asistencias
                   </a>
-              </div>
-            )}
-
-            {!isResident && (
-              <div className="mt-4">
-                <PDFDownloadLink
-                  document={<MeetingPdfDocument meeting={meeting} />}
-                  fileName={`Acta_Reunion_${meeting.main_topic}.pdf`}
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  {({ loading }) => loading ? 'Generando PDF...' : 'Generar Acta de Reunión en PDF'}
-                </PDFDownloadLink>
-              </div>
-            )}
+            
+                  <div className="mt-4">
+                    <PDFDownloadLink
+                      document={<MeetingPdfDocument meeting={meeting} />}
+                      fileName={`Acta_Reunion_${meeting.main_topic}.pdf`}
+                      className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      {({ loading }) =>
+                        loading ? "Generando PDF..." : "Generar Acta de Reunión en PDF"
+                      }
+                    </PDFDownloadLink>
+                  </div>
+                </>
+              )}
+            
+              {meeting.status === "canceled" && (
+                <div className="mt-4 text-red-500">
+                  Esta reunión ha sido cancelada. No es posible registrar asistencia ni generar un acta.
+                </div>
+              )}
+            </div>
+            )}            
 
             {isResident && (
               <div className="mt-4">

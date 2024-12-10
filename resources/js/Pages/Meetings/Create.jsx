@@ -173,29 +173,16 @@ export default function CreateMeeting({ userRole, associations }) {
 
                             <div>
                                 <InputLabel htmlFor="status" value="Estado *" />
-                                <select
+                                <TextInput
                                     id="status"
                                     name="status"
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        handleChange("status", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                    required
-                                >
-                                    <option value="scheduled">
-                                        Programada
-                                    </option>
-                                    <option value="completed">
-                                        Completada
-                                    </option>
-                                    <option value="canceled">Cancelada</option>
-                                </select>
-                                <InputError
-                                    message={errors.status}
-                                    className="mt-2"
+                                    value="Programada"
+                                    className="mt-1 block w-full bg-gray-100 cursor-not-allowed"
+                                    readOnly
                                 />
+                                <input type="hidden" name="status" value="scheduled" />
                             </div>
+
 
                             <div>
                                 <InputLabel
