@@ -87,17 +87,27 @@ export default function ProjectsIndex() {
         }
 
         try {
-            const response = await axios.post("/contributions", {
+            await axios.post("/contributions", {
                 project_id: projectId,
                 neighbor_id: selectedNeighbor,
                 amount: individualContribution,
             });
 
             alert("Contribución registrada con éxito.");
-            setContributions([...contributions, response.data.contribution]);
             setSelectedNeighbor("");
 
+            // Solicita la lista actualizada de contribuciones
+            const contributionsRes = await axios.get(
+                `/projects/${projectId}/contributions`
+            );
+            setContributions(contributionsRes.data);
+
             // Recalcular el monto restante
+            const totalContributed = contributionsRes.data.reduce(
+                (total, contribution) =>
+                    total + parseInt(contribution.amount, 10),
+                0
+            );
             const newRemaining = Math.max(
                 0,
                 remainingAmount - individualContribution
