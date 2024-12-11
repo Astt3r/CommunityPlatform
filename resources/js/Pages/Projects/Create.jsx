@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage, router } from "@inertiajs/react";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
@@ -20,6 +20,11 @@ export default function ProjectCreate() {
         neighbor_ids: [], // IDs de los vecinos seleccionados
         file: null, // Archivo opcional
     });
+
+    const handleCancel = () => {
+        reset();
+        router.visit(route("projects.index"));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -299,7 +304,7 @@ export default function ProjectCreate() {
                                 <button
                                     type="button"
                                     className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                                    onClick={() => reset()}
+                                    onClick={handleCancel}
                                 >
                                     Cancelar
                                 </button>

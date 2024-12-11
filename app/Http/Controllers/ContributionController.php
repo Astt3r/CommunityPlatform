@@ -92,7 +92,10 @@ class ContributionController extends Controller
                 : $project->neighbors()->count();
 
             if ($totalNeighbors === 0) {
-                throw new \Exception('No hay vecinos asociados al proyecto.');
+                return response()->json([
+                    'message' => 'No hay vecinos asociados al proyecto.',
+                    'individual_contribution' => 0,
+                ], 200); // Retornar respuesta manejable en lugar de lanzar excepción
             }
 
             $individualContribution = (int) ceil($totalBudget / $totalNeighbors);
@@ -105,6 +108,7 @@ class ContributionController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Get neighbors associated with a project.

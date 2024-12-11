@@ -108,11 +108,23 @@ export default function ProjectShow() {
                         <ul className="list-disc list-inside">
                             {project.changes
                                 .split("\n")
-                                .map((change, index) => (
-                                    <li key={index} className="mb-2">
-                                        {change}
-                                    </li>
-                                ))}
+                                .map((change, index) => {
+                                    // Si la línea comienza con espacios, es una observación (subcomentario)
+                                    const isObservation =
+                                        change.startsWith("    ");
+                                    return (
+                                        <li
+                                            key={index}
+                                            className={`mb-2 ${
+                                                isObservation
+                                                    ? "ml-6 list-none text-gray-600"
+                                                    : ""
+                                            }`}
+                                        >
+                                            {change}
+                                        </li>
+                                    );
+                                })}
                         </ul>
                     ) : (
                         <p>No hay cambios registrados.</p>

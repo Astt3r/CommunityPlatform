@@ -104,9 +104,9 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
     Route::resource('meeting-attendances', MeetingAttendanceController::class);
     Route::resource('minutes', MinutesController::class);
     Route::post('/meetings/{meetingId}/mark-completed', [MeetingController::class, 'markAsCompleted'])
-    ->name('meetings.mark-completed');
+        ->name('meetings.mark-completed');
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
-    
+
 
 
 });
@@ -122,6 +122,7 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
     Route::resource('expense-types', ExpenseTypeController::class);
     Route::resource('incomes', IncomeController::class);
     Route::resource('income-types', IncomeTypeController::class);
+    Route::resource('fees', FeeController::class);
 });
 
 // Export functions
