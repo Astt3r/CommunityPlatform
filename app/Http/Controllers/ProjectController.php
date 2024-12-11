@@ -244,9 +244,8 @@ class ProjectController extends Controller
                 'is_for_all_neighbors' => 'required|boolean',
                 'neighbor_ids' => 'nullable|array',
                 'neighbor_ids.*' => 'exists:neighbors,id',
-                'status' => 'required|string|in:planeado,aprobado,en proceso,completado,cancelado,rechazado',
+                'status' => 'nullable|string|in:planeado,aprobado,en proceso,completado,cancelado,rechazado', // Ahora es nullable
                 'observation' => 'nullable|string|max:255',
-
             ],
             [
                 'name.required' => 'El nombre del proyecto es obligatorio.',
@@ -260,46 +259,46 @@ class ProjectController extends Controller
                 'budget.numeric' => 'El presupuesto debe ser un número.',
                 'is_for_all_neighbors.required' => 'Debe especificar si el proyecto es para todos los vecinos.',
                 'neighbor_ids.*.exists' => 'Algunos vecinos seleccionados no son válidos.',
-                'status.required' => 'El estado del proyecto es obligatorio.',
                 'status.in' => 'El estado seleccionado no es válido.',
             ]
         );
 
+
         // Verificar restricciones según el estado actual del proyecto
-        switch ($project->status) {
-            case 'planeado':
-                if (!in_array($validated['status'], ['aprobado', 'rechazado'])) {
+        if (isset($validated['status']) && $validated['status'] !== $project->status) {
+            switch ($project->status) {
+                case 'planeado':
+                    if (!in_array($validated['status'], ['aprobado', 'rechazado'])) {
+                        return response()->json([
+                            'message' => 'Solo puedes cambiar el estado de "Planeado" a "Aprobado" o "Rechazado".'
+                        ], 403);
+                    }
+                    break;
+
+                case 'aprobado':
+                    if ($validated['status'] !== 'en proceso') {
+                        return response()->json([
+                            'message' => 'Solo puedes cambiar el estado de "Aprobado" a "En Proceso".'
+                        ], 403);
+                    }
+                    break;
+
+                case 'en proceso':
+                    if (!in_array($validated['status'], ['completado', 'cancelado'])) {
+                        return response()->json([
+                            'message' => 'Solo puedes cambiar el estado de "En Proceso" a "Completado" o "Cancelado".'
+                        ], 403);
+                    }
+                    break;
+
+                case 'completado':
+                case 'cancelado':
+                case 'rechazado':
                     return response()->json([
-                        'message' => 'Solo puedes cambiar el estado de "Planeado" a "Aprobado" o "Rechazado".'
+                        'message' => 'No puedes editar un proyecto en estado "Completado", "Cancelado" o "Rechazado".'
                     ], 403);
-                }
-                break;
+            }
 
-            case 'aprobado':
-                if ($validated['status'] !== 'en proceso') {
-                    return response()->json([
-                        'message' => 'Solo puedes cambiar el estado de "Aprobado" a "En Proceso".'
-                    ], 403);
-                }
-                break;
-
-            case 'en proceso':
-                if (!in_array($validated['status'], ['completado', 'cancelado'])) {
-                    return response()->json([
-                        'message' => 'Solo puedes cambiar el estado de "En Proceso" a "Completado" o "Cancelado".'
-                    ], 403);
-                }
-                break;
-
-            case 'completado':
-            case 'cancelado':
-            case 'rechazado':
-                return response()->json([
-                    'message' => 'No puedes editar un proyecto en estado "Completado", "Cancelado" o "Rechazado".'
-                ], 403);
-        }
-
-        if ($validated['status'] !== $project->status) {
             $currentDateTime = now()->format('Y-m-d H:i:s');
 
             // Construir el mensaje del cambio de estado
@@ -313,11 +312,6 @@ class ProjectController extends Controller
             // Concatenar el nuevo cambio al historial existente
             $project->changes .= ($project->changes ? "\n" : "") . $newChange;
         }
-
-
-
-
-
 
 
         // Actualizar los campos del proyecto

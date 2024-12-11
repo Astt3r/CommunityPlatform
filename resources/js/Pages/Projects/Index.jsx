@@ -21,6 +21,12 @@ export default function ProjectsIndex() {
     const isBoardMember = auth.user.role === "board_member";
 
     const openModal = async (project) => {
+        if (["completado", "rechazado", "cancelado"].includes(project.status)) {
+            alert(
+                "No puedes gestionar contribuciones para un proyecto en estado final."
+            );
+            return;
+        }
         setModalOpen(true);
         setSelectedProject(project);
 
