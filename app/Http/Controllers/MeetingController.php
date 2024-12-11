@@ -142,7 +142,7 @@ class MeetingController extends Controller
         }
 
         $rules = [
-            'meeting_date' => 'required|date|after:now',
+            'meeting_date' => 'required|date|after_or_equal:' . now()->subWeek()->toDateString(),
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
@@ -227,7 +227,7 @@ class MeetingController extends Controller
 
         // Definir reglas de validación
         $rules = [
-            'meeting_date' => 'required|date|after:now',
+            'meeting_date' => 'required|date|after_or_equal:' . now()->subWeek()->toDateString(),
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
@@ -249,7 +249,7 @@ class MeetingController extends Controller
         $messages = [
             'meeting_date.required' => 'La fecha de la reunión es obligatoria.',
             'meeting_date.date' => 'La fecha de la reunión debe ser una fecha válida.',
-            'meeting_date.after' => 'La fecha de la reunión debe ser posterior a la fecha actual.',
+            'meeting_date.after_or_equal' => 'La fecha de la reunión no puede ser anterior a :date.',
             'main_topic.required' => 'El tema principal es obligatorio.',
             'main_topic.max' => 'El tema principal no debe exceder los 255 caracteres.',
             'description.max' => 'La descripción no debe exceder los 1000 caracteres.',
@@ -260,7 +260,7 @@ class MeetingController extends Controller
             'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
             'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no existe.',
             'neighborhood_association_id.in' => 'No tienes permiso para cambiar la asociación vecinal.',
-        ];
+        ];        
 
         // Validar la solicitud
         $validatedData = $request->validate($rules, $messages);
