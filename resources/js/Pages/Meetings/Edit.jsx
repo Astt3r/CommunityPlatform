@@ -12,7 +12,7 @@ export default function EditMeeting({ meeting, associations, userRole }) {
         description: meeting.description || "",
         location: meeting.location || "",
         result: meeting.result || "",
-        status: meeting.status || "scheduled",
+        status: meeting.status || "scheduled", // Aquí se inicializa correctamente
         neighborhood_association_id: meeting.neighborhood_association_id || "",
     });
 
@@ -146,21 +146,25 @@ export default function EditMeeting({ meeting, associations, userRole }) {
                                 />
                             </div>
 
-                            <div>
-                                <InputLabel htmlFor="status" value="Estado" />
-                                <select
-                                    id="status"
-                                    name="status"
-                                    value={data.status}
-                                    onChange={(e) => setData("status", e.target.value)}
-                                    className="mt-1 block w-full"
-                                    disabled={!isEditable}
-                                >
-                                    <option value="scheduled">Programada</option>
-                                    <option value="canceled">Cancelada</option>
-                                </select>
-                                <InputError message={errors.status} className="mt-2" />
-                            </div>
+                            {meeting.status !== "completed" && (
+                                <div>
+                                    <InputLabel htmlFor="status" value="Estado" />
+                                    <select
+                                        id="status"
+                                        name="status"
+                                        value={data.status} // Esto vincula el valor inicial enviado desde el backend
+                                        onChange={(e) => setData("status", e.target.value)}
+                                        className="mt-1 block w-full"
+                                        disabled={!isEditable}
+                                    >
+                                        <option value="scheduled">Programada</option>
+                                        <option value="canceled">Cancelada</option>
+                                    </select>
+
+                                    <InputError message={errors.status} className="mt-2" />
+                                </div>
+                            )}
+
                             <div>
                                 <InputLabel
                                     htmlFor="neighborhood_association_id"

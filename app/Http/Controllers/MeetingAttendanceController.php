@@ -42,7 +42,7 @@ class MeetingAttendanceController extends Controller
         if ($meeting->status === 'canceled') {
             return redirect()->back()->with('error', 'No puedes registrar asistencia para una reunión cancelada.');
         }
-
+    
         // Validar los datos de asistencia
         $validated = $request->validate([
             'attendance' => 'required|array',
@@ -50,18 +50,24 @@ class MeetingAttendanceController extends Controller
             'absenceReasons' => 'required|array',
             'absenceReasons.*' => 'nullable|string',
         ]);
-
+    
         // Obtener IDs de vecinos activos
         $activeNeighborIds = Neighbor::where('status', 'active')->pluck('id')->toArray();
-
-        // Limpiar registros existentes para vecinos inactivos
-        MeetingAttendance::where('meeting_id', $meetingId)
-            ->whereNotIn('neighbor_id', $activeNeighborIds)
-            ->delete();
-
-        // Guardar los nuevos registros de asistencia
+    
+        // Obtener vecinos ya marcados como presentes
+        $alreadyPresent = MeetingAttendance::where('meeting_id', $meetingId)
+            ->where('attended', true)
+            ->pluck('neighbor_id')
+            ->toArray();
+    
+        // Guardar nuevos registros de asistencia, evitando modificaciones en vecinos ya presentes
         foreach ($validated['attendance'] as $neighborId => $attended) {
             if (in_array($neighborId, $activeNeighborIds)) {
+                // Bloquear modificaciones si ya están marcados como presentes
+                if (in_array($neighborId, $alreadyPresent)) {
+                    continue;
+                }
+    
                 MeetingAttendance::updateOrCreate(
                     ['meeting_id' => $meetingId, 'neighbor_id' => $neighborId],
                     [
@@ -71,15 +77,15 @@ class MeetingAttendanceController extends Controller
                 );
             }
         }
-
+    
         // Marcar la reunión como completada
         $meeting->update(['status' => 'completed']);
-
+    
         // Redirigir al show de la reunión con un mensaje de éxito
         return redirect()->route('meetings.show', $meetingId)
             ->with('message', 'Asistencias registradas correctamente y reunión marcada como completada.');
     }
-
+    
 
 
 
@@ -100,11 +106,15 @@ class MeetingAttendanceController extends Controller
             ->with('user:id,name') // Cargar usuario relacionado
             ->get();
 
+        // Obtener registros de asistencia de la reunión
+        $attendanceRecords = MeetingAttendance::where('meeting_id', $meetingId)->get(['neighbor_id', 'attended', 'absence_reason']);
+
         return inertia('MeetingAttendance/ShowAttendance', [
             'meetingId' => $meetingId,
             'neighbors' => $neighbors,
             'mainTopic' => $meeting->main_topic,
             'meetingStatus' => $meeting->status, // Incluir el estado de la reunión
+            'attendanceRecords' => $attendanceRecords, // Incluir registros de asistencia
         ]);
     }
 

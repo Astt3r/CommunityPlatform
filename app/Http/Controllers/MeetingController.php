@@ -211,11 +211,12 @@ class MeetingController extends Controller
         $userRole = auth()->user()->role;
 
         return Inertia::render('Meetings/Edit', [
-            'meeting' => $meeting,
+            'meeting' => $meeting, // Esto contiene el estado actual desde la BD
             'associations' => $associations,
-            'userRole' => $userRole, // Enviar el rol del usuario
+            'userRole' => $userRole,
         ]);
     }
+
 
     /**
      * Update the specified resource in storage.
