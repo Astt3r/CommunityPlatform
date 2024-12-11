@@ -45,7 +45,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 backgroundColor:
                     meeting.status === "completed"
                         ? "green"
-                        : meeting.status === "cancelled"
+                        : meeting.status === "canceled"
                         ? "red"
                         : "blue",
             }))
@@ -76,7 +76,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         backgroundColor:
                             meeting.status === "completed"
                                 ? "green"
-                                : meeting.status === "cancelled"
+                                : meeting.status === "canceled"
                                 ? "red"
                                 : "blue",
                     }))
