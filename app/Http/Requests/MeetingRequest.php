@@ -21,7 +21,7 @@ class MeetingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'meeting_date' => 'required|date|after_or_equal:today',
+            'meeting_date' => 'required|date|after_or_equal:' . now()->subWeek()->toDateString(),
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
@@ -29,6 +29,7 @@ class MeetingRequest extends FormRequest
             'status' => 'required|in:scheduled,completed,canceled',
         ];
     }
+
 
     /**
      * Mensajes personalizados para las reglas de validación.
@@ -38,7 +39,7 @@ class MeetingRequest extends FormRequest
         return [
             'meeting_date.required' => 'La fecha de la reunión es obligatoria.',
             'meeting_date.date' => 'La fecha de la reunión debe ser válida.',
-            'meeting_date.after_or_equal' => 'La fecha de la reunión no puede ser anterior al día de hoy.',
+            'meeting_date.after_or_equal' => 'La fecha de la reunión no puede ser anterior a hace una semana.',
             'main_topic.required' => 'El tema principal de la reunión es obligatorio.',
             'main_topic.string' => 'El tema principal debe ser un texto válido.',
             'main_topic.max' => 'El tema principal no puede exceder los 255 caracteres.',
@@ -53,4 +54,5 @@ class MeetingRequest extends FormRequest
             'status.in' => 'El estado debe ser uno de los siguientes: programada, completada o cancelada.',
         ];
     }
+
 }
