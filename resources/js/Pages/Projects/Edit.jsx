@@ -40,7 +40,7 @@ export default function ProjectEdit({
             // Actualizar datos del proyecto
             const response = await axios.put(
                 route("projects.update", project.id),
-                data 
+                data
             );
 
             if (response.status === 200) {
@@ -420,7 +420,12 @@ export default function ProjectEdit({
                                     onChange={(e) =>
                                         setData("observation", e.target.value)
                                     }
-                                    className="mt-1 block w-full border-gray-300 rounded-md"
+                                    disabled={isFinalState} // Deshabilitar si es un estado final
+                                    className={`mt-1 block w-full border-gray-300 rounded-md ${
+                                        isFinalState
+                                            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                            : ""
+                                    }`}
                                     placeholder="Agregue una observación al cambiar el estado"
                                 />
                                 <InputError

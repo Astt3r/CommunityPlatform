@@ -48,9 +48,14 @@ export default function ProjectsIndex() {
             const remaining = Math.max(0, project.budget - totalContributed);
             setRemainingAmount(remaining);
 
-            setIndividualContribution(
-                Math.ceil(contributionRes.data.individual_contribution)
-            );
+            if (contributionRes.data.individual_contribution === 0) {
+                alert("Este proyecto no tiene vecinos asociados.");
+                setModalOpen(false); // Cierra el modal automáticamente
+            } else {
+                setIndividualContribution(
+                    Math.ceil(contributionRes.data.individual_contribution)
+                );
+            }
         } catch (error) {
             console.error("Error al cargar datos del modal:", error);
             alert("Error al cargar los datos del proyecto.");
