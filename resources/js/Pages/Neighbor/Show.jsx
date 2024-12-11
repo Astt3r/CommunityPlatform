@@ -34,7 +34,7 @@ export default function NeighborShow() {
                         Detalles del Vecino
                     </h2>
                     <h2 className="mb-2">
-                        <strong>Nombre:</strong>
+                        <strong>Nombre:</strong>{" "}
                         {neighbor.user_name || "N/A"}
                     </h2>
                     <p className="mb-2">
