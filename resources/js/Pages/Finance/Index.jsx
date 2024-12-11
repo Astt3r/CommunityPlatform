@@ -1,7 +1,10 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Link } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 export default function FinanceIndex() {
+    const userRole = usePage().props.auth.user.role;
+
     return (
         <AuthenticatedLayout
             header={
@@ -23,9 +26,17 @@ export default function FinanceIndex() {
                                     Gastos
                                 </h3>
                             </div>
-                            <p className="mt-2 text-gray-600">
-                                Administra y registra los gastos.
-                            </p>
+                            {/* 2 mensajes segun si es residente o no */}
+                            {userRole.includes("resident") ? (
+                                <p className="mt-2 text-gray-600">
+                                    Vista de los gastos de la Junta de Vecinos.
+                                </p>
+                            ) : (
+                                <p className="mt-2 text-gray-600">
+                                    Administra y registra los gastos de la Junta
+                                    de Vecinos.
+                                </p>
+                            )}
                             <Link
                                 href={route("expenses.index")}
                                 className="text-blue-500 hover:underline mt-2 block"
@@ -35,25 +46,28 @@ export default function FinanceIndex() {
                         </div>
 
                         {/* Tipos de Gastos */}
-                        <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
-                            <div className="flex items-center mb-4">
-                                <div className="text-green-500 text-3xl mr-4">
-                                    📊
+
+                        {!userRole.includes("resident") && (
+                            <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
+                                <div className="flex items-center mb-4">
+                                    <div className="text-green-500 text-3xl mr-4">
+                                        📊
+                                    </div>
+                                    <h3 className="text-lg font-semibold">
+                                        Tipos de Gastos
+                                    </h3>
                                 </div>
-                                <h3 className="text-lg font-semibold">
-                                    Tipos de Gastos
-                                </h3>
+                                <p className="mt-2 text-gray-600">
+                                    Define y organiza las categorías de gastos.
+                                </p>
+                                <Link
+                                    href={route("expense-types.index")}
+                                    className="text-green-500 hover:underline mt-2 block"
+                                >
+                                    Ver Tipos de Gastos
+                                </Link>
                             </div>
-                            <p className="mt-2 text-gray-600">
-                                Define y organiza las categorías de gastos.
-                            </p>
-                            <Link
-                                href={route("expense-types.index")}
-                                className="text-green-500 hover:underline mt-2 block"
-                            >
-                                Ver Tipos de Gastos
-                            </Link>
-                        </div>
+                        )}
 
                         {/* Ingresos */}
                         <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
@@ -65,9 +79,18 @@ export default function FinanceIndex() {
                                     Ingresos
                                 </h3>
                             </div>
-                            <p className="mt-2 text-gray-600">
-                                Registra y administra los ingresos.
-                            </p>
+                            {/* 2 mensajes segun si es residente o no */}
+                            {userRole.includes("resident") ? (
+                                <p className="mt-2 text-gray-600">
+                                    Vista de los ingresos de la Junta de
+                                    Vecinos.
+                                </p>
+                            ) : (
+                                <p className="mt-2 text-gray-600">
+                                    Registra y administra los ingresos de la
+                                    Junta de Vecinos.
+                                </p>
+                            )}
                             <Link
                                 href={route("incomes.index")}
                                 className="text-purple-500 hover:underline mt-2 block"
@@ -77,23 +100,55 @@ export default function FinanceIndex() {
                         </div>
 
                         {/* Tipos de Ingresos */}
+                        {!userRole.includes("resident") && (
+                            <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
+                                <div className="flex items-center mb-4">
+                                    <div className="text-yellow-500 text-3xl mr-4">
+                                        🔧
+                                    </div>
+                                    <h3 className="text-lg font-semibold">
+                                        Tipos de Ingresos
+                                    </h3>
+                                </div>
+                                <p className="mt-2 text-gray-600">
+                                    Define las fuentes de ingresos disponibles.
+                                </p>
+                                <Link
+                                    href={route("income-types.index")}
+                                    className="text-yellow-500 hover:underline mt-2 block"
+                                >
+                                    Ver Tipos de Ingresos
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* Cuotas */}
                         <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
                             <div className="flex items-center mb-4">
-                                <div className="text-yellow-500 text-3xl mr-4">
-                                    🔧
+                                <div className="text-green-500 text-3xl mr-4">
+                                    💰
                                 </div>
                                 <h3 className="text-lg font-semibold">
-                                    Tipos de Ingresos
+                                    Cuotas
                                 </h3>
                             </div>
-                            <p className="mt-2 text-gray-600">
-                                Define las fuentes de ingresos disponibles.
-                            </p>
+                            {/* 2 mensajes segun si es residente o no */}
+                            {userRole.includes("resident") ? (
+                                <p className="mt-2 text-gray-600">
+                                    Vista de las cuotas de la Junta de Vecinos.
+                                </p>
+                            ) : (
+                                <p className="mt-2 text-gray-600">
+                                    Administra las cuotas de la Junta de
+                                    Vecinos.
+                                </p>
+                            )}
+
                             <Link
-                                href={route("income-types.index")}
-                                className="text-yellow-500 hover:underline mt-2 block"
+                                href={route("fees.index")}
+                                className="text-green-500 hover:underline mt-2 block"
                             >
-                                Ver Tipos de Ingresos
+                                Ver Cuotas
                             </Link>
                         </div>
                     </div>
