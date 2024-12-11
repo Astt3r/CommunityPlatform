@@ -399,7 +399,6 @@ export default function EditNeighborWithUser({
                                             }
                                             className="mt-1 block w-full"
                                             min={data.joined_date || ""}
-                                            max={today}
                                         />
                                         <InputError
                                             message={errors.left_date}
