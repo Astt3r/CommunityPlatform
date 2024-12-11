@@ -301,7 +301,8 @@ class MeetingController extends Controller
         $meeting->status = 'completed';
         $meeting->save();
 
-        return response()->json(['message' => 'Reunión marcada como completada.'], 200);
+        return redirect()->route('meetings.show', $meetingId)->with('success', 'Reunión marcada como completada.');
+
     }
 
 
