@@ -195,10 +195,10 @@ class ProjectController extends Controller
         $project->load(['files', 'neighbors.user']); // Cargar vecinos y los datos de usuario asociados
 
         return Inertia::render('Projects/Show', [
-            'project' => $project,
-            'changes' => nl2br($project->changes), // Mostrar cambios con saltos de línea
+            'project' => $project, // Incluir todo el objeto del proyecto
         ]);
     }
+
 
 
 
@@ -245,6 +245,8 @@ class ProjectController extends Controller
                 'neighbor_ids' => 'nullable|array',
                 'neighbor_ids.*' => 'exists:neighbors,id',
                 'status' => 'required|string|in:planeado,aprobado,en proceso,completado,cancelado,rechazado',
+                'observation' => 'nullable|string|max:255',
+
             ],
             [
                 'name.required' => 'El nombre del proyecto es obligatorio.',
@@ -297,12 +299,26 @@ class ProjectController extends Controller
                 ], 403);
         }
 
-        // Verificar si el estado ha cambiado y registrar el cambio
         if ($validated['status'] !== $project->status) {
             $currentDateTime = now()->format('Y-m-d H:i:s');
+
+            // Construir el mensaje del cambio de estado
             $newChange = "Estado cambiado de '{$project->status}' a '{$validated['status']}' el {$currentDateTime}";
+
+            // Si existe una observación, agregarla como una nueva línea indentada
+            if (!empty($validated['observation'])) {
+                $newChange .= "\n    {$validated['observation']}";
+            }
+
+            // Concatenar el nuevo cambio al historial existente
             $project->changes .= ($project->changes ? "\n" : "") . $newChange;
         }
+
+
+
+
+
+
 
         // Actualizar los campos del proyecto
         $project->update($validated);

@@ -34,13 +34,13 @@ export default function ProjectEdit({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { file, ...rest } = data;
+        const { file, observation, ...rest } = data;
 
         try {
             // Actualizar datos del proyecto
             const response = await axios.put(
                 route("projects.update", project.id),
-                rest
+                data 
             );
 
             if (response.status === 200) {
@@ -160,7 +160,6 @@ export default function ProjectEdit({
                                     className="mt-2"
                                 />
                             </div>
-
                             {/* Descripción */}
                             <div>
                                 <InputLabel
@@ -186,7 +185,6 @@ export default function ProjectEdit({
                                     className="mt-2"
                                 />
                             </div>
-
                             {/* Problema que aborda */}
                             <div>
                                 <InputLabel
@@ -212,7 +210,6 @@ export default function ProjectEdit({
                                     className="mt-2"
                                 />
                             </div>
-
                             {/* Proyecto para todos los vecinos */}
                             <div className="flex items-center">
                                 <input
@@ -241,7 +238,6 @@ export default function ProjectEdit({
                                     }
                                 />
                             </div>
-
                             {/* Selección de vecinos */}
                             {!data.is_for_all_neighbors && (
                                 <div>
@@ -288,7 +284,6 @@ export default function ProjectEdit({
                                     </div>
                                 </div>
                             )}
-
                             {/* Fechas */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Fecha de Inicio */}
@@ -346,7 +341,6 @@ export default function ProjectEdit({
                                     />
                                 </div>
                             </div>
-
                             {/* Estado */}
                             <div>
                                 <InputLabel
@@ -414,6 +408,26 @@ export default function ProjectEdit({
 
                                 <InputError message={errors.status} />
                             </div>
+                            {/* // Campo de observación cuando cambia el estado */}
+                            <div>
+                                <InputLabel
+                                    htmlFor="observation"
+                                    value="Observación del Cambio"
+                                />
+                                <textarea
+                                    id="observation"
+                                    value={data.observation || ""}
+                                    onChange={(e) =>
+                                        setData("observation", e.target.value)
+                                    }
+                                    className="mt-1 block w-full border-gray-300 rounded-md"
+                                    placeholder="Agregue una observación al cambiar el estado"
+                                />
+                                <InputError
+                                    message={errors.observation}
+                                    className="mt-2"
+                                />
+                            </div>
 
                             {/* Presupuesto */}
                             <div>
@@ -440,7 +454,6 @@ export default function ProjectEdit({
                                     className="mt-2"
                                 />
                             </div>
-
                             {/* Archivo */}
                             <div>
                                 <InputLabel
@@ -477,7 +490,6 @@ export default function ProjectEdit({
                                     className="mt-2"
                                 />
                             </div>
-
                             {/* Botones */}
                             <div className="flex justify-end space-x-4 mt-4">
                                 <button
