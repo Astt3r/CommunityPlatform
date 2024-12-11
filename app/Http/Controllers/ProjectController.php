@@ -124,12 +124,32 @@ class ProjectController extends Controller
             'neighbor_ids.*' => 'exists:neighbors,id',
         ];
 
+        // Mensajes de validación
+        $messages = [
+            'name.required' => 'El nombre del proyecto es obligatorio.',
+            'name.string' => 'El nombre del proyecto debe ser una cadena de texto.',
+            'name.max' => 'El nombre del proyecto no puede exceder los 255 caracteres.',
+            'description.required' => 'La descripción es obligatoria.',
+            'description.string' => 'La descripción debe ser una cadena de texto.',
+            'description.max' => 'La descripción no puede exceder los 500 caracteres.',
+            'issue.required' => 'El problema a resolver es obligatorio.',
+            'issue.string' => 'El problema a resolver debe ser una cadena de texto.',
+            'issue.max' => 'El problema a resolver no puede exceder los 1000 caracteres.',
+            'start_date.required' => 'La fecha de inicio es obligatoria.',
+            'start_date.date' => 'La fecha de inicio debe ser una fecha válida.',
+            'end_date.date' => 'La fecha de finalización debe ser una fecha válida.',
+            'end_date.after_or_equal' => 'La fecha de finalización debe ser igual o posterior a la fecha de inicio.',
+            'budget.required' => 'El presupuesto es obligatorio.',
+            'budget.numeric' => 'El presupuesto debe ser un número.',
+            'budget.min' => 'El presupuesto no puede ser negativo.',
+        ];
+
         // Ajustar la validación para los board_members
         if ($user->role === 'board_member') {
             $rules['neighbor_ids.*'] .= '|exists:neighbors,id';
         }
-
-        $validated = $request->validate($rules);
+        // Validar la solicitud
+        $validated = $request->validate($rules, $messages);
 
         $validated['status'] = 'planeado';
 
