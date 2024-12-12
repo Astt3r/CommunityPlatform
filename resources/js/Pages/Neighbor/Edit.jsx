@@ -238,6 +238,29 @@ export default function EditNeighborWithUser({
                                     className="mt-2"
                                 />
                             </div>
+
+                            {/* Estado */}
+                            <div>
+                                <InputLabel htmlFor="status" value="Estado *" />
+                                <select
+                                    id="status"
+                                    name="status"
+                                    value={data.status}
+                                    onChange={(e) =>
+                                        setData("status", e.target.value)
+                                    }
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50"
+                                    required
+                                >
+                                    <option value="active">Activo</option>
+                                    <option value="inactive">Inactivo</option>
+                                </select>
+                                <InputError
+                                    message={errors.status}
+                                    className="mt-2"
+                                />
+                            </div>
+
                             {/* Asociación Vecinal */}
                             {!neighborhoodAssociationId && (
                                 <div>
