@@ -21,6 +21,9 @@ class DashboardController extends Controller
         $role = $user->role;
         $neighbor = $user->neighbor;
 
+        $userAssociations = collect(); // Initialize as an empty collection as default
+
+
         // Totales de ingresos y gastos
         $totalIncome = Income::sum('amount');
         $totalExpense = Expense::sum('amount');
