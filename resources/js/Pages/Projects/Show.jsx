@@ -53,7 +53,13 @@ export default function ProjectShow() {
                     </p>
                     <p className="mb-2">
                         <strong>Estado:</strong>{" "}
-                        {project.status || "No especificado"}
+                        {project.status
+                            ? project.status
+                                  .toLowerCase()
+                                  .replace(/\b\w/g, (char) =>
+                                      char.toUpperCase()
+                                  )
+                            : "No especificado"}
                     </p>
                     <p className="mb-2">
                         <strong>Presupuesto:</strong> ${project.budget || "N/A"}

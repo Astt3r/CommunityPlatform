@@ -14,78 +14,78 @@ use App\Models\Neighbor;
 
 class MeetingController extends Controller
 {
-    public function index(Request $request) 
-{
-    $user = $request->user();
-    $filters = $request->only('main_topic', 'status', 'neighborhood_association_id');
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $filters = $request->only('main_topic', 'status', 'neighborhood_association_id');
 
-    $meetingsQuery = Meeting::query()
-        ->when($filters['main_topic'] ?? null, function ($query, $main_topic) {
-            $query->where('main_topic', 'like', "%$main_topic%");
-        })
-        ->when($filters['status'] ?? null, function ($query, $status) {
-            $query->where('status', $status);
-        });
-
-    if ($user->role === 'board_member') {
-        // Acceder al vecino asociado al usuario
-        $neighbor = $user->neighbor()->with('neighborhoodAssociation')->first();
-
-        if ($neighbor && $neighbor->neighborhoodAssociation) {
-            $associationId = $neighbor->neighborhoodAssociation->id;
-
-            // Filtrar reuniones de la junta del vecino y reuniones generales
-            $meetingsQuery->where(function ($query) use ($associationId) {
-                $query->where('neighborhood_association_id', $associationId)
-                    ->orWhereNull('neighborhood_association_id');
+        $meetingsQuery = Meeting::query()
+            ->when($filters['main_topic'] ?? null, function ($query, $main_topic) {
+                $query->where('main_topic', 'like', "%$main_topic%");
+            })
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                $query->where('status', $status);
             });
+
+        if ($user->role === 'board_member' || $user->role === 'resident') {
+            // Acceder al vecino asociado al usuario
+            $neighbor = $user->neighbor()->with('neighborhoodAssociation')->first();
+
+            if ($neighbor && $neighbor->neighborhoodAssociation) {
+                $associationId = $neighbor->neighborhoodAssociation->id;
+
+                // Filtrar reuniones de la junta del vecino y reuniones generales
+                $meetingsQuery->where(function ($query) use ($associationId) {
+                    $query->where('neighborhood_association_id', $associationId)
+                        ->orWhereNull('neighborhood_association_id');
+                });
+            } else {
+                // Si no tiene una junta asignada, mostrar solo reuniones generales
+                $meetingsQuery->whereNull('neighborhood_association_id');
+            }
+
+            $allAssociations = collect(); // No mostrar el dropdown para board_members
         } else {
-            // Si no tiene una junta asignada, mostrar solo reuniones generales
-            $meetingsQuery->whereNull('neighborhood_association_id');
+            // Filtrar por neighborhood_association_id si está presente
+            if ($filters['neighborhood_association_id'] ?? null) {
+                $meetingsQuery->where('neighborhood_association_id', $filters['neighborhood_association_id']);
+            }
+            $allAssociations = NeighborhoodAssociation::select('id', 'name')->get();
         }
 
-        $allAssociations = collect(); // No mostrar el dropdown para board_members
-    } else {
-        // Filtrar por neighborhood_association_id si está presente
-        if ($filters['neighborhood_association_id'] ?? null) {
-            $meetingsQuery->where('neighborhood_association_id', $filters['neighborhood_association_id']);
+        $meetings = $meetingsQuery->paginate(10);
+
+        // Obtener el neighbor_id asociado al usuario
+        $neighbor = $user->neighbor()->first();
+        if ($neighbor) {
+            // Calcular asistencias del usuario conectado
+            $validAttendances = MeetingAttendance::where('neighbor_id', $neighbor->id)->get();
+            $totalMeetings = $validAttendances->count();
+            $attendedMeetings = $validAttendances->where('attended', 1)->count();
+
+            $attendancePercentage = $totalMeetings > 0 ? round(($attendedMeetings / $totalMeetings) * 100, 2) : 0;
+
+            $attendanceData = [
+                'total' => $totalMeetings,
+                'attended' => $attendedMeetings,
+                'percentage' => $attendancePercentage,
+            ];
+        } else {
+            $attendanceData = [
+                'total' => 0,
+                'attended' => 0,
+                'percentage' => 0,
+            ];
         }
-        $allAssociations = NeighborhoodAssociation::select('id', 'name')->get();
+
+        return inertia('Meetings/Index', [
+            'meetings' => $meetings,
+            'filters' => $filters,
+            'allAssociations' => $allAssociations,
+            'userRole' => $user->role,
+            'userAttendance' => $attendanceData,
+        ]);
     }
-
-    $meetings = $meetingsQuery->paginate(10);
-
-    // Obtener el neighbor_id asociado al usuario
-    $neighbor = $user->neighbor()->first();
-    if ($neighbor) {
-        // Calcular asistencias del usuario conectado
-        $validAttendances = MeetingAttendance::where('neighbor_id', $neighbor->id)->get();
-        $totalMeetings = $validAttendances->count();
-        $attendedMeetings = $validAttendances->where('attended', 1)->count();
-
-        $attendancePercentage = $totalMeetings > 0 ? round(($attendedMeetings / $totalMeetings) * 100, 2) : 0;
-
-        $attendanceData = [
-            'total' => $totalMeetings,
-            'attended' => $attendedMeetings,
-            'percentage' => $attendancePercentage,
-        ];
-    } else {
-        $attendanceData = [
-            'total' => 0,
-            'attended' => 0,
-            'percentage' => 0,
-        ];
-    }
-
-    return inertia('Meetings/Index', [
-        'meetings' => $meetings,
-        'filters' => $filters,
-        'allAssociations' => $allAssociations,
-        'userRole' => $user->role,
-        'userAttendance' => $attendanceData,
-    ]);
-}
 
 
 
@@ -167,7 +167,7 @@ class MeetingController extends Controller
             $rules['neighborhood_association_id'] .= '|in:' . $neighbor->neighborhood_association_id;
         }
 
-        
+
 
         $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -275,7 +275,7 @@ class MeetingController extends Controller
             'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
             'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no existe.',
             'neighborhood_association_id.in' => 'No tienes permiso para cambiar la asociación vecinal.',
-        ];        
+        ];
 
         // Validar la solicitud
         $validatedData = $request->validate($rules, $messages);

@@ -204,7 +204,11 @@ export default function ProjectsIndex() {
                                     {project.description}
                                 </td>
                                 <td className="px-6 py-3 hidden lg:table-cell">
-                                    {project.status}
+                                    {project.status
+                                        .toLowerCase()
+                                        .replace(/\b\w/g, (char) =>
+                                            char.toUpperCase()
+                                        )}
                                 </td>
                                 <td className="px-6 py-3 flex flex-col sm:flex-row gap-2">
                                     <Link

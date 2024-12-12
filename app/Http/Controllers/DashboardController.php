@@ -26,32 +26,7 @@ class DashboardController extends Controller
         $totalExpense = Expense::sum('amount');
         $balanceStatus = $totalIncome > $totalExpense ? 'Superávit' : 'Déficit';
 
-        // Reuniones próximas
-        $upcomingMeetings = Meeting::select('id', 'meeting_date as date', 'location', 'status')
-            ->where('meeting_date', '>=', now())
-            ->orderBy('meeting_date', 'asc')
-            ->get()
-            ->map(function ($meeting) {
-                $meeting->date = $meeting->date ? Carbon::parse($meeting->date)->format('Y-m-d\TH:i:s') : null;
-                return $meeting;
-            });
-
-        // Distribución de reuniones por estado
-        $meetingDistribution = Meeting::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->get();
-
-        // Estado de proyectos
-        $projectStates = Project::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->get();
-
-        // Proyectos activos
-        $activeProjects = Project::where('status', 'en proceso')
-            ->select('name', 'start_date', 'end_date', 'budget')
-            ->get();
-
-        // Fetch data based on the user's role
+        // Fetch data based on user's role
         if ($role === 'admin') {
             $meetings = Meeting::latest()->take(10)->get();
             $projects = Project::latest()->take(10)->get();
@@ -72,6 +47,43 @@ class DashboardController extends Controller
             $neighbors = Neighbor::whereIn('neighborhood_association_id', $userAssociations)->count();
             $associations = $userAssociations->count();
         }
+
+        // Reuniones próximas
+        $upcomingMeetings = Meeting::select('id', 'meeting_date as date', 'location', 'status')
+            ->where('meeting_date', '>=', now())
+            ->when($role !== 'admin', function ($query) use ($userAssociations) {
+                $query->whereIn('neighborhood_association_id', $userAssociations);
+            })
+            ->orderBy('meeting_date', 'asc')
+            ->get()
+            ->map(function ($meeting) {
+                $meeting->date = $meeting->date ? Carbon::parse($meeting->date)->format('Y-m-d\TH:i:s') : null;
+                return $meeting;
+            });
+
+        // Distribución de reuniones por estado
+        $meetingDistribution = Meeting::selectRaw('status, COUNT(*) as count')
+            ->when($role !== 'admin', function ($query) use ($userAssociations) {
+                $query->whereIn('neighborhood_association_id', $userAssociations);
+            })
+            ->groupBy('status')
+            ->get();
+
+        // Estado de proyectos
+        $projectStates = Project::selectRaw('status, COUNT(*) as count')
+            ->when($role !== 'admin', function ($query) use ($userAssociations) {
+                $query->whereIn('association_id', $userAssociations);
+            })
+            ->groupBy('status')
+            ->get();
+
+        // Proyectos activos
+        $activeProjects = Project::where('status', 'en proceso')
+            ->when($role !== 'admin', function ($query) use ($userAssociations) {
+                $query->whereIn('association_id', $userAssociations);
+            })
+            ->select('name', 'start_date', 'end_date', 'budget')
+            ->get();
 
         return Inertia::render('Dashboard', [
             'role' => $role,

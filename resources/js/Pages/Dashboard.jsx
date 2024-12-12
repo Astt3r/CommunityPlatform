@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 const COLORS = ["#4ade80", "#38bdf8", "#facc15", "#f87171"];
 
@@ -31,6 +32,8 @@ export default function Dashboard({
     projectStates,
 }) {
     useEffect(() => {
+        // usepage to get the role
+
         console.log("Dashboard Role:", role);
         console.log("Neighbors:", neighbors);
         console.log("Board Members:", boardMembers);
@@ -44,12 +47,12 @@ export default function Dashboard({
                 <h3 className="text-lg font-medium text-gray-900">
                     Balance de Ingresos vs Gastos
                 </h3>
-                <p className="mt-2 text-2xl">
+                <p className="mt-2 text-xl">
                     <span className="font-bold text-green-600">
                         Ingresos: ${totalIncome}
                     </span>
                 </p>
-                <p className="mt-2 text-2xl">
+                <p className="mt-2 text-xl">
                     <span className="font-bold text-red-600">
                         Gastos: ${totalExpense}
                     </span>
