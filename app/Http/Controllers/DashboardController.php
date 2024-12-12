@@ -19,6 +19,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $role = $user->role;
+        $neighbor = $user->neighbor;
 
         // Totales de ingresos y gastos
         $totalIncome = Income::sum('amount');
@@ -58,18 +59,17 @@ class DashboardController extends Controller
             $boardMembers = CommitteeMember::count();
             $associations = NeighborhoodAssociation::count();
         } else {
-            $userAssociations = $user->association()->pluck('id');
+            $userAssociations = $neighbor->neighborhoodAssociation()->pluck('id');
 
             $meetings = Meeting::whereIn('neighborhood_association_id', $userAssociations)
                 ->latest()
                 ->take(10)
                 ->get();
-            $projects = Project::whereIn('neighborhood_association_id', $userAssociations)
+            $projects = Project::whereIn('association_id', $userAssociations)
                 ->latest()
                 ->take(10)
                 ->get();
             $neighbors = Neighbor::whereIn('neighborhood_association_id', $userAssociations)->count();
-            $boardMembers = CommitteeMember::whereIn('neighborhood_association_id', $userAssociations)->count();
             $associations = $userAssociations->count();
         }
 
@@ -78,7 +78,6 @@ class DashboardController extends Controller
             'meetings' => $meetings,
             'projects' => $projects,
             'neighbors' => $neighbors,
-            'boardMembers' => $boardMembers,
             'associations' => $associations,
             'totalIncome' => $totalIncome,
             'totalExpense' => $totalExpense,

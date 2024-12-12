@@ -6,6 +6,10 @@ import {
     Tooltip,
     ResponsiveContainer,
     Legend,
+    BarChart,
+    XAxis,
+    YAxis,
+    Bar,
 } from "recharts";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
@@ -24,6 +28,7 @@ export default function Dashboard({
     balanceStatus,
     upcomingMeetings,
     meetingDistribution,
+    projectStates,
 }) {
     useEffect(() => {
         console.log("Dashboard Role:", role);
@@ -63,10 +68,13 @@ export default function Dashboard({
             </div>
         );
     }
-
     function renderUpcomingMeetings() {
         if (!upcomingMeetings.length) {
-            return <p>No hay reuniones próximas.</p>;
+            return (
+                <div className="bg-white shadow-lg p-6">
+                    <p>No hay reuniones próximas.</p>
+                </div>
+            );
         }
 
         const statusMap = {
@@ -242,7 +250,11 @@ export default function Dashboard({
     }
     function renderActiveProjects(activeProjects) {
         if (!activeProjects.length) {
-            return <p>No hay proyectos activos.</p>;
+            return (
+                <div className="bg-white shadow-lg p-6">
+                    <p className="text-gray-700">No hay proyectos activos.</p>
+                </div>
+            );
         }
 
         return (
@@ -322,14 +334,6 @@ export default function Dashboard({
                         {neighbors}
                     </p>
                 </div>
-                <div className="bg-white shadow-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900">
-                        Miembros de la Directiva
-                    </h3>
-                    <p className="mt-2 text-4xl font-bold text-red-600">
-                        {boardMembers}
-                    </p>
-                </div>
             </>
         );
     }
@@ -348,14 +352,6 @@ export default function Dashboard({
                         {neighbors}
                     </p>
                 </div>
-                <div className="bg-white shadow-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900">
-                        Miembros de la Directiva
-                    </h3>
-                    <p className="mt-2 text-4xl font-bold text-red-600">
-                        {boardMembers}
-                    </p>
-                </div>
             </>
         );
     }
@@ -365,6 +361,7 @@ export default function Dashboard({
             <>
                 {renderBalanceCard()}
                 {renderUpcomingMeetings()}
+
                 {renderMeetingDistribution()}
                 <div className="bg-white shadow-lg p-6">
                     <h3 className="text-lg font-medium text-gray-900">
@@ -372,14 +369,6 @@ export default function Dashboard({
                     </h3>
                     <p className="mt-2 text-4xl font-bold text-yellow-600">
                         {neighbors}
-                    </p>
-                </div>
-                <div className="bg-white shadow-lg p-6">
-                    <h3 className="text-lg font-medium text-gray-900">
-                        Miembros de la Directiva
-                    </h3>
-                    <p className="mt-2 text-4xl font-bold text-red-600">
-                        {boardMembers}
                     </p>
                 </div>
             </>
