@@ -149,13 +149,27 @@ class MeetingController extends Controller
             'result' => 'nullable|string|max:1000',
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
+        $messages = [
+            'meeting_date.required' => 'La fecha de la reunión es obligatoria.',
+            'meeting_date.date' => 'La fecha de la reunión debe ser una fecha válida.',
+            'meeting_date.after_or_equal' => 'La fecha de la reunión no puede ser anterior a :date.',
+            'main_topic.required' => 'El tema principal es obligatorio.',
+            'main_topic.max' => 'El tema principal no debe exceder los 255 caracteres.',
+            'description.max' => 'La descripción no debe exceder los 1000 caracteres.',
+            'location.required' => 'La ubicación es obligatoria.',
+            'location.max' => 'La ubicación no debe exceder los 255 caracteres.',
+            'neighborhood_association_id.required' => 'La asociación vecinal es obligatoria.',
+            'neighborhood_association_id.exists' => 'La asociación vecinal seleccionada no existe.',
+        ];
 
         // Ajustar validación para los board_members
         if ($user->role === 'board_member') {
             $rules['neighborhood_association_id'] .= '|in:' . $neighbor->neighborhood_association_id;
         }
 
-        $validator = Validator::make($request->all(), $rules);
+        
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
