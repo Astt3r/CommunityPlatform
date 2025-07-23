@@ -30,6 +30,17 @@ class DatabaseSeeder extends Seeder
         // Create a neighborhood association for the admin
         $adminAssociation = NeighborhoodAssociation::factory()->withCreator($adminUser->id)->create();
 
+        // Create a neighbor record for the admin user  
+        Neighbor::factory()->create([
+            'neighborhood_association_id' => $adminAssociation->id,
+            'user_id' => $adminUser->id,
+            'address' => $faker->address,
+            'identification_number' => $this->generateRut(),
+            'registration_date' => now(),
+            'birth_date' => Carbon::parse('1980-01-01')->addYears(rand(0, 40)),
+            'status' => 'active',
+        ]);
+
         // Create neighbors associated with the admin's neighborhood association
         for ($i = 0; $i < 3; $i++) {
             $user = User::factory()->create();
@@ -55,6 +66,17 @@ class DatabaseSeeder extends Seeder
 
         // Create a neighborhood association for the board member
         $boardMemberAssociation = NeighborhoodAssociation::factory()->withCreator($boardMemberUser->id)->create();
+
+        // Create a neighbor record for the board member user
+        Neighbor::factory()->create([
+            'neighborhood_association_id' => $boardMemberAssociation->id,
+            'user_id' => $boardMemberUser->id,
+            'address' => $faker->address,
+            'identification_number' => $this->generateRut(),
+            'registration_date' => now(),
+            'birth_date' => Carbon::parse('1980-01-01')->addYears(rand(0, 40)),
+            'status' => 'active',
+        ]);
 
         // Create neighbors associated with the board member's neighborhood association
         for ($i = 0; $i < 3; $i++) {

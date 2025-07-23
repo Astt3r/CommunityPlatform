@@ -37,7 +37,13 @@ class DashboardController extends Controller
             $boardMembers = CommitteeMember::count();
             $associations = NeighborhoodAssociation::count();
         } else {
-            $userAssociations = $neighbor->neighborhoodAssociation()->pluck('id');
+            // Handle case where user might not have a neighbor record
+            if ($neighbor) {
+                $userAssociations = $neighbor->neighborhoodAssociation()->pluck('id');
+            } else {
+                // If user doesn't have neighbor record, get associations they created
+                $userAssociations = NeighborhoodAssociation::where('creator_id', $user->id)->pluck('id');
+            }
 
             $meetings = Meeting::whereIn('neighborhood_association_id', $userAssociations)
                 ->latest()
