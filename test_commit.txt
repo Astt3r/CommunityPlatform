@@ -1,3 +1,0 @@
-Este es un archivo de prueba para el commit de test.
-Fecha: 23 de julio de 2025
-Repositorio: CommunityPlatform
