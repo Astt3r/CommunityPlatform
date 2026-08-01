@@ -305,6 +305,18 @@ y un `railway.json` para desplegar la app completa (incluida una base MySQL) en
 4. Railway detecta el `Dockerfile` automáticamente y hace el deploy. El `docker/entrypoint.sh` corre las migraciones (y el seeder si `RUN_SEEDER=true`) antes de levantar el servidor.
 5. Una vez arriba, actualiza el badge/link de "Demo en Vivo" al inicio de este README con la URL real.
 
+#### 🔄 Reseed automático (la demo es pública y con login real)
+
+Las credenciales demo (`admin@example.com` / `password`, etc.) están documentadas más abajo a propósito, para que cualquiera pueda probar la app — pero eso también significa que cualquiera puede loguearse como `admin` y modificar los datos. Para que la demo siempre se vea "limpia", se resetea sola periódicamente:
+
+1. En el servicio de la app, agrega la variable `APP_DEMO_RESEED=true` (fuera de la demo pública, déjala en `false` o sin definir — es la guarda que evita que `demo:reset` borre una base de datos real por accidente).
+2. En el mismo proyecto de Railway, crea un **segundo servicio** apuntando al mismo repo/Dockerfile ("+ New" → "GitHub Repo", mismo repositorio).
+3. En ese servicio, ve a **Settings → Deploy** y:
+   - Cambia el **Custom Start Command** a `php artisan demo:reset`.
+   - Activa **Cron Schedule** con, por ejemplo, `0 */6 * * *` (cada 6 horas).
+   - Copia las mismas variables de entorno `DB_*`/`APP_KEY` del servicio principal (o referénciales con `${{app.VARIABLE}}`).
+4. Railway levanta ese servicio solo en cada horario programado, corre `migrate:fresh --seed` y se apaga — sin dejar un proceso corriendo 24/7.
+
 ### Vercel (alternativa serverless)
 El proyecto también incluye configuración para Vercel en `vercel.json` (requiere una MySQL gestionada externa, ya que Vercel no aloja bases de datos).
 
