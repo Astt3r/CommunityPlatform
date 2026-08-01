@@ -1,0 +1,182 @@
+erDiagram
+    USERS ||--o| NEIGHBORS : "tiene (opcional)"
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ NEIGHBORS : agrupa
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ MEETINGS : organiza
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ PROJECTS : impulsa
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ COMMITTEES : tiene
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ EXPENSE_TYPES : define
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ INCOME_TYPES : define
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ EXPENSES : registra
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ INCOMES : registra
+    NEIGHBORHOOD_ASSOCIATIONS }o--o| USERS : "creada/actualizada por"
+
+    NEIGHBORS ||--o{ FEES : debe
+    NEIGHBORS ||--o{ MEETING_ATTENDANCES : asiste
+    NEIGHBORS ||--o{ CONTRIBUTIONS : aporta
+    NEIGHBORS ||--o{ COMMITTEE_MEMBERS : integra
+    NEIGHBORS }o--o{ PROJECTS : "participa (neighbor_project)"
+
+    MEETINGS ||--o{ MEETING_ATTENDANCES : registra
+    MEETINGS ||--o{ MINUTES : genera
+
+    PROJECTS ||--o{ FILES : adjunta
+    PROJECTS ||--o{ CONTRIBUTIONS : recibe
+
+    COMMITTEES ||--o{ COMMITTEE_MEMBERS : compone
+
+    EXPENSE_TYPES ||--o{ EXPENSES : clasifica
+    INCOME_TYPES ||--o{ INCOMES : clasifica
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        enum role "resident|board_member|admin"
+        timestamp email_verified_at
+    }
+
+    NEIGHBORHOOD_ASSOCIATIONS {
+        bigint id PK
+        string name
+        string address
+        string phone
+        string email
+        int number_of_members
+        date date_of_funding
+        boolean is_active
+        bigint created_by FK
+        bigint updated_by FK
+    }
+
+    NEIGHBORS {
+        bigint id PK
+        string address
+        string identification_number "RUT"
+        date registration_date
+        date birth_date
+        enum status "active|inactive"
+        bigint user_id FK "nullable"
+        bigint neighborhood_association_id FK
+    }
+
+    COMMITTEES {
+        bigint id PK
+        bigint neighborhood_association_id FK
+        string name
+        string description
+        bigint created_by FK
+        bigint updated_by FK
+    }
+
+    COMMITTEE_MEMBERS {
+        bigint id PK
+        bigint committee_id FK
+        bigint neighbor_id FK
+        enum status "active|inactive"
+        date joined_date
+        date left_date
+    }
+
+    MEETINGS {
+        bigint id PK
+        datetime meeting_date
+        string main_topic
+        text description
+        string location
+        enum status "scheduled|completed|canceled"
+        bigint neighborhood_association_id FK "nullable"
+    }
+
+    MINUTES {
+        bigint id PK
+        text content
+        timestamp created_date
+        string signed_by
+        string approved_by
+        bigint meeting_id FK
+    }
+
+    MEETING_ATTENDANCES {
+        bigint id PK
+        bigint meeting_id FK
+        bigint neighbor_id FK
+        boolean attended
+        string absence_reason
+    }
+
+    PROJECTS {
+        bigint id PK
+        string name
+        string description
+        string issue
+        boolean is_for_all_neighbors
+        date start_date
+        date end_date
+        enum status "planeado|aprobado|en proceso|completado|cancelado|rechazado"
+        int budget
+        longtext changes
+        bigint association_id FK
+    }
+
+    FILES {
+        bigint id PK
+        bigint project_id FK
+        string file_path
+    }
+
+    CONTRIBUTIONS {
+        bigint id PK
+        int amount
+        bigint neighbor_id FK
+        bigint project_id FK
+    }
+
+    EXPENSE_TYPES {
+        bigint id PK
+        string name
+        string code UK
+        enum status "active|inactive"
+        bigint created_by FK
+        bigint association_id FK "nullable"
+    }
+
+    EXPENSES {
+        bigint id PK
+        string concept
+        string responsible
+        timestamp date
+        int amount
+        enum status "approved|pending|rejected"
+        bigint type_id FK
+        bigint association_id FK
+    }
+
+    INCOME_TYPES {
+        bigint id PK
+        string name
+        string code UK
+        enum status "active|inactive"
+        bigint created_by FK
+        bigint association_id FK "nullable"
+    }
+
+    INCOMES {
+        bigint id PK
+        string source
+        date date
+        string responsible
+        int amount
+        enum status "active|inactive"
+        bigint type_id FK
+        bigint association_id FK
+    }
+
+    FEES {
+        bigint id PK
+        int amount
+        date due_date
+        date paid_date
+        enum status "pending|paid|overdue"
+        bigint neighbor_id FK
+    }
