@@ -4,6 +4,7 @@
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat&logo=react)](https://reactjs.org)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com)
 [![Inertia.js](https://img.shields.io/badge/Inertia.js-1.x-9553E9?style=flat)](https://inertiajs.com)
+[![Demo en Vivo](https://img.shields.io/badge/Demo-en%20vivo-success?style=flat&logo=railway)](https://junta-app-production.up.railway.app)
 
 > 🔄 **Revival de un proyecto de título universitario.** Este repo parte de
 > [fit-dran/juntatransparente](https://github.com/fit-dran/juntatransparente) (2024) y fue
@@ -79,7 +80,9 @@ El sistema define 3 roles (`admin`, `board_member`, `resident`):
 
 ## 🚀 Demo en Vivo
 
-🔗 **Ver Demo**: *(pendiente — se actualizará con la URL de Railway tras el primer deploy, ver sección [Deployment](#-deployment))*
+🔗 **Ver Demo**: [junta-app-production.up.railway.app](https://junta-app-production.up.railway.app)
+
+> La base de datos se resetea automáticamente cada 6 horas (ver [Reseed automático](#-reseed-automático-la-demo-es-pública-y-con-login-real)), así que si encuentras la data "rara" ya se va a limpiar sola.
 
 ### 👤 Credenciales de Prueba
 
