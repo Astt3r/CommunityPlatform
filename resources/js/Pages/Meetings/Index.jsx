@@ -20,6 +20,32 @@ const traducirEstado = (estado) => {
     return estadosTraduccion[estado] || estado;
 };
 
+const estadoBackgroundColor = (estado) => {
+    switch (estado) {
+        case "completed":
+            return "green";
+        case "canceled":
+            return "red";
+        case "in_progress":
+            return "orange";
+        default:
+            return "blue";
+    }
+};
+
+const estadoTextColorClass = (estado) => {
+    switch (estado) {
+        case "completed":
+            return "text-green-500";
+        case "canceled":
+            return "text-red-500";
+        case "in_progress":
+            return "text-amber-500";
+        default:
+            return "text-blue-500";
+    }
+};
+
 export default function MeetingIndex({ allAssociations, userRole }) {
     const { meetings, filters, flash, userAttendance } = usePage().props;
     const { data, setData, get } = useForm({
@@ -42,12 +68,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                 title: meeting.main_topic,
                 start: parseISO(meeting.meeting_date).toISOString(),
                 allDay: true,
-                backgroundColor:
-                    meeting.status === "completed"
-                        ? "green"
-                        : meeting.status === "canceled"
-                        ? "red"
-                        : "blue",
+                backgroundColor: estadoBackgroundColor(meeting.status),
             }))
         );
     }, [meetings.data]);
@@ -73,12 +94,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                         title: meeting.main_topic,
                         start: parseISO(meeting.meeting_date).toISOString(),
                         allDay: true,
-                        backgroundColor:
-                            meeting.status === "completed"
-                                ? "green"
-                                : meeting.status === "canceled"
-                                ? "red"
-                                : "blue",
+                        backgroundColor: estadoBackgroundColor(meeting.status),
                     }))
                 );
             },
@@ -307,13 +323,7 @@ export default function MeetingIndex({ allAssociations, userRole }) {
                                     {meeting.main_topic}
                                 </td>
                                 <td
-                                    className={`px-4 py-2 ${
-                                        meeting.status === "scheduled"
-                                            ? "text-blue-500"
-                                            : meeting.status === "completed"
-                                            ? "text-green-500"
-                                            : "text-red-500"
-                                    }`}
+                                    className={`px-4 py-2 ${estadoTextColorClass(meeting.status)}`}
                                 >
                                     {traducirEstado(meeting.status)}
                                 </td>

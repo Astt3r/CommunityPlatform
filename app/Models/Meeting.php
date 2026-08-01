@@ -29,6 +29,16 @@ class Meeting extends Model
         return $this->hasMany(MeetingAttendance::class);
     }
 
+    public function votes()
+    {
+        return $this->hasMany(MeetingVote::class);
+    }
+
+    public function openVote()
+    {
+        return $this->belongsTo(MeetingVote::class, 'open_vote_id');
+    }
+
     protected static function boot()
     {
         parent::boot();

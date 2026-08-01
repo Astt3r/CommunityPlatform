@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Meeting;
 use App\Models\MeetingAttendance;
+use App\Models\MeetingVote;
+use App\Models\MeetingVoteCast;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
 use Carbon\Carbon;
@@ -188,6 +190,33 @@ class MeetingController extends Controller
         $this->authorize('view', $meeting);
         $meeting->load('neighborhoodAssociation'); // Cargar la relación con la junta vecinal
 
+        $user = auth()->user();
+        $openVote = null;
+
+        if ($meeting->open_vote_id !== null) {
+            $vote = MeetingVote::with('options')->find($meeting->open_vote_id);
+
+            if ($vote) {
+                $tallies = $vote->tallies();
+                $hasVoted = $user->neighbor
+                    ? MeetingVoteCast::where('meeting_vote_id', $vote->id)
+                        ->where('neighbor_id', $user->neighbor->id)
+                        ->exists()
+                    : false;
+
+                $openVote = [
+                    'id' => $vote->id,
+                    'question' => $vote->question,
+                    'options' => $tallies->map(fn ($option) => [
+                        'id' => $option->id,
+                        'label' => $option->label,
+                        'count' => $option->ballots_count,
+                    ]),
+                    'has_voted' => $hasVoted,
+                ];
+            }
+        }
+
         return Inertia::render('Meetings/ShowMeeting', [
             'meeting' => [
                 'id' => $meeting->id,
@@ -199,6 +228,12 @@ class MeetingController extends Controller
                 'result' => $meeting->result,
                 'is_canceled' => $meeting->status === 'canceled', // Validar si está cancelada
                 'neighborhood_association' => $meeting->neighborhoodAssociation ? $meeting->neighborhoodAssociation->name : null,
+            ],
+            'openVote' => $openVote,
+            'canVote' => [
+                'open' => $user->can('openVote', $meeting),
+                'close' => $user->can('closeVote', $meeting),
+                'cast' => $user->can('castVote', $meeting),
             ],
             'userRole' => auth()->user()->role, // Pasar directamente el rol del usuario
         ]);
@@ -240,8 +275,8 @@ class MeetingController extends Controller
             'neighborhood_association_id' => 'required|exists:neighborhood_associations,id',
         ];
 
-        // Validar el campo 'status' solo si la reunión no está completada
-        if ($meeting->status !== 'completed') {
+        // Validar el campo 'status' solo si la reunión no está completada ni en curso
+        if (! in_array($meeting->status, ['completed', 'in_progress'])) {
             $rules['status'] = 'required|in:scheduled,canceled';
         }
 
@@ -277,8 +312,8 @@ class MeetingController extends Controller
             'result',
         ];
 
-        // Si la reunión no está completada, permitir actualizar los campos adicionales
-        if ($meeting->status !== 'completed') {
+        // Si la reunión no está completada ni en curso, permitir actualizar los campos adicionales
+        if (! in_array($meeting->status, ['completed', 'in_progress'])) {
             $updatableFields = array_merge($updatableFields, [
                 'meeting_date',
                 'main_topic',

@@ -13,6 +13,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\IncomeTypeController;
 use App\Http\Controllers\MeetingAttendanceController;
 use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\MeetingVoteController;
 use App\Http\Controllers\MinutesController;
 use App\Http\Controllers\NeighborController;
 use App\Http\Controllers\NeighborhoodAssociationController;
@@ -104,6 +105,9 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
         ->name('meetings.mark-completed');
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
 
+    Route::post('/meetings/{meeting}/votes', [MeetingVoteController::class, 'store'])->name('meetings.votes.store');
+    Route::post('/meetings/{meeting}/votes/cast', [MeetingVoteController::class, 'cast'])->name('meetings.votes.cast');
+    Route::post('/meetings/{meeting}/votes/close', [MeetingVoteController::class, 'close'])->name('meetings.votes.close');
 });
 
 // Finance

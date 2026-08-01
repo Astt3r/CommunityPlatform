@@ -26,6 +26,8 @@
         "@fullcalendar/react": "^6.1.15",
         "@react-pdf/renderer": "^4.1.4",
         "date-fns": "^4.1.0",
+        "laravel-echo": "^2.4.0",
+        "pusher-js": "^8.6.0",
         "react-router-dom": "^6.26.2",
         "react-toastify": "^10.0.6",
         "recharts": "^2.13.3"
