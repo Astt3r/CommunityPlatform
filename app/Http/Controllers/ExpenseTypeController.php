@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ExpenseType;
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ExpenseTypeRequest;
-use Inertia\Inertia;
+use App\Models\ExpenseType;
 use App\Models\Neighbor;
-
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ExpenseTypeController extends Controller
 {
@@ -18,10 +15,10 @@ class ExpenseTypeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'No estás asociado a ninguna junta de vecinos.');
             }
 
@@ -41,15 +38,6 @@ class ExpenseTypeController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
-
-
     public function create()
     {
         return Inertia::render('Finance/ExpenseTypes/Create');
@@ -65,7 +53,7 @@ class ExpenseTypeController extends Controller
         if ($user->role !== 'admin') {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'No estás asociado a ninguna junta de vecinos.');
             }
 
@@ -85,9 +73,6 @@ class ExpenseTypeController extends Controller
         return redirect()->route('expense-types.index')->with('message', 'Tipo de gasto creado exitosamente.');
     }
 
-
-
-
     public function edit(ExpenseType $expenseType)
     {
         return Inertia::render('Finance/ExpenseTypes/Edit', [
@@ -100,7 +85,7 @@ class ExpenseTypeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:255',
-            'code' => 'required|string|max:20|unique:expense_types,code,' . $expenseType->id,
+            'code' => 'required|string|max:20|unique:expense_types,code,'.$expenseType->id,
             'status' => 'required|in:active,inactive',
             'effective_date' => 'nullable|date',
             'end_date' => 'nullable|date|after:effective_date',

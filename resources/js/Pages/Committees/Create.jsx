@@ -4,14 +4,10 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CommitteesCreate({ types }) {
+export default function CommitteesCreate() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         description: "",
-        code: "",
-        status: "active",
-        effective_date: "",
-        end_date: "",
     });
 
     const handleChange = (field, value) => {
@@ -88,93 +84,6 @@ export default function CommitteesCreate({ types }) {
                                 />
                                 <InputError
                                     message={errors.description}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Código */}
-                            <div>
-                                <InputLabel htmlFor="code" value="Código" />
-                                <TextInput
-                                    id="code"
-                                    type="text"
-                                    name="code"
-                                    value={data.code}
-                                    onChange={(e) =>
-                                        handleChange("code", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.code}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Estado */}
-                            <div>
-                                <InputLabel htmlFor="status" value="Estado" />
-                                <select
-                                    id="status"
-                                    name="status"
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        handleChange("status", e.target.value)
-                                    }
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                >
-                                    <option value="active">Activo</option>
-                                    <option value="inactive">Inactivo</option>
-                                </select>
-                                <InputError
-                                    message={errors.status}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Fecha de Inicio */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="effective_date"
-                                    value="Fecha de Inicio"
-                                />
-                                <TextInput
-                                    id="effective_date"
-                                    type="date"
-                                    name="effective_date"
-                                    value={data.effective_date}
-                                    onChange={(e) =>
-                                        handleChange(
-                                            "effective_date",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.effective_date}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            {/* Fecha de Fin */}
-                            <div>
-                                <InputLabel
-                                    htmlFor="end_date"
-                                    value="Fecha de Fin (Opcional)"
-                                />
-                                <TextInput
-                                    id="end_date"
-                                    type="date"
-                                    name="end_date"
-                                    value={data.end_date}
-                                    onChange={(e) =>
-                                        handleChange("end_date", e.target.value)
-                                    }
-                                    className="mt-1 block w-full"
-                                />
-                                <InputError
-                                    message={errors.end_date}
                                     className="mt-2"
                                 />
                             </div>

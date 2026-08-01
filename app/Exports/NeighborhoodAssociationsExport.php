@@ -2,10 +2,10 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use App\Models\NeighborhoodAssociation;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
 class NeighborhoodAssociationsExport implements FromCollection, WithHeadings, WithMapping
 {
@@ -20,13 +20,12 @@ class NeighborhoodAssociationsExport implements FromCollection, WithHeadings, Wi
     {
         $query = NeighborhoodAssociation::query();
 
-        if (!empty($this->filter['latest'])) {
+        if (! empty($this->filter['latest'])) {
             $query->latest()->take((int) $this->filter['latest']);
         }
 
         return $query->get();
     }
-
 
     public function headings(): array
     {
@@ -45,5 +44,4 @@ class NeighborhoodAssociationsExport implements FromCollection, WithHeadings, Wi
             $neighborhood->is_active ? 'Sí' : 'No',
         ];
     }
-
 }

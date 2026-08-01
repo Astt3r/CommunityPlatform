@@ -2,12 +2,23 @@
 
 namespace Database\Seeders;
 
+use App\Models\Committee;
+use App\Models\CommitteeMember;
+use App\Models\Contribution;
+use App\Models\Expense;
+use App\Models\ExpenseType;
+use App\Models\Income;
+use App\Models\IncomeType;
+use App\Models\Meeting;
+use App\Models\MeetingAttendance;
+use App\Models\Minutes;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
+use App\Models\Project;
 use App\Models\User;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,17 +31,17 @@ class DatabaseSeeder extends Seeder
 
         // Create an admin user if it doesn't exist
         $adminUser = User::firstOrCreate([
-            'email' => 'admin@example.com'
+            'email' => 'admin@example.com',
         ], [
             'name' => 'Admin User',
             'password' => bcrypt('password'),
-            'role' => 'admin'
+            'role' => 'admin',
         ]);
 
         // Create a neighborhood association for the admin
         $adminAssociation = NeighborhoodAssociation::factory()->withCreator($adminUser->id)->create();
 
-        // Create a neighbor record for the admin user  
+        // Create a neighbor record for the admin user
         Neighbor::factory()->create([
             'neighborhood_association_id' => $adminAssociation->id,
             'user_id' => $adminUser->id,
@@ -57,11 +68,11 @@ class DatabaseSeeder extends Seeder
 
         // Create a board member user if it doesn't exist
         $boardMemberUser = User::firstOrCreate([
-            'email' => 'board_member@example.com'
+            'email' => 'board_member@example.com',
         ], [
             'name' => 'Board Member User',
             'password' => bcrypt('password'),
-            'role' => 'board_member'
+            'role' => 'board_member',
         ]);
 
         // Create a neighborhood association for the board member
@@ -92,6 +103,25 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // Create a resident demo user, associated to the board member's association
+        $residentUser = User::firstOrCreate([
+            'email' => 'vecino@example.com',
+        ], [
+            'name' => 'Vecino Demo',
+            'password' => bcrypt('password'),
+            'role' => 'resident',
+        ]);
+
+        Neighbor::factory()->create([
+            'neighborhood_association_id' => $boardMemberAssociation->id,
+            'user_id' => $residentUser->id,
+            'address' => $faker->address,
+            'identification_number' => $this->generateRut(),
+            'registration_date' => now(),
+            'birth_date' => Carbon::parse('1980-01-01')->addYears(rand(0, 40)),
+            'status' => 'active',
+        ]);
+
         // Create additional neighbors assigned to random neighborhood associations
         $associations = NeighborhoodAssociation::all();
         $users = User::factory()->count(50)->create();
@@ -107,6 +137,83 @@ class DatabaseSeeder extends Seeder
                 'status' => $faker->randomElement(['active', 'inactive']),
             ]);
         }
+
+        // Populate demo content (committees, meetings, projects, finance) for the
+        // two "flagship" associations used in the demo credentials.
+        $this->seedAssociationDemoData($adminAssociation, $adminUser);
+        $this->seedAssociationDemoData($boardMemberAssociation, $boardMemberUser);
+    }
+
+    /**
+     * Seed committees, meetings, a project and finance records for a demo
+     * association, so DBeaver/manual QA has non-empty tables to inspect.
+     */
+    private function seedAssociationDemoData(NeighborhoodAssociation $association, User $creator): void
+    {
+        $neighbors = Neighbor::where('neighborhood_association_id', $association->id)->get();
+
+        // Committees + members
+        $committees = Committee::factory()->count(2)->create([
+            'neighborhood_association_id' => $association->id,
+            'created_by' => $creator->id,
+        ]);
+
+        foreach ($committees as $committee) {
+            foreach ($neighbors->random(min(2, $neighbors->count())) as $neighbor) {
+                CommitteeMember::factory()->create([
+                    'committee_id' => $committee->id,
+                    'neighbor_id' => $neighbor->id,
+                ]);
+            }
+        }
+
+        // Meetings + attendance + minutes
+        $meetings = Meeting::factory()->count(3)->create([
+            'neighborhood_association_id' => $association->id,
+        ]);
+
+        foreach ($meetings as $meeting) {
+            foreach ($neighbors as $neighbor) {
+                MeetingAttendance::factory()->create([
+                    'meeting_id' => $meeting->id,
+                    'neighbor_id' => $neighbor->id,
+                ]);
+            }
+
+            if ($meeting->status === 'completed') {
+                Minutes::factory()->create(['meeting_id' => $meeting->id]);
+            }
+        }
+
+        // Project + contributions
+        $project = Project::factory()->create(['association_id' => $association->id]);
+
+        foreach ($neighbors->random(min(3, $neighbors->count())) as $neighbor) {
+            $project->neighbors()->attach($neighbor->id);
+            Contribution::factory()->create([
+                'project_id' => $project->id,
+                'neighbor_id' => $neighbor->id,
+            ]);
+        }
+
+        // Finance: expense/income types + records
+        $expenseType = ExpenseType::factory()->create([
+            'association_id' => $association->id,
+            'created_by' => $creator->id,
+        ]);
+        Expense::factory()->count(3)->create([
+            'type_id' => $expenseType->id,
+            'association_id' => $association->id,
+        ]);
+
+        $incomeType = IncomeType::factory()->create([
+            'association_id' => $association->id,
+            'created_by' => $creator->id,
+        ]);
+        Income::factory()->count(3)->create([
+            'type_id' => $incomeType->id,
+            'association_id' => $association->id,
+        ]);
     }
 
     /**
@@ -120,13 +227,13 @@ class DatabaseSeeder extends Seeder
         $formattedNumber = number_format($number, 0, '', '.');
         $verifier = $this->calculateVerifier($number);
 
-        return $formattedNumber . '-' . $verifier;
+        return $formattedNumber.'-'.$verifier;
     }
 
     /**
      * Calculate the RUT verifier digit.
      *
-     * @param int $number
+     * @param  int  $number
      * @return string
      */
     private function calculateVerifier($number)

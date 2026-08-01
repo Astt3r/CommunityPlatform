@@ -10,15 +10,15 @@ class IncomeType extends Model
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "description",
-        "code",
-        "status",
-        "created_by",
-        "updated_by",
-        "effective_date",
-        "end_date",
-        "association_id", // Nuevo campo
+        'name',
+        'description',
+        'code',
+        'status',
+        'created_by',
+        'updated_by',
+        'effective_date',
+        'end_date',
+        'association_id', // Nuevo campo
     ];
 
     public function user()
@@ -36,4 +36,3 @@ class IncomeType extends Model
         return $query->where('status', 'active');
     }
 }
-

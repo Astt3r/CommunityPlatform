@@ -54,8 +54,6 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    
-
     /**
      * Check if the user has a board member role.
      */
@@ -73,29 +71,17 @@ class User extends Authenticatable
 
     }
 
-    public function association()
-    {
-        return $this->belongsTo(NeighborhoodAssociation::class, 'association_id');
-    }
     public function neighbor()
     {
         return $this->hasOne(Neighbor::class, 'user_id');
     }
-    public function boardMember()
+
+    /**
+     * La junta de vecinos del usuario se resuelve siempre a través de su
+     * registro Neighbor: no existe FK directa de association en users.
+     */
+    public function currentAssociation(): ?NeighborhoodAssociation
     {
-        return $this->belongsTo(NeighborhoodAssociation::class, 'neighborhood_association_id');
+        return $this->neighbor?->neighborhoodAssociation;
     }
-    public function neighborhoodAssociation()
-    {
-        return $this->belongsTo(NeighborhoodAssociation::class, 'neighborhood_association_id');
-    }
-    
-
-
-
-
-
-
-
-
 }

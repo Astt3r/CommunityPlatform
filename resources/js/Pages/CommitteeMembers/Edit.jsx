@@ -2,10 +2,10 @@ import React from "react";
 import { usePage, useForm, Link } from "@inertiajs/react";
 
 export default function CommitteeMembersEdit() {
-    const { committeeMember, committees = [], users = [] } = usePage().props; // Default empty arrays for committees and users
+    const { committeeMember, committees = [], neighbors = [] } = usePage().props; // Default empty arrays for committees and neighbors
     const { data, setData, put, processing, errors } = useForm({
         committee_id: committeeMember.committee_id || "",
-        user_id: committeeMember.user_id || "",
+        neighbor_id: committeeMember.neighbor_id || "",
         status: committeeMember.status || "",
         joined_date: committeeMember.joined_date || "",
         left_date: committeeMember.left_date || "",
@@ -36,7 +36,7 @@ export default function CommitteeMembersEdit() {
                         <option value="">Seleccione un comité</option>
                         {committees.map((committee) => (
                             <option key={committee.id} value={committee.id}>
-                                {committee.name} ({committee.type})
+                                {committee.name}
                             </option>
                         ))}
                     </select>
@@ -47,22 +47,22 @@ export default function CommitteeMembersEdit() {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        Usuario
+                        Vecino
                     </label>
                     <select
-                        value={data.user_id}
-                        onChange={(e) => setData("user_id", e.target.value)}
+                        value={data.neighbor_id}
+                        onChange={(e) => setData("neighbor_id", e.target.value)}
                         className="border rounded px-2 py-1 w-full"
                     >
-                        <option value="">Seleccione un usuario</option>
-                        {users.map((user) => (
-                            <option key={user.id} value={user.id}>
-                                {user.name} - {user.email}
+                        <option value="">Seleccione un vecino</option>
+                        {neighbors.map((neighbor) => (
+                            <option key={neighbor.id} value={neighbor.id}>
+                                {neighbor.user?.name} - {neighbor.user?.email}
                             </option>
                         ))}
                     </select>
-                    {errors.user_id && (
-                        <div className="text-red-500 text-sm">{errors.user_id}</div>
+                    {errors.neighbor_id && (
+                        <div className="text-red-500 text-sm">{errors.neighbor_id}</div>
                     )}
                 </div>
 

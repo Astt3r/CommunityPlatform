@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\NeighborhoodAssociation;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,17 @@ class ExpenseTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->unique()->randomElement([
+                'Mantención', 'Servicios básicos', 'Seguridad', 'Eventos', 'Insumos', 'Jardinería',
+            ]).' '.$this->faker->unique()->numberBetween(1, 1000),
+            'description' => $this->faker->sentence(),
+            'code' => strtoupper($this->faker->unique()->bothify('GA-###')),
+            'status' => 'active',
+            'created_by' => User::factory(),
+            'updated_by' => null,
+            'association_id' => NeighborhoodAssociation::factory(),
+            'effective_date' => $this->faker->dateTimeBetween('-1 year', 'now'),
+            'end_date' => null,
         ];
     }
 }

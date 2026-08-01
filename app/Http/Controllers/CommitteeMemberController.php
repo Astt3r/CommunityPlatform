@@ -2,45 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CommitteeMember;
+use App\Http\Requests\CommitteeMemberRequest;
 use App\Models\Committee;
-use App\Models\User;
+use App\Models\CommitteeMember;
+use App\Models\Neighbor;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Http\Requests\CommitteeMemberRequest;
 
 class CommitteeMemberController extends Controller
 {
     public function index()
     {
-        $committeeMembers = CommitteeMember::with(['committee', 'user'])->get();
+        $committeeMembers = CommitteeMember::with(['committee', 'neighbor.user'])->get();
 
         return Inertia::render('CommitteeMembers/Index', [
             'committeeMembers' => $committeeMembers,
         ]);
     }
 
-
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        $committees = Committee::active()->get(['id', 'name']);
-        $users = User::all(['id', 'name']);
+        $committees = Committee::get(['id', 'name']);
+        $neighbors = Neighbor::with('user:id,name,email')->get(['id', 'user_id']);
 
         return Inertia::render('CommitteeMembers/Create', [
             'committees' => $committees,
-            'users' => $users,
+            'neighbors' => $neighbors,
         ]);
     }
-
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(CommitteeMemberRequest $request)
     {
+        $this->authorize('create', CommitteeMember::class);
         // Los datos ya están validados por CommitteeMemberRequest
         $validated = $request->validated();
 
@@ -56,8 +55,10 @@ class CommitteeMemberController extends Controller
      */
     public function show(CommitteeMember $committeeMember)
     {
+        $this->authorize('view', $committeeMember);
+
         return Inertia::render('CommitteeMembers/Show', [
-            'committeeMember' => $committeeMember->load(['user', 'committee']),
+            'committeeMember' => $committeeMember->load(['neighbor.user', 'committee']),
         ]);
     }
 
@@ -66,13 +67,14 @@ class CommitteeMemberController extends Controller
      */
     public function edit(CommitteeMember $committeeMember)
     {
-        $committees = Committee::active()->get();
-        $users = User::all();
+        $this->authorize('update', $committeeMember);
+        $committees = Committee::get();
+        $neighbors = Neighbor::with('user:id,name,email')->get(['id', 'user_id']);
 
         return Inertia::render('CommitteeMembers/Edit', [
-            'committeeMember' => $committeeMember->load(['user', 'committee']),
+            'committeeMember' => $committeeMember->load(['neighbor.user', 'committee']),
             'committees' => $committees,
-            'users' => $users,
+            'neighbors' => $neighbors,
         ]);
     }
 
@@ -81,9 +83,10 @@ class CommitteeMemberController extends Controller
      */
     public function update(Request $request, CommitteeMember $committeeMember)
     {
+        $this->authorize('update', $committeeMember);
         $validated = $request->validate([
             'committee_id' => 'required|exists:committees,id',
-            'user_id' => 'required|exists:users,id',
+            'neighbor_id' => 'required|exists:neighbors,id',
             'status' => 'required|in:active,inactive',
             'joined_date' => 'required|date',
             'left_date' => 'nullable|date|after_or_equal:joined_date',
@@ -99,6 +102,7 @@ class CommitteeMemberController extends Controller
      */
     public function destroy(CommitteeMember $committeeMember)
     {
+        $this->authorize('delete', $committeeMember);
         $committeeMember->delete();
 
         return redirect()->route('committee-members.index')->with('message', 'Miembro eliminado exitosamente.');

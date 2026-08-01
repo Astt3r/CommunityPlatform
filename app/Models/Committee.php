@@ -13,5 +13,17 @@ class Committee extends Model
         'name',
         'description',
         'created_by',
+        'updated_by',
+        'neighborhood_association_id',
     ];
+
+    public function neighborhoodAssociation()
+    {
+        return $this->belongsTo(NeighborhoodAssociation::class);
+    }
+
+    public function members()
+    {
+        return $this->hasMany(CommitteeMember::class);
+    }
 }

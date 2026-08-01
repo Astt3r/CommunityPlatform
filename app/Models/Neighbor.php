@@ -4,21 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Neighbor extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "address",
-        "identification_number",
-        "registration_date",
-        "birth_date",
-        "status",
-        "last_participation_date",
-        "user_id",
-        "neighborhood_association_id",
+        'address',
+        'identification_number',
+        'registration_date',
+        'birth_date',
+        'status',
+        'last_participation_date',
+        'user_id',
+        'neighborhood_association_id',
     ];
 
     public function user()
@@ -36,17 +35,11 @@ class Neighbor extends Model
         return $query->where('status', 'active');
     }
 
-    public function association()
-    {
-        return $this->belongsTo(NeighborhoodAssociation::class, 'association_id'); // Ajusta 'association_id' si la clave foránea tiene otro nombre
-    }
-
     // Relación con Contributions
     public function contributions()
     {
         return $this->hasMany(Contribution::class);
     }
-
 
     public function meetingAttendances()
     {
@@ -61,24 +54,14 @@ class Neighbor extends Model
 
     public function attendanceSummary()
     {
-        $attended = $this->meetingAttendances()->where('status', 'attended')->count();
-        $absent = $this->meetingAttendances()->where('status', 'absent')->count();
-
         return [
-            'attended' => $attended,
-            'absent' => $absent,
+            'attended' => $this->meetingAttendances()->where('attended', true)->count(),
+            'absent' => $this->meetingAttendances()->where('attended', false)->count(),
         ];
     }
 
     public function committeeMemberships()
     {
-        return $this->hasMany(CommitteeMember::class, 'user_id', 'user_id');
+        return $this->hasMany(CommitteeMember::class, 'neighbor_id');
     }
-
-
-
-
-
-
-
 }

@@ -10,16 +10,16 @@ class CommitteeMember extends Model
     use HasFactory;
 
     protected $fillable = [
-        "committee_id",
-        "user_id",
-        "status",
-        "joined_date",
-        "left_date",
+        'committee_id',
+        'neighbor_id',
+        'status',
+        'joined_date',
+        'left_date',
     ];
 
-    public function user()
+    public function neighbor()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Neighbor::class);
     }
 
     public function committee()
@@ -31,5 +31,4 @@ class CommitteeMember extends Model
     {
         return $query->where('status', 'active');
     }
-
 }

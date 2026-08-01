@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Meeting;
 use App\Models\MeetingAttendance;
 use App\Models\Neighbor;
-use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use App\Models\Meeting;
 
 class MeetingAttendanceController extends Controller
 {
@@ -39,10 +37,12 @@ class MeetingAttendanceController extends Controller
     {
         // Verificar si la reunión está cancelada
         $meeting = Meeting::findOrFail($meetingId);
+        $this->authorize('manageAttendance', $meeting);
+
         if ($meeting->status === 'canceled') {
             return redirect()->back()->with('error', 'No puedes registrar asistencia para una reunión cancelada.');
         }
-    
+
         // Validar los datos de asistencia
         $validated = $request->validate([
             'attendance' => 'required|array',
@@ -50,16 +50,16 @@ class MeetingAttendanceController extends Controller
             'absenceReasons' => 'required|array',
             'absenceReasons.*' => 'nullable|string',
         ]);
-    
+
         // Obtener IDs de vecinos activos
         $activeNeighborIds = Neighbor::where('status', 'active')->pluck('id')->toArray();
-    
+
         // Obtener vecinos ya marcados como presentes
         $alreadyPresent = MeetingAttendance::where('meeting_id', $meetingId)
             ->where('attended', true)
             ->pluck('neighbor_id')
             ->toArray();
-    
+
         // Guardar nuevos registros de asistencia, evitando modificaciones en vecinos ya presentes
         foreach ($validated['attendance'] as $neighborId => $attended) {
             if (in_array($neighborId, $activeNeighborIds)) {
@@ -67,7 +67,7 @@ class MeetingAttendanceController extends Controller
                 if (in_array($neighborId, $alreadyPresent)) {
                     continue;
                 }
-    
+
                 MeetingAttendance::updateOrCreate(
                     ['meeting_id' => $meetingId, 'neighbor_id' => $neighborId],
                     [
@@ -77,28 +77,19 @@ class MeetingAttendanceController extends Controller
                 );
             }
         }
-    
+
         // Marcar la reunión como completada
         $meeting->update(['status' => 'completed']);
-    
+
         // Redirigir al show de la reunión con un mensaje de éxito
         return redirect()->route('meetings.show', $meetingId)
             ->with('message', 'Asistencias registradas correctamente y reunión marcada como completada.');
     }
-    
-
-
-
-
 
     public function showAttendance($meetingId)
     {
-        // Verificar si el usuario tiene el rol permitido
-        if (!in_array(auth()->user()->role, ['admin', 'board_member'])) {
-            abort(403, 'No tienes permiso para acceder a esta página.');
-        }
-
         $meeting = Meeting::findOrFail($meetingId);
+        $this->authorize('manageAttendance', $meeting);
 
         // Obtener vecinos activos de la misma junta de vecinos de la reunión
         $neighbors = Neighbor::where('neighborhood_association_id', $meeting->neighborhood_association_id)
@@ -118,9 +109,6 @@ class MeetingAttendanceController extends Controller
         ]);
     }
 
-
-
-
     public function showSummary($meetingId)
     {
         $meeting = Meeting::findOrFail($meetingId);
@@ -134,14 +122,11 @@ class MeetingAttendanceController extends Controller
             ->get();
 
         return inertia('MeetingAttendance/ShowAttendanceSummary', [
-        'meetingId' => $meetingId,
-        'mainTopic' => $meeting->main_topic, // Corregido para incluir el tema principal
-        'attendances' => $attendances,
-    ]);
+            'meetingId' => $meetingId,
+            'mainTopic' => $meeting->main_topic, // Corregido para incluir el tema principal
+            'attendances' => $attendances,
+        ]);
     }
-
-
-
 
     /**
      * Show the form for editing the specified resource.
@@ -166,5 +151,4 @@ class MeetingAttendanceController extends Controller
     {
         //
     }
-    
 }

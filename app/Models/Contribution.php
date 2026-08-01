@@ -24,5 +24,4 @@ class Contribution extends Model
     {
         return $this->belongsTo(Neighbor::class);
     }
-
 }

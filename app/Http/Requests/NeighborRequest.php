@@ -24,16 +24,16 @@ class NeighborRequest extends FormRequest
 
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $userId, // Ignorar el usuario actual
+            'email' => 'required|string|email|max:255|unique:users,email,'.$userId, // Ignorar el usuario actual
             'password' => $this->isMethod('post') ? 'required|string|confirmed|min:8' : 'nullable|string|confirmed|min:8',
             'role' => 'nullable|string|in:resident,board_member,admin',
-            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,' . $neighborId,
+            'address' => 'required|regex:/^[\pL\pN\s,.-]+$/u|max:255|unique:neighbors,address,'.$neighborId,
             'identification_number' => [
                 'required',
                 'max:50',
-                'unique:neighbors,identification_number,' . $neighborId,
+                'unique:neighbors,identification_number,'.$neighborId,
                 function ($attribute, $value, $fail) {
-                    if (!$this->isValidRUT($value)) {
+                    if (! $this->isValidRUT($value)) {
                         $fail('El RUT ingresado no tiene un formato válido.');
                     }
                 },
@@ -43,7 +43,7 @@ class NeighborRequest extends FormRequest
                 'required',
                 'date',
                 'before:today',
-                'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), // Mayor de 18 años
+                'before_or_equal:'.now()->subYears(18)->format('Y-m-d'), // Mayor de 18 años
             ],
             'status' => 'required|in:active,inactive',
             'last_participation_date' => 'nullable|date|after_or_equal:registration_date',
@@ -53,15 +53,15 @@ class NeighborRequest extends FormRequest
             'committee_id' => [
                 'nullable',
                 'exists:committees,id',
-                function ($attribute, $value, $fail) use ($userId) {
+                function ($attribute, $value, $fail) use ($neighborId) {
                     if ($value) {
-                        // Validar si el usuario ya tiene un cargo activo en otra directiva
-                        $hasActiveRole = \App\Models\CommitteeMember::where('user_id', $userId)
+                        // Validar si el vecino ya tiene un cargo activo en otra directiva
+                        $hasActiveRole = \App\Models\CommitteeMember::where('neighbor_id', $neighborId)
                             ->where('status', 'active')
                             ->where(function ($query) {
-                            $query->whereNull('left_date')
-                                ->orWhere('left_date', '>', now());
-                        })
+                                $query->whereNull('left_date')
+                                    ->orWhere('left_date', '>', now());
+                            })
                             ->exists();
 
                         if ($hasActiveRole) {
@@ -72,11 +72,6 @@ class NeighborRequest extends FormRequest
             ],
         ];
     }
-
-
-
-
-
 
     /**
      * Custom error messages.
@@ -117,8 +112,6 @@ class NeighborRequest extends FormRequest
         ];
     }
 
-
-
     /**
      * Validar el formato del RUT.
      */
@@ -135,7 +128,7 @@ class NeighborRequest extends FormRequest
                 $i = 2;
             }
             $suma += $v * $i;
-            ++$i;
+            $i++;
         }
 
         $dvr = 11 - ($suma % 11);
@@ -148,5 +141,4 @@ class NeighborRequest extends FormRequest
 
         return (string) $dvr === strtoupper($dv);
     }
-
 }

@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Neighbor;
-use App\Models\NeighborhoodAssociation;
+use App\Http\Requests\NeighborRequest;
 use App\Models\Committee;
 use App\Models\CommitteeMember;
-use App\Http\Requests\NeighborRequest;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Request;
+use App\Models\Neighbor;
+use App\Models\NeighborhoodAssociation;
 use App\Models\User;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class NeighborController extends Controller
 {
@@ -27,10 +25,10 @@ class NeighborController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
             }
 
@@ -39,13 +37,13 @@ class NeighborController extends Controller
 
         $query = Neighbor::with(['user', 'neighborhoodAssociation']);
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query->where('neighborhood_association_id', $neighborhoodAssociationId);
         }
 
-        if ($request->has("name")) {
+        if ($request->has('name')) {
             $query->whereHas('user', function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->input('name') . '%');
+                $query->where('name', 'like', '%'.$request->input('name').'%');
             });
         }
 
@@ -57,7 +55,7 @@ class NeighborController extends Controller
         $neighbors = $query->paginate(10)->withQueryString();
         $juntasDeVecinos = NeighborhoodAssociation::all();
 
-        return Inertia::render("Neighbor/Index", [
+        return Inertia::render('Neighbor/Index', [
             'neighbors' => $neighbors->through(function ($neighbor) {
                 $isBoardMember = $neighbor->user && $neighbor->user->role === 'board_member';
 
@@ -87,18 +85,9 @@ class NeighborController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
-
-
-
     public function store(NeighborRequest $request)
     {
+        $this->authorize('create', Neighbor::class);
         $validatedData = $request->validated();
         $user = $request->user();
 
@@ -145,14 +134,6 @@ class NeighborController extends Controller
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario creados exitosamente.');
     }
 
-
-
-
-
-
-
-
-
     public function create(Request $request)
     {
         $user = $request->user();
@@ -180,10 +161,10 @@ class NeighborController extends Controller
         ]);
     }
 
-
     public function show($id)
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation', 'meetingAttendances.meeting')->findOrFail($id);
+        $this->authorize('view', $neighbor);
 
         // Filtrar las asistencias válidas (relacionadas con reuniones existentes)
         $validAttendances = $neighbor->meetingAttendances->filter(function ($attendance) {
@@ -219,23 +200,16 @@ class NeighborController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
     public function edit($id)
     {
         $neighbor = Neighbor::with('user', 'neighborhoodAssociation')->findOrFail($id);
+        $this->authorize('update', $neighbor);
 
         // Obtener el rol activo del vecino en una directiva
         $activeCommitteeMembership = $neighbor->committeeMemberships()
             ->where('status', 'active')
             ->with('committee')
             ->first();
-
 
         // Verificar que el usuario autenticado no pueda editar su propio registro
         if (Auth::id() === $neighbor->user_id) {
@@ -277,6 +251,7 @@ class NeighborController extends Controller
 
     public function update(NeighborRequest $request, Neighbor $neighbor)
     {
+        $this->authorize('update', $neighbor);
         $validatedData = $request->validated();
 
         DB::transaction(function () use ($validatedData, $neighbor) {
@@ -298,11 +273,11 @@ class NeighborController extends Controller
             ]);
 
             // Gestionar relación con la directiva
-            if (!empty($validatedData['committee_id'])) {
+            if (! empty($validatedData['committee_id'])) {
                 // Si selecciona una directiva, actualizar o crear registro en `CommitteeMember`
                 $committeeMember = CommitteeMember::updateOrCreate(
                     [
-                        'user_id' => $neighbor->user_id,
+                        'neighbor_id' => $neighbor->id,
                         'committee_id' => $validatedData['committee_id'],
                     ],
                     [
@@ -316,7 +291,7 @@ class NeighborController extends Controller
                 $neighbor->user->update(['role' => 'board_member']);
             } else {
                 // Si desmarca la opción "Es directiva", marcar registros como inactivos
-                CommitteeMember::where('user_id', $neighbor->user_id)
+                CommitteeMember::where('neighbor_id', $neighbor->id)
                     ->where('status', 'active')
                     ->update([
                         'status' => 'inactive',
@@ -324,12 +299,12 @@ class NeighborController extends Controller
                     ]);
 
                 // Verificar si tiene otros registros activos
-                $hasActiveRoles = CommitteeMember::where('user_id', $neighbor->user_id)
+                $hasActiveRoles = CommitteeMember::where('neighbor_id', $neighbor->id)
                     ->where('status', 'active')
                     ->exists();
 
                 // Si no tiene otros cargos activos, cambiar rol a 'resident'
-                if (!$hasActiveRoles) {
+                if (! $hasActiveRoles) {
                     $neighbor->user->update(['role' => 'resident']);
                 }
             }
@@ -338,9 +313,10 @@ class NeighborController extends Controller
         return redirect()->route('neighbors.index')->with('success', 'Vecino y usuario actualizados exitosamente.');
     }
 
-
     public function destroy(Neighbor $neighbor)
     {
+        $this->authorize('delete', $neighbor);
+
         // Verificar que el usuario autenticado no pueda eliminar su propio registro
         if (Auth::id() === $neighbor->user_id) {
             return redirect()->route('neighbors.index')->with('error', 'No puedes eliminar tu propio registro.');
@@ -365,10 +341,6 @@ class NeighborController extends Controller
         return redirect()->route('neighbors.index')->with('success', 'Vecino eliminado correctamente.');
     }
 
-
-
-
-
     private function isValidRUT($rut)
     {
         // Lógica para validar el formato del RUT chileno
@@ -382,7 +354,7 @@ class NeighborController extends Controller
                 $i = 2;
             }
             $suma += $v * $i;
-            ++$i;
+            $i++;
         }
         $dvr = 11 - ($suma % 11);
         if ($dvr == 11) {
@@ -397,9 +369,4 @@ class NeighborController extends Controller
             return false;
         }
     }
-
-
-
-
-
 }

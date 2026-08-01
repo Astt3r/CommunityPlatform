@@ -18,11 +18,11 @@ class IncomeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin'; // Verificar si el usuario es administrador
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             // Verificar si el usuario pertenece a una asociación vecinal
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
             }
 
@@ -31,7 +31,7 @@ class IncomeController extends Controller
 
         $query = Income::with('type', 'association'); // Cargar relaciones necesarias
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query->where('association_id', $associationId); // Filtrar por asociación
         }
 
@@ -50,11 +50,11 @@ class IncomeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin'; // Verificar si el usuario es administrador
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             // Verificar si el usuario pertenece a una asociación vecinal
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhood_association_id) {
+            if (! $neighbor || ! $neighbor->neighborhood_association_id) {
                 return redirect()->route('incomes.index')
                     ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
             }
@@ -78,9 +78,10 @@ class IncomeController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Income::class);
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
-        if (!$neighbor || !$neighbor->neighborhood_association_id) {
+        if (! $neighbor || ! $neighbor->neighborhood_association_id) {
             return redirect()->route('incomes.index')
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
@@ -112,10 +113,10 @@ class IncomeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || $income->association_id !== $neighbor->neighborhoodAssociation->id) {
+            if (! $neighbor || $income->association_id !== $neighbor->neighborhoodAssociation->id) {
                 abort(403, 'No tienes permiso para ver este ingreso.');
             }
         }
@@ -133,6 +134,7 @@ class IncomeController extends Controller
     public function destroy($id)
     {
         $income = Income::findOrFail($id);
+        $this->authorize('delete', $income);
         $income->delete();
 
         return redirect()->route('incomes.index')->with('message', 'Ingreso eliminado correctamente.');
@@ -146,11 +148,11 @@ class IncomeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
             if (
-                !$neighbor ||
+                ! $neighbor ||
                 $income->association_id !== $neighbor->neighborhoodAssociation->id
             ) {
                 abort(403, 'No tienes permiso para editar este ingreso.');
@@ -176,11 +178,11 @@ class IncomeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
             if (
-                !$neighbor ||
+                ! $neighbor ||
                 $income->association_id !== $neighbor->neighborhoodAssociation->id
             ) {
                 abort(403, 'No tienes permiso para actualizar este ingreso.');
@@ -202,7 +204,4 @@ class IncomeController extends Controller
 
         return redirect()->route('incomes.index')->with('message', 'Ingreso actualizado correctamente.');
     }
-
-    
-
 }

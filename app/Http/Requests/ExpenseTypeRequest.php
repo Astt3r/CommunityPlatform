@@ -29,7 +29,6 @@ class ExpenseTypeRequest extends FormRequest
         ];
     }
 
-
     /**
      * Custom error messages.
      */

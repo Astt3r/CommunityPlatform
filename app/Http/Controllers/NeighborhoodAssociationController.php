@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\NeighborhoodAssociation;
-use App\Models\Neighbor;
+use App\Exports\NeighborhoodAssociationsExport;
 use App\Http\Requests\NeighborhoodAssociationRequest;
+use App\Models\NeighborhoodAssociation;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-use App\Models\Committee;
-use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\NeighborhoodAssociationsExport;
 
 class NeighborhoodAssociationController extends Controller
 {
@@ -26,12 +23,12 @@ class NeighborhoodAssociationController extends Controller
 
         // Aplicar filtro de nombre si se proporciona
         if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->input('name') . '%');
+            $query->where('name', 'like', '%'.$request->input('name').'%');
         }
 
         // Verificar rol y ajustar query
         if ($user->role === 'board_member' || $user->role === 'resident') {
-            $query->where('id', $user->neighborhood_association_id);
+            $query->where('id', $user->currentAssociation()?->id);
         }
 
         // Paginación con 10 registros por página
@@ -57,6 +54,7 @@ class NeighborhoodAssociationController extends Controller
      */
     public function store(NeighborhoodAssociationRequest $request)
     {
+        $this->authorize('create', NeighborhoodAssociation::class);
         // Validar los datos
         $validated = $request->validated();
 
@@ -77,17 +75,13 @@ class NeighborhoodAssociationController extends Controller
             ->with('success', 'Asociación creada exitosamente.');
     }
 
-
-
-
-
-
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
+        $this->authorize('view', $association);
 
         // Formatear la fecha en español
         Carbon::setLocale('es');
@@ -104,6 +98,7 @@ class NeighborhoodAssociationController extends Controller
     public function edit(string $id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
+        $this->authorize('update', $association);
 
         return Inertia::render('NeighborhoodAssociations/Edit', [
             'association' => $association,
@@ -116,6 +111,7 @@ class NeighborhoodAssociationController extends Controller
     public function update(Request $request, string $id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
+        $this->authorize('update', $association);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -144,6 +140,7 @@ class NeighborhoodAssociationController extends Controller
     public function destroy(string $id)
     {
         $association = NeighborhoodAssociation::findOrFail($id);
+        $this->authorize('delete', $association);
 
         // Verificar si la asociación tiene vecinos asociados
         if ($association->neighbors()->count() > 0) {
@@ -162,8 +159,6 @@ class NeighborhoodAssociationController extends Controller
             ->with('success', 'Asociación eliminada exitosamente.');
     }
 
-
-
     public function export(Request $request)
     {
         $latest = $request->query('latest', null); // Obtener el filtro `latest` si está presente
@@ -173,5 +168,4 @@ class NeighborhoodAssociationController extends Controller
             'neighborhood_associations.xlsx'
         );
     }
-
 }

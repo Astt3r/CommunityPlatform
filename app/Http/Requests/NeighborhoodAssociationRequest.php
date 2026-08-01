@@ -30,7 +30,6 @@ class NeighborhoodAssociationRequest extends FormRequest
         ];
     }
 
-
     /**
      * Get custom messages for validation errors.
      */

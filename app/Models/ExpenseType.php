@@ -20,7 +20,6 @@ class ExpenseType extends Model
         'association_id', // Asegúrate de que este campo esté aquí
     ];
 
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -36,5 +35,4 @@ class ExpenseType extends Model
     {
         return $this->hasMany(Expense::class, 'type_id');
     }
-
 }

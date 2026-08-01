@@ -5,10 +5,10 @@ import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 
-export default function CommitteeMemberCreate({ committees, users }) {
+export default function CommitteeMemberCreate({ committees, neighbors }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         committee_id: "",
-        user_id: "",
+        neighbor_id: "",
         status: "active",
         joined_date: "",
         left_date: "",
@@ -85,28 +85,28 @@ export default function CommitteeMemberCreate({ committees, users }) {
                                 />
                             </div>
 
-                            {/* Usuario */}
+                            {/* Vecino */}
                             <div>
-                                <InputLabel htmlFor="user_id" value="Usuario" />
+                                <InputLabel htmlFor="neighbor_id" value="Vecino" />
                                 <select
-                                    id="user_id"
-                                    value={data.user_id}
+                                    id="neighbor_id"
+                                    value={data.neighbor_id}
                                     onChange={(e) =>
-                                        setData("user_id", e.target.value)
+                                        setData("neighbor_id", e.target.value)
                                     }
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">
-                                        Seleccione un usuario
+                                        Seleccione un vecino
                                     </option>
-                                    {users.map((user) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
+                                    {neighbors.map((neighbor) => (
+                                        <option key={neighbor.id} value={neighbor.id}>
+                                            {neighbor.user?.name}
                                         </option>
                                     ))}
                                 </select>
                                 <InputError
-                                    message={errors.user_id}
+                                    message={errors.neighbor_id}
                                     className="mt-2"
                                 />
                             </div>

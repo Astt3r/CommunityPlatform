@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Committee;
 use App\Http\Requests\CommitteeRequest;
+use App\Models\Committee;
+use App\Models\Neighbor;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Neighbor;
-
 
 class CommitteeController extends Controller
 {
@@ -19,12 +17,12 @@ class CommitteeController extends Controller
     {
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
-        if (!$neighbor) {
+        if (! $neighbor) {
             return redirect()->route('dashboard')
                 ->withErrors(['message' => 'No tienes un perfil de vecino asociado.']);
         }
 
-        if (!$neighbor->neighborhood_association_id) {
+        if (! $neighbor->neighborhood_association_id) {
             return redirect()->route('dashboard')
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
@@ -35,11 +33,6 @@ class CommitteeController extends Controller
             'committees' => $committees,
         ]);
     }
-
-
-
-
-
 
     /**
      * Muestra el formulario para crear un nuevo comité.
@@ -54,11 +47,12 @@ class CommitteeController extends Controller
      */
     public function store(CommitteeRequest $request)
     {
+        $this->authorize('create', Committee::class);
         // Obtener al vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
         // Validar si el vecino pertenece a una junta de vecinos
-        if (!$neighbor || !$neighbor->neighborhood_association_id) {
+        if (! $neighbor || ! $neighbor->neighborhood_association_id) {
             return redirect()->route('committees.index')
                 ->withErrors(['message' => 'No puedes crear un comité si no perteneces a una junta de vecinos.']);
         }
@@ -76,7 +70,6 @@ class CommitteeController extends Controller
         return redirect()->route('committees.index')->with('success', 'Comité creado exitosamente.');
     }
 
-
     /**
      * Muestra el formulario para editar un comité existente.
      */
@@ -86,7 +79,7 @@ class CommitteeController extends Controller
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
         // Verificar si el vecino pertenece a la misma junta de vecinos que el comité
-        if (!$neighbor || $committee->neighborhood_association_id !== $neighbor->neighborhood_association_id) {
+        if (! $neighbor || $committee->neighborhood_association_id !== $neighbor->neighborhood_association_id) {
             abort(403, 'No tienes permiso para acceder a este comité.');
         }
 
@@ -95,20 +88,16 @@ class CommitteeController extends Controller
         ]);
     }
 
-
-
     /**
      * Actualiza la información de un comité existente.
      */
     public function update(Request $request, Committee $committee)
     {
+        $this->authorize('update', $committee);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:50',
+            'name' => 'required|string|max:50|unique:committees,name,'.$committee->id,
             'description' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20|unique:committees,code,' . $committee->id,
-            'status' => 'required|in:active,inactive',
-            'effective_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
         ]);
 
         $validated['updated_by'] = auth()->id();
@@ -123,6 +112,7 @@ class CommitteeController extends Controller
      */
     public function destroy(Committee $committee)
     {
+        $this->authorize('delete', $committee);
         $committee->delete();
 
         return redirect()->route('committees.index')->with('message', 'Comité eliminado exitosamente.');

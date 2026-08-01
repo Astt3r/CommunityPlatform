@@ -29,7 +29,6 @@ class IncomeTypeRequest extends FormRequest
         ];
     }
 
-
     /**
      * Custom error messages.
      */

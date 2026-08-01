@@ -52,7 +52,7 @@ export default function CommitteeMembersIndex() {
                                         <tr key={member.id} className="hover:bg-gray-50">
                                             <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
                                             <td className="border border-gray-300 px-4 py-2">{member.committee.name}</td>
-                                            <td className="border border-gray-300 px-4 py-2">{member.user.name}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{member.neighbor?.user?.name}</td>
                                             <td className="border border-gray-300 px-4 py-2 capitalize">{member.status}</td>
                                             <td className="border border-gray-300 px-4 py-2">{member.joined_date}</td>
                                             <td className="border border-gray-300 px-4 py-2">

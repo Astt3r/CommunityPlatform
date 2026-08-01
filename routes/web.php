@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Autenticación
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Rutas de ascociaciones nuevas
 
@@ -66,12 +66,10 @@ Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committees', CommitteeController::class);
 });
 
-
 // Committee Members
 Route::middleware(['auth', 'role:admin,board_member'])->group(function () {
     Route::resource('committee-members', CommitteeMemberController::class);
 });
-
 
 //
 
@@ -91,7 +89,6 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
     Route::get('/projects/{projectId}/individual-contribution', [ContributionController::class, 'individualContribution'])->name('projects.individualContribution');
 });
 
-
 // Meetings
 Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
     Route::resource('meetings', MeetingController::class);
@@ -107,10 +104,7 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
         ->name('meetings.mark-completed');
     Route::get('/meetings/{meeting}', [MeetingController::class, 'show'])->name('meetings.show');
 
-
-
 });
-
 
 // Finance
 Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function () {
@@ -128,10 +122,12 @@ Route::middleware(['auth', 'role:admin,board_member,resident'])->group(function 
 // Export functions
 Route::get('/export-neighborhoods', function (Request $request) {
     $filter = $request->only('latest');
+
     return Excel::download(new NeighborhoodAssociationsExport($filter), 'neighborhood_associations.xlsx');
 });
 
 Route::get('/export-projects', function (Request $request) {
     $filter = $request->only('latest'); // Captura el filtro "latest"
+
     return Excel::download(new ProjectsExport($filter), 'projects.xlsx');
 });

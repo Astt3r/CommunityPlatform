@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contribution;
-use Illuminate\Http\Request;
-use App\Models\Project;
 use App\Models\Neighbor;
+use App\Models\Project;
+use Illuminate\Http\Request;
 
 class ContributionController extends Controller
 {
@@ -109,7 +109,6 @@ class ContributionController extends Controller
         }
     }
 
-
     /**
      * Get neighbors associated with a project.
      */
@@ -155,5 +154,4 @@ class ContributionController extends Controller
             return response()->json(['message' => 'Error al eliminar la contribución.', 'error' => $e->getMessage()], 500);
         }
     }
-
 }

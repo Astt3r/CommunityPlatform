@@ -2,36 +2,29 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\Expense;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
-use App\Models\NeighborhoodAssociation; // Asegúrate de importar este modelo
-use App\Models\ExpenseType; // Asegúrate de importar este modelo
-use App\Models\Neighbor; // Asegúrate de importar este modelo
-use App\Models\User; // Asegúrate de importar este modelo
 use App\Http\Requests\ExpenseRequest;
-
-
-
-
+use App\Models\Expense;
+use App\Models\ExpenseType;
+// Asegúrate de importar este modelo
+use App\Models\Neighbor; // Asegúrate de importar este modelo
+use Illuminate\Http\Request; // Asegúrate de importar este modelo
+// Asegúrate de importar este modelo
+use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
     public function index(Request $request)
     {
         $user = $request->user();
         $isAdmin = $user->role === 'admin'; // Asegúrate de que 'role' esté correctamente implementado
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
             }
 
@@ -40,7 +33,7 @@ class ExpenseController extends Controller
 
         $query = Expense::with('type', 'association'); // Carga relaciones necesarias
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query->where('association_id', $associationId); // Filtrar por asociación
         }
 
@@ -51,9 +44,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -62,11 +52,11 @@ class ExpenseController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin'; // Verificar si el usuario es administrador
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             // Verificar si el usuario pertenece a una asociación vecinal
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhood_association_id) {
+            if (! $neighbor || ! $neighbor->neighborhood_association_id) {
                 return redirect()->route('expenses.index')
                     ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
             }
@@ -85,20 +75,17 @@ class ExpenseController extends Controller
         ]);
     }
 
-
-
-
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(ExpenseRequest $request)
     {
+        $this->authorize('create', Expense::class);
         // Obtener el vecino asociado al usuario autenticado
         $neighbor = Neighbor::where('user_id', auth()->id())->first();
 
         // Validar que el vecino exista y esté asociado a una junta
-        if (!$neighbor || !$neighbor->neighborhood_association_id) {
+        if (! $neighbor || ! $neighbor->neighborhood_association_id) {
             return redirect()->route('expenses.index')
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
@@ -128,10 +115,10 @@ class ExpenseController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || $expense->association_id !== $neighbor->neighborhoodAssociation->id) {
+            if (! $neighbor || $expense->association_id !== $neighbor->neighborhoodAssociation->id) {
                 abort(403, 'No tienes permiso para ver este gasto.');
             }
         }
@@ -143,13 +130,13 @@ class ExpenseController extends Controller
         ]);
     }
 
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
         $expense = Expense::findOrFail($id);
+        $this->authorize('delete', $expense);
         $expense->delete();
 
         return redirect()->route('expenses.index')->with('message', 'Gasto eliminado correctamente.');
@@ -160,11 +147,11 @@ class ExpenseController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
             if (
-                !$neighbor ||
+                ! $neighbor ||
                 $expense->association_id !== $neighbor->neighborhoodAssociation->id
             ) {
                 abort(403, 'No tienes permiso para editar este gasto.');
@@ -185,7 +172,6 @@ class ExpenseController extends Controller
         ]);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
@@ -194,11 +180,11 @@ class ExpenseController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
             if (
-                !$neighbor ||
+                ! $neighbor ||
                 $expense->association_id !== $neighbor->neighborhoodAssociation->id
             ) {
                 abort(403, 'No tienes permiso para actualizar este gasto.');
@@ -216,7 +202,4 @@ class ExpenseController extends Controller
 
         return redirect()->route('expenses.index')->with('message', 'Gasto actualizado correctamente.');
     }
-
 }
-
-

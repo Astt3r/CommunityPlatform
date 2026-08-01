@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\NeighborhoodAssociation;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,10 @@ class CommitteeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => ucfirst($this->faker->unique()->words(2, true)),
+            'description' => $this->faker->sentence(),
+            'neighborhood_association_id' => NeighborhoodAssociation::factory(),
+            'created_by' => User::factory(),
         ];
     }
 }

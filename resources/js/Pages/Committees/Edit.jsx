@@ -2,23 +2,15 @@ import React from "react";
 import { usePage, useForm, Link } from "@inertiajs/react";
 
 export default function CommitteesEdit() {
-    const { committee, types = [] } = usePage().props; // Default empty array for types
+    const { committee } = usePage().props;
     const { data, setData, put, processing, errors } = useForm({
         name: committee.name || "",
         description: committee.description || "",
-        code: committee.code || "",
-        status: committee.status || "",
-        effective_date: committee.effective_date || "",
-        end_date: committee.end_date || "",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
         put(route("committees.update", committee.id));
-    };
-
-    const toggleStatus = () => {
-        setData("status", data.status === "active" ? "inactive" : "active");
     };
 
     return (
@@ -55,81 +47,6 @@ export default function CommitteesEdit() {
                     {errors.description && (
                         <div className="text-red-500 text-sm">
                             {errors.description}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Código
-                    </label>
-                    <input
-                        type="text"
-                        value={data.code}
-                        onChange={(e) => setData("code", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.code && (
-                        <div className="text-red-500 text-sm">
-                            {errors.code}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Estado
-                    </label>
-                    <button
-                        type="button"
-                        onClick={toggleStatus}
-                        className={`px-4 py-2 rounded ${
-                            data.status === "active"
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                        } text-white hover:opacity-80`}
-                    >
-                        {data.status === "active" ? "Activo" : "Inactivo"}
-                    </button>
-                    {errors.status && (
-                        <div className="text-red-500 text-sm">
-                            {errors.status}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Fecha de Inicio
-                    </label>
-                    <input
-                        type="date"
-                        value={data.effective_date}
-                        onChange={(e) =>
-                            setData("effective_date", e.target.value)
-                        }
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.effective_date && (
-                        <div className="text-red-500 text-sm">
-                            {errors.effective_date}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Fecha de Fin (Opcional)
-                    </label>
-                    <input
-                        type="date"
-                        value={data.end_date}
-                        onChange={(e) => setData("end_date", e.target.value)}
-                        className="border rounded px-2 py-1 w-full"
-                    />
-                    {errors.end_date && (
-                        <div className="text-red-500 text-sm">
-                            {errors.end_date}
                         </div>
                     )}
                 </div>

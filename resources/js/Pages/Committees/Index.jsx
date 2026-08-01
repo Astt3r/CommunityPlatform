@@ -32,9 +32,6 @@ export default function CommitteesIndex() {
                                         <th className="border border-gray-300 px-4 py-2">#</th>
                                         <th className="border border-gray-300 px-4 py-2">Nombre</th>
                                         <th className="border border-gray-300 px-4 py-2">Descripción</th>
-                                        <th className="border border-gray-300 px-4 py-2">Código</th>
-                                        <th className="border border-gray-300 px-4 py-2">Tipo</th>
-                                        <th className="border border-gray-300 px-4 py-2">Estado</th>
                                         <th className="border border-gray-300 px-4 py-2">Acciones</th>
                                     </tr>
                                 </thead>
@@ -44,13 +41,6 @@ export default function CommitteesIndex() {
                                             <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
                                             <td className="border border-gray-300 px-4 py-2">{committee.name}</td>
                                             <td className="border border-gray-300 px-4 py-2">{committee.description}</td>
-                                            <td className="border border-gray-300 px-4 py-2">{committee.code}</td>
-                                            <td className="border border-gray-300 px-4 py-2 capitalize">
-                                                {committee.type}
-                                            </td>
-                                            <td className="border border-gray-300 px-4 py-2 capitalize">
-                                                {committee.status}
-                                            </td>
                                             <td className="border border-gray-300 px-4 py-2 space-x-2">
                                                 <Link
                                                     href={`/committees/${committee.id}/edit`}

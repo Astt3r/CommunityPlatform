@@ -21,7 +21,7 @@ class ProjectsExport implements FromCollection, WithHeadings, WithMapping
         $query = Project::query();
 
         // Aplica el filtro si existe
-        if (!empty($this->filter['latest'])) {
+        if (! empty($this->filter['latest'])) {
             $query->latest()->take((int) $this->filter['latest']);
         }
 

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meeting;
+use App\Models\MeetingAttendance;
+use App\Models\Neighbor;
+use App\Models\NeighborhoodAssociation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Requests\MeetingRequest;
-use App\Models\MeetingAttendance;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use App\Models\NeighborhoodAssociation;
-use App\Models\Neighbor;
 
 class MeetingController extends Controller
 {
@@ -87,10 +86,6 @@ class MeetingController extends Controller
         ]);
     }
 
-
-
-
-
     /**
      * Show the form for creating a new resource.
      */
@@ -103,12 +98,12 @@ class MeetingController extends Controller
 
         if ($user->role === 'board_member') {
             // Solo cargar la asociación asignada al vecino
-            if (!$neighbor || !$neighbor->neighborhood_association_id) {
+            if (! $neighbor || ! $neighbor->neighborhood_association_id) {
                 abort(403, 'No tienes una asociación asignada.');
             }
 
             $association = NeighborhoodAssociation::find($neighbor->neighborhood_association_id, ['id', 'name']);
-            if (!$association) {
+            if (! $association) {
                 abort(403, 'No tienes una asociación válida.');
             }
 
@@ -127,22 +122,20 @@ class MeetingController extends Controller
         ]);
     }
 
-
-
-
     public function store(Request $request)
     {
+        $this->authorize('create', Meeting::class);
         $user = $request->user();
 
         // Obtener el vecino asociado al usuario
         $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-        if (!$neighbor) {
+        if (! $neighbor) {
             abort(403, 'No estás asociado a ninguna junta de vecinos.');
         }
 
         $rules = [
-            'meeting_date' => 'required|date|after_or_equal:' . now()->subWeek()->toDateString(),
+            'meeting_date' => 'required|date|after_or_equal:'.now()->subWeek()->toDateString(),
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
@@ -164,10 +157,8 @@ class MeetingController extends Controller
 
         // Ajustar validación para los board_members
         if ($user->role === 'board_member') {
-            $rules['neighborhood_association_id'] .= '|in:' . $neighbor->neighborhood_association_id;
+            $rules['neighborhood_association_id'] .= '|in:'.$neighbor->neighborhood_association_id;
         }
-
-
 
         $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -176,7 +167,7 @@ class MeetingController extends Controller
         }
 
         // Crear reunión
-        $meeting = new Meeting();
+        $meeting = new Meeting;
         $meeting->meeting_date = Carbon::parse($request->input('meeting_date'))->toDateTimeString();
         $meeting->main_topic = $request->input('main_topic');
         $meeting->description = $request->input('description');
@@ -189,12 +180,12 @@ class MeetingController extends Controller
         return redirect()->route('meetings.index')->with('success', 'Reunión creada exitosamente.');
     }
 
-
     /**
      * Display the specified resource.
      */
     public function show(Meeting $meeting)
     {
+        $this->authorize('view', $meeting);
         $meeting->load('neighborhoodAssociation'); // Cargar la relación con la junta vecinal
 
         return Inertia::render('Meetings/ShowMeeting', [
@@ -213,14 +204,13 @@ class MeetingController extends Controller
         ]);
     }
 
-
-
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id)
     {
         $meeting = Meeting::findOrFail($id);
+        $this->authorize('update', $meeting);
         $associations = NeighborhoodAssociation::all(['id', 'name']);
         $userRole = auth()->user()->role;
 
@@ -231,18 +221,18 @@ class MeetingController extends Controller
         ]);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
         $meeting = Meeting::findOrFail($id);
+        $this->authorize('update', $meeting);
         $user = auth()->user();
 
         // Definir reglas de validación
         $rules = [
-            'meeting_date' => 'required|date|after_or_equal:' . now()->subWeek()->toDateString(),
+            'meeting_date' => 'required|date|after_or_equal:'.now()->subWeek()->toDateString(),
             'main_topic' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'location' => 'required|string|max:255',
@@ -257,7 +247,7 @@ class MeetingController extends Controller
 
         // Si el usuario es un `board_member`, limitar la edición de la asociación
         if ($user->role === 'board_member') {
-            $rules['neighborhood_association_id'] .= '|in:' . $meeting->neighborhood_association_id;
+            $rules['neighborhood_association_id'] .= '|in:'.$meeting->neighborhood_association_id;
         }
 
         // Mensajes personalizados
@@ -302,7 +292,6 @@ class MeetingController extends Controller
         return redirect()->route('meetings.index')->with('success', 'Reunión actualizada exitosamente.');
     }
 
-
     public function markAsCompleted($meetingId)
     {
         $meeting = Meeting::findOrFail($meetingId);
@@ -320,19 +309,13 @@ class MeetingController extends Controller
 
     }
 
-
-
-
-
-
-
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
         $meeting = Meeting::findOrFail($id);
+        $this->authorize('delete', $meeting);
 
         // Eliminar las asistencias relacionadas
         $meeting->attendances()->delete();
@@ -342,5 +325,4 @@ class MeetingController extends Controller
 
         return back()->with('success', 'La reunión fue eliminada correctamente.');
     }
-
 }

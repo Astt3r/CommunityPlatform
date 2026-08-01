@@ -21,12 +21,14 @@ class Meeting extends Model
         'location',
         'result',
         'status',
+        'neighborhood_association_id',
     ];
+
     public function attendances()
     {
         return $this->hasMany(MeetingAttendance::class);
     }
-    
+
     protected static function boot()
     {
         parent::boot();
@@ -35,11 +37,11 @@ class Meeting extends Model
             $meeting->attendances()->delete(); // Eliminar asistencias asociadas antes de eliminar la reunión
         });
     }
+
     public function neighborhoodAssociation()
     {
         return $this->belongsTo(NeighborhoodAssociation::class);
     }
-
 
     // Define any relationships, if needed, such as with attendees or minutes
 }

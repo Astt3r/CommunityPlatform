@@ -21,13 +21,12 @@ class CommitteeMemberRequest extends FormRequest
     {
         return [
             'committee_id' => 'required|exists:committees,id', // Comité debe existir
-            'user_id' => 'required|exists:users,id|unique:committee_members,user_id,NULL,id,committee_id,' . $this->committee_id, // Usuario único por comité
+            'neighbor_id' => 'required|exists:neighbors,id|unique:committee_members,neighbor_id,NULL,id,committee_id,'.$this->committee_id, // Vecino único por comité
             'status' => 'required|in:active,inactive', // Estado válido
             'joined_date' => 'required|date|before_or_equal:today', // Fecha válida y no futura
             'left_date' => 'nullable|date|after_or_equal:joined_date', // Fecha válida y posterior a la de ingreso
         ];
     }
-
 
     /**
      * Custom error messages.
@@ -37,9 +36,9 @@ class CommitteeMemberRequest extends FormRequest
         return [
             'committee_id.required' => 'El comité es obligatorio.',
             'committee_id.exists' => 'El comité seleccionado no es válido.',
-            'user_id.required' => 'El usuario es obligatorio.',
-            'user_id.exists' => 'El usuario seleccionado no es válido.',
-            'user_id.unique' => 'Este usuario ya es miembro de este comité.',
+            'neighbor_id.required' => 'El vecino es obligatorio.',
+            'neighbor_id.exists' => 'El vecino seleccionado no es válido.',
+            'neighbor_id.unique' => 'Este vecino ya es miembro de este comité.',
             'status.required' => 'El estado es obligatorio.',
             'status.in' => 'El estado debe ser "activo" o "inactivo".',
             'joined_date.required' => 'La fecha de ingreso es obligatoria.',

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Meeting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,11 @@ class MinutesFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'content' => $this->faker->paragraphs(3, true),
+            'created_date' => $this->faker->dateTimeBetween('-6 months', 'now'),
+            'signed_by' => $this->faker->name,
+            'approved_by' => $this->faker->name,
+            'meeting_id' => Meeting::factory(),
         ];
     }
 }

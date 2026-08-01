@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
 use App\Models\File;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
-use App\Http\Requests\UpdateProjectRequest;
-
+use App\Models\Project;
 use Illuminate\Http\Request;
-use App\Http\Requests\ProjectRequest;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -23,10 +20,10 @@ class ProjectController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin'; // Cambia 'role' por tu lógica real para roles
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'El usuario no pertenece a ninguna junta de vecinos.');
             }
 
@@ -35,12 +32,9 @@ class ProjectController extends Controller
 
         $query = Project::with('files');
 
-
-
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $query->where('association_id', $associationId); // Usar la columna correcta
         }
-
 
         $projects = $query->latest()->paginate(10);
 
@@ -48,12 +42,6 @@ class ProjectController extends Controller
             'projects' => $projects,
         ]);
     }
-
-
-
-
-
-
 
     /**
      * Show the form for creating a new resource.
@@ -65,7 +53,7 @@ class ProjectController extends Controller
         // Verificar el vecino asociado al usuario actual
         $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-        if (!$neighbor) {
+        if (! $neighbor) {
             abort(403, 'No estás asociado a ninguna junta de vecinos.');
         }
 
@@ -102,14 +90,13 @@ class ProjectController extends Controller
         ]);
     }
 
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Project::class);
         $user = $request->user();
-
 
         // Reglas de validación
         $rules = [
@@ -153,7 +140,6 @@ class ProjectController extends Controller
 
         $validated['status'] = 'planeado';
 
-
         // Asignar automáticamente la junta vecinal
         if ($user->role === 'board_member') {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
@@ -161,14 +147,13 @@ class ProjectController extends Controller
         }
 
         // Inicializar changes con fecha de creacion y fase incial
-        $validated['changes'] = "Proyecto creado el " . now()->format('Y-m-d H:i:s');
+        $validated['changes'] = 'Proyecto creado el '.now()->format('Y-m-d H:i:s');
 
         // Crear el proyecto
         $project = Project::create($validated);
 
-
         // Manejar relaciones con la tabla intermedia
-        if (!$validated['is_for_all_neighbors'] && isset($validated['neighbor_ids'])) {
+        if (! $validated['is_for_all_neighbors'] && isset($validated['neighbor_ids'])) {
             foreach ($validated['neighbor_ids'] as $neighborId) {
                 $project->neighbors()->attach($neighborId, ['access_type' => 'viewer']);
             }
@@ -191,6 +176,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
+        $this->authorize('view', $project);
+
         // Cargar relaciones necesarias
         $project->load(['files', 'neighbors.user']); // Cargar vecinos y los datos de usuario asociados
 
@@ -199,14 +186,12 @@ class ProjectController extends Controller
         ]);
     }
 
-
-
-
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Project $project)
     {
+        $this->authorize('update', $project);
         $associations = NeighborhoodAssociation::all(['id', 'name']);
         $neighbors = Neighbor::where('neighborhood_association_id', $project->association_id)
             ->with('user') // Asegúrate de cargar la relación `user`
@@ -223,15 +208,13 @@ class ProjectController extends Controller
         ]);
     }
 
-
-
-
-
     /**
      * Actualiza un proyecto existente.
      */
     public function update(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         // Validar los datos entrantes
         $validated = $request->validate(
             [
@@ -263,14 +246,13 @@ class ProjectController extends Controller
             ]
         );
 
-
         // Verificar restricciones según el estado actual del proyecto
         if (isset($validated['status']) && $validated['status'] !== $project->status) {
             switch ($project->status) {
                 case 'planeado':
-                    if (!in_array($validated['status'], ['aprobado', 'rechazado'])) {
+                    if (! in_array($validated['status'], ['aprobado', 'rechazado'])) {
                         return response()->json([
-                            'message' => 'Solo puedes cambiar el estado de "Planeado" a "Aprobado" o "Rechazado".'
+                            'message' => 'Solo puedes cambiar el estado de "Planeado" a "Aprobado" o "Rechazado".',
                         ], 403);
                     }
                     break;
@@ -278,15 +260,15 @@ class ProjectController extends Controller
                 case 'aprobado':
                     if ($validated['status'] !== 'en proceso') {
                         return response()->json([
-                            'message' => 'Solo puedes cambiar el estado de "Aprobado" a "En Proceso".'
+                            'message' => 'Solo puedes cambiar el estado de "Aprobado" a "En Proceso".',
                         ], 403);
                     }
                     break;
 
                 case 'en proceso':
-                    if (!in_array($validated['status'], ['completado', 'cancelado'])) {
+                    if (! in_array($validated['status'], ['completado', 'cancelado'])) {
                         return response()->json([
-                            'message' => 'Solo puedes cambiar el estado de "En Proceso" a "Completado" o "Cancelado".'
+                            'message' => 'Solo puedes cambiar el estado de "En Proceso" a "Completado" o "Cancelado".',
                         ], 403);
                     }
                     break;
@@ -295,7 +277,7 @@ class ProjectController extends Controller
                 case 'cancelado':
                 case 'rechazado':
                     return response()->json([
-                        'message' => 'No puedes editar un proyecto en estado "Completado", "Cancelado" o "Rechazado".'
+                        'message' => 'No puedes editar un proyecto en estado "Completado", "Cancelado" o "Rechazado".',
                     ], 403);
             }
 
@@ -305,14 +287,13 @@ class ProjectController extends Controller
             $newChange = "Estado cambiado de '{$project->status}' a '{$validated['status']}' el {$currentDateTime}";
 
             // Si existe una observación, agregarla como una nueva línea indentada
-            if (!empty($validated['observation'])) {
+            if (! empty($validated['observation'])) {
                 $newChange .= "\n    {$validated['observation']}";
             }
 
             // Concatenar el nuevo cambio al historial existente
-            $project->changes .= ($project->changes ? "\n" : "") . $newChange;
+            $project->changes .= ($project->changes ? "\n" : '').$newChange;
         }
-
 
         // Actualizar los campos del proyecto
         $project->update($validated);
@@ -326,11 +307,6 @@ class ProjectController extends Controller
 
         return response()->json(['message' => 'Proyecto actualizado correctamente.'], 200);
     }
-
-
-
-
-
 
     public function uploadFile(Request $request, Project $project)
     {
@@ -389,6 +365,8 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        $this->authorize('delete', $project);
+
         // Eliminar archivos físicos y registros asociados
         foreach ($project->files as $file) {
             if (Storage::exists($file->file_path)) {

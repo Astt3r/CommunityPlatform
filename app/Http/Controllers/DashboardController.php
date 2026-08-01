@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Meeting;
-use App\Models\Project;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 use App\Models\CommitteeMember;
 use App\Models\Expense;
 use App\Models\Income;
+use App\Models\Meeting;
 use App\Models\Neighbor;
 use App\Models\NeighborhoodAssociation;
+use App\Models\Project;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -19,10 +19,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $role = $user->role;
-        $neighbor = $user->neighbor;
 
         $userAssociations = collect(); // Initialize as an empty collection as default
-
 
         // Totales de ingresos y gastos
         $totalIncome = Income::sum('amount');
@@ -38,11 +36,11 @@ class DashboardController extends Controller
             $associations = NeighborhoodAssociation::count();
         } else {
             // Handle case where user might not have a neighbor record
-            if ($neighbor) {
-                $userAssociations = $neighbor->neighborhoodAssociation()->pluck('id');
+            if ($association = $user->currentAssociation()) {
+                $userAssociations = collect([$association->id]);
             } else {
-                // If user doesn't have neighbor record, get associations they created
-                $userAssociations = NeighborhoodAssociation::where('creator_id', $user->id)->pluck('id');
+                // If user doesn't have neighbor record, fall back to associations they created
+                $userAssociations = NeighborhoodAssociation::where('created_by', $user->id)->pluck('id');
             }
 
             $meetings = Meeting::whereIn('neighborhood_association_id', $userAssociations)
@@ -67,6 +65,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($meeting) {
                 $meeting->date = $meeting->date ? Carbon::parse($meeting->date)->format('Y-m-d\TH:i:s') : null;
+
                 return $meeting;
             });
 

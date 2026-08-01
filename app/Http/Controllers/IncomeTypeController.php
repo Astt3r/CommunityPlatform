@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IncomeTypeRequest;
 use App\Models\IncomeType;
+use App\Models\Neighbor;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Http\Requests\IncomeTypeRequest;
-use App\Models\Neighbor;
-use App\Models\NeighborhoodAssociation;
-
 
 class IncomeTypeController extends Controller
 {
@@ -17,10 +15,10 @@ class IncomeTypeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'No estás asociado a ninguna junta de vecinos.');
             }
 
@@ -37,7 +35,6 @@ class IncomeTypeController extends Controller
             'incomeTypes' => $incomeTypes,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -60,7 +57,7 @@ class IncomeTypeController extends Controller
         if ($user->role !== 'admin') {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'No estás asociado a ninguna junta de vecinos.');
             }
 
@@ -108,7 +105,7 @@ class IncomeTypeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:255',
-            'code' => 'required|string|max:20|unique:income_types,code,' . $incomeType->id,
+            'code' => 'required|string|max:20|unique:income_types,code,'.$incomeType->id,
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -118,6 +115,7 @@ class IncomeTypeController extends Controller
 
         return redirect()->route('income-types.index')->with('message', 'Tipo de ingreso actualizado exitosamente.');
     }
+
     /**
      * Remove the specified resource from storage.
      */

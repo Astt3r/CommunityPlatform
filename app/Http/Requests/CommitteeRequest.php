@@ -22,15 +22,8 @@ class CommitteeRequest extends FormRequest
         return [
             'name' => 'required|string|max:50|unique:committees,name',
             'description' => 'required|string|max:255',
-            'code' => 'nullable|string|max:20|unique:committees,code',
-            'status' => 'required|in:active,inactive',
-            'effective_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
-            'parent_committee_id' => 'nullable|exists:committees,id',
         ];
     }
-
-
 
     /**
      * Custom error messages.
@@ -43,17 +36,6 @@ class CommitteeRequest extends FormRequest
             'name.max' => 'El nombre no debe exceder los 50 caracteres.',
             'description.required' => 'La descripción es obligatoria.',
             'description.max' => 'La descripción no debe exceder los 255 caracteres.',
-            'code.max' => 'El código no debe exceder los 20 caracteres.',
-            'code.unique' => 'El código ya está en uso.',
-            'status.required' => 'El estado es obligatorio.',
-            'status.in' => 'El estado debe ser "active" o "inactive".',
-            'effective_date.required' => 'La fecha de inicio es obligatoria.',
-            'effective_date.date' => 'La fecha de inicio debe ser una fecha válida.',
-            'end_date.date' => 'La fecha de fin debe ser una fecha válida.',
-            'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
-            'parent_committee_id.exists' => 'El comité padre seleccionado no es válido.',
         ];
     }
-
-
 }

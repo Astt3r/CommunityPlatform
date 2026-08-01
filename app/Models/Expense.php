@@ -36,7 +36,6 @@ class Expense extends Model
         return $this->belongsTo(ExpenseType::class, 'type_id');
     }
 
-
     /**
      * Get the association that this income belongs to.
      */
@@ -44,5 +43,4 @@ class Expense extends Model
     {
         return $this->belongsTo(NeighborhoodAssociation::class, 'association_id');
     }
-
 }

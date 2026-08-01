@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Committee;
+use App\Models\Neighbor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,11 @@ class CommitteeMemberFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'committee_id' => Committee::factory(),
+            'neighbor_id' => Neighbor::factory(),
+            'status' => 'active',
+            'joined_date' => $this->faker->dateTimeBetween('-2 years', 'now'),
+            'left_date' => null,
         ];
     }
 }

@@ -37,10 +37,6 @@ class ProjectRequest extends FormRequest
         ];
     }
 
-
-
-
-
     public function messages()
     {
         return [
@@ -68,6 +64,4 @@ class ProjectRequest extends FormRequest
             'file.max' => 'El archivo no puede superar los 2 MB.',
         ];
     }
-
-
 }

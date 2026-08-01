@@ -70,5 +70,4 @@ class Project extends Model
     {
         return $this->hasMany(Contribution::class);
     }
-
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Neighbor;
-use Inertia\Inertia;
 use App\Models\Fee;
+use App\Models\Neighbor;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class FeeController extends Controller
 {
@@ -17,10 +17,10 @@ class FeeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::with('neighborhoodAssociation')->where('user_id', $user->id)->first();
 
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'The user does not belong to any neighborhood association.');
             }
 
@@ -47,7 +47,7 @@ class FeeController extends Controller
     {
         $neighbor = Neighbor::where('user_id', $request->user()->id)->first();
 
-        if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+        if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
             return redirect()->route('fees.index')
                 ->withErrors(['message' => 'No estás asociado a ninguna junta de vecinos.']);
         }
@@ -77,7 +77,7 @@ class FeeController extends Controller
 
         // Assign association_id based on the neighbor
         $selectedNeighbor = Neighbor::find($validated['neighbor_id']);
-        if (!$selectedNeighbor || !$selectedNeighbor->neighborhoodAssociation) {
+        if (! $selectedNeighbor || ! $selectedNeighbor->neighborhoodAssociation) {
             return redirect()->route('fees.index')
                 ->withErrors(['message' => 'El vecino seleccionado no está asociado a ninguna junta de vecinos.']);
         }
@@ -88,6 +88,7 @@ class FeeController extends Controller
 
         return redirect()->route('fees.index')->with('message', 'Cuota creada exitosamente.');
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -96,9 +97,9 @@ class FeeController extends Controller
         $user = request()->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
-            if (!$neighbor || !$neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $neighbor->neighborhoodAssociation) {
                 abort(403, 'No tienes permiso para crear una cuota.');
             }
             $neighbors = Neighbor::where('neighborhood_association_id', $neighbor->neighborhoodAssociation->id)
@@ -107,7 +108,6 @@ class FeeController extends Controller
         } else {
             $neighbors = Neighbor::all()->with('user');
         }
-
 
         return Inertia::render('Finance/Fees/Create', [
             'neighbors' => $neighbors,
@@ -122,9 +122,9 @@ class FeeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
-            if (!$neighbor || $fee->association_id !== $neighbor->neighborhoodAssociation->id) {
+            if (! $neighbor || $fee->association_id !== $neighbor->neighborhoodAssociation->id) {
                 abort(403, 'No tienes permiso para ver esta cuota.');
             }
         }
@@ -142,9 +142,9 @@ class FeeController extends Controller
         $user = $request->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
-            if (!$neighbor || $fee->association_id !== $neighbor->neighborhoodAssociation->id) {
+            if (! $neighbor || $fee->association_id !== $neighbor->neighborhoodAssociation->id) {
                 abort(403, 'No tienes permiso para actualizar esta cuota.');
             }
         }
@@ -163,18 +163,17 @@ class FeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-
     public function destroy(Fee $fee)
     {
         $user = request()->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::with('neighborhoodAssociation')
                 ->where('user_id', $user->id)
                 ->first();
 
-            if (!$neighbor || !$fee->neighbor || !$fee->neighbor->neighborhoodAssociation) {
+            if (! $neighbor || ! $fee->neighbor || ! $fee->neighbor->neighborhoodAssociation) {
                 abort(403, 'No tienes permiso para eliminar esta cuota.');
             }
 
@@ -199,9 +198,9 @@ class FeeController extends Controller
         $user = request()->user();
         $isAdmin = $user->role === 'admin';
 
-        if (!$isAdmin) {
+        if (! $isAdmin) {
             $neighbor = Neighbor::where('user_id', $user->id)->first();
-            if (!$neighbor || $fee->neighbor->neighborhoodAssociation->id !== $neighbor->neighborhoodAssociation->id) {
+            if (! $neighbor || $fee->neighbor->neighborhoodAssociation->id !== $neighbor->neighborhoodAssociation->id) {
                 abort(403, 'No tienes permiso para editar esta cuota.');
             }
         }
