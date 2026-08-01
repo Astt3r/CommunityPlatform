@@ -11,6 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Railway (and most PaaS hosts) terminate TLS at their edge and
+        // forward plain HTTP internally. Without this, Laravel doesn't
+        // know the original request was HTTPS and generates http:// URLs
+        // for assets/routes, which browsers then block as mixed content.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckUserRole::class,
         ]);
