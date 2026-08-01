@@ -5,6 +5,13 @@
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com)
 [![Inertia.js](https://img.shields.io/badge/Inertia.js-1.x-9553E9?style=flat)](https://inertiajs.com)
 
+> 🔄 **Revival de un proyecto de título universitario.** Este repo parte de
+> [fit-dran/juntatransparente](https://github.com/fit-dran/juntatransparente) (2024) y fue
+> saneado y llevado a un estándar de ingeniería productivo: se corrigieron bugs reales del
+> modelo de datos, se agregaron Policies de autorización multi-tenant, tests automatizados
+> (Pest + Dusk/E2E), CI en GitHub Actions, Docker y despliegue en Railway. Ver
+> [Licencia y créditos](#-licencia) para el detalle de la atribución.
+
 ## 📖 Descripción
 
 **Community Platform** es una aplicación web moderna desarrollada con Laravel y React para la gestión integral de juntas de vecinos. El sistema facilita la administración, promueve la transparencia y fomenta la participación ciudadana mediante herramientas digitales intuitivas.
@@ -15,10 +22,10 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
 ## ✨ Características Principales
 
 ### 👥 **Gestión de Usuarios Multi-Rol**
-- **Administrador**: Control total del sistema y múltiples juntas
-- **Jefe de Junta**: Gestión completa de su junta vecinal
-- **Miembro de Directorio**: Acceso a funciones de gestión limitadas
-- **Vecino**: Consulta de información y participación en votaciones
+El sistema define 3 roles (`admin`, `board_member`, `resident`):
+- **Administrador** (`admin`): Control total del sistema y de todas las juntas de vecinos
+- **Directiva** (`board_member`): Gestión completa de su propia junta vecinal (vecinos, proyectos, reuniones, finanzas, comités)
+- **Vecino** (`resident`): Consulta de información y participación en proyectos/reuniones de su junta
 
 ### 📊 **Dashboard Interactivo**
 - Métricas en tiempo real de finanzas y participación
@@ -64,22 +71,23 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
 - **Iconos**: Heroicons
 
 ### Herramientas de Desarrollo
-- **Testing**: PHPUnit, Pest
-- **Code Quality**: Laravel Pint, PHPStan
+- **Testing**: Pest (unit/feature) + Laravel Dusk (E2E con ChromeDriver/Selenium WebDriver)
+- **Code Quality**: Laravel Pint
+- **CI/CD**: GitHub Actions (lint + Pest + Dusk en cada push/PR, ver `.github/workflows/tests.yml`)
+- **Contenedores**: Docker Compose (MySQL 8.4 + phpMyAdmin) para desarrollo local
 - **Package Manager**: Composer, NPM
 
 ## 🚀 Demo en Vivo
 
-🔗 **[Ver Demo](https://tu-demo-url.com)** *(configurar GitHub Pages)*
+🔗 **Ver Demo**: *(pendiente — se actualizará con la URL de Railway tras el primer deploy, ver sección [Deployment](#-deployment))*
 
 ### 👤 Credenciales de Prueba
 
 | Rol | Email | Contraseña | Permisos |
 |-----|-------|------------|----------|
 | **Administrador** | `admin@example.com` | `password` | Acceso completo al sistema |
-| **Jefe de Junta** | `jefe@example.com` | `password` | Gestión de junta vecinal |
-| **Miembro Directorio** | `miembro@example.com` | `password` | Funciones limitadas de gestión |
-| **Vecino** | `vecino@example.com` | `password` | Consulta y participación |
+| **Directiva** | `board_member@example.com` | `password` | Gestión completa de su junta vecinal |
+| **Vecino** | `vecino@example.com` | `password` | Consulta y participación en su junta |
 
 ## 💻 Requisitos del Sistema
 
@@ -99,7 +107,14 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
    cd CommunityPlatform
    ```
 
-2. **Instalar dependencias**
+2. **Levantar MySQL con Docker Compose**
+   ```bash
+   docker compose up -d
+   ```
+   Esto crea la base `community_platform` en `127.0.0.1:3306` (usuario `junta` /
+   contraseña `junta`) y un phpMyAdmin opcional en `http://localhost:8081`.
+
+3. **Instalar dependencias**
    ```bash
    # Dependencias PHP
    composer install
@@ -108,24 +123,13 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
    npm install
    ```
 
-3. **Configurar entorno**
+4. **Configurar entorno**
    ```bash
-   # Copiar archivo de configuración
+   # Copiar archivo de configuración (ya apunta al MySQL de Docker)
    cp .env.example .env
    
    # Generar clave de aplicación
    php artisan key:generate
-   ```
-
-4. **Configurar base de datos**
-   ```env
-   # Editar .env con tus credenciales
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=community_platform
-   DB_USERNAME=tu_usuario
-   DB_PASSWORD=tu_contraseña
    ```
 
 5. **Migrar y poblar base de datos**
@@ -150,10 +154,18 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
    - Aplicación: `http://localhost:8000`
    - Login con las credenciales de prueba mostradas arriba
 
-### 🐳 Instalación con Docker (Opcional)
+### 🗄️ Explorar el esquema en DBeaver (sin instalar Laravel)
+
+Si solo quieres inspeccionar el modelo de datos:
+
+1. `docker compose up -d`
+2. Conecta DBeaver a `127.0.0.1:3306`, base `community_platform`, usuario/contraseña `junta`/`junta`.
+3. Ejecuta `database/sql/schema.sql` y luego `database/sql/seed.sql` (ver `database/sql/README.md`).
+
+### 🐳 Instalación con Docker (alternativa: Laravel Sail)
 
 ```bash
-# Usar Laravel Sail
+# Usar Laravel Sail en vez de docker-compose.yml
 ./vendor/bin/sail up -d
 ./vendor/bin/sail artisan migrate --seed
 ```
@@ -174,33 +186,83 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
 ```
 app/
 ├── Http/Controllers/     # Controladores
-├── Models/              # Modelos Eloquent
-├── Exports/             # Exportadores Excel/PDF
-└── Providers/           # Service Providers
+├── Models/               # Modelos Eloquent
+├── Policies/             # Autorización por junta de vecinos (tenant)
+├── Exports/              # Exportadores Excel/PDF
+└── Providers/            # Service Providers
 
 resources/
-├── js/                  # Componentes React
-├── views/               # Plantillas Inertia
-└── css/                 # Estilos
+├── js/                   # Componentes React
+├── views/                # Plantillas Inertia + acta PDF (minutes/template.blade.php)
+└── css/                  # Estilos
 
 database/
-├── migrations/          # Migraciones
-├── seeders/            # Datos de prueba
-└── factories/          # Factories para testing
+├── migrations/           # Migraciones
+├── seeders/              # Datos de prueba
+├── factories/            # Factories para testing
+└── sql/                  # schema.sql + seed.sql listos para DBeaver
+
+tests/
+├── Feature/               # Pest (incluye Feature/Policies)
+├── Unit/                  # Pest
+└── Browser/                # Laravel Dusk (E2E)
+
+docker-compose.yml         # MySQL 8.4 + phpMyAdmin para desarrollo local
+docs/erd.mmd                # Diagrama entidad-relación (Mermaid)
 ```
+
+## 🗂️ Modelo de Datos
+
+Esquema completo (todas las entidades, tipos y relaciones) — fuente en [`docs/erd.mmd`](docs/erd.mmd)
+y DDL importable en DBeaver en [`database/sql/schema.sql`](database/sql/schema.sql).
+
+```mermaid
+erDiagram
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ NEIGHBORS : agrupa
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ MEETINGS : organiza
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ PROJECTS : impulsa
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ COMMITTEES : tiene
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ EXPENSES : registra
+    NEIGHBORHOOD_ASSOCIATIONS ||--o{ INCOMES : registra
+    USERS ||--o| NEIGHBORS : "tiene (opcional)"
+    NEIGHBORS ||--o{ FEES : debe
+    NEIGHBORS ||--o{ MEETING_ATTENDANCES : asiste
+    NEIGHBORS ||--o{ CONTRIBUTIONS : aporta
+    NEIGHBORS ||--o{ COMMITTEE_MEMBERS : integra
+    NEIGHBORS }o--o{ PROJECTS : participa
+    MEETINGS ||--o{ MEETING_ATTENDANCES : registra
+    MEETINGS ||--o{ MINUTES : genera
+    PROJECTS ||--o{ FILES : adjunta
+    PROJECTS ||--o{ CONTRIBUTIONS : recibe
+    COMMITTEES ||--o{ COMMITTEE_MEMBERS : compone
+    EXPENSE_TYPES ||--o{ EXPENSES : clasifica
+    INCOME_TYPES ||--o{ INCOMES : clasifica
+```
+
+*(diagrama resumido; el detalle completo de columnas está en `docs/erd.mmd`)*
 
 ## 🧪 Testing
 
+El proyecto usa **Pest** para tests de backend (unit/feature, incluye policies de
+autorización) y **Laravel Dusk** (ChromeDriver/Selenium WebDriver) para tests E2E
+de los flujos principales (login por rol, CRUD de vecinos, reuniones + acta PDF,
+proyectos, finanzas).
+
 ```bash
-# Ejecutar todos los tests
-php artisan test
+# Estilo de código
+./vendor/bin/pint --test
 
-# Tests con cobertura
-php artisan test --coverage
+# Tests de backend (Pest)
+./vendor/bin/pest
 
-# Tests específicos
-php artisan test --filter=UserTest
+# Tests E2E (Dusk) — requiere la app servida y ChromeDriver
+php artisan dusk:chrome-driver --detect
+php artisan serve &
+php artisan dusk
 ```
+
+Estos mismos pasos corren automáticamente en cada push/PR vía GitHub Actions
+(`.github/workflows/tests.yml`).
 
 ## 📦 Deployment
 
@@ -214,8 +276,37 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-### Vercel (Recomendado)
-El proyecto incluye configuración para Vercel en `vercel.json`
+### 🚂 Railway (demo en vivo)
+
+El repo incluye un `Dockerfile` multi-stage (build de assets con Vite + PHP 8.2)
+y un `railway.json` para desplegar la app completa (incluida una base MySQL) en
+[Railway](https://railway.app):
+
+1. Crea un proyecto nuevo en Railway y elige **Deploy from GitHub repo**, apuntando a este repositorio.
+2. En el mismo proyecto, agrega un servicio **MySQL** (botón "+ New" → "Database" → "MySQL").
+3. En el servicio de la app (el que construye el `Dockerfile`), configura estas variables de entorno:
+
+   | Variable | Valor |
+   |---|---|
+   | `APP_KEY` | genera uno localmente con `php artisan key:generate --show` y pégalo aquí |
+   | `APP_ENV` | `production` |
+   | `APP_DEBUG` | `false` |
+   | `APP_URL` | la URL pública que Railway te asigna al servicio |
+   | `DB_CONNECTION` | `mysql` |
+   | `DB_HOST` | `${{MySQL.MYSQLHOST}}` |
+   | `DB_PORT` | `${{MySQL.MYSQLPORT}}` |
+   | `DB_DATABASE` | `${{MySQL.MYSQLDATABASE}}` |
+   | `DB_USERNAME` | `${{MySQL.MYSQLUSER}}` |
+   | `DB_PASSWORD` | `${{MySQL.MYSQLPASSWORD}}` |
+   | `RUN_SEEDER` | `true` solo en el primer deploy (para cargar las 3 cuentas demo), luego cámbialo a `false` |
+
+   Las referencias `${{MySQL.VARIABLE}}` son la sintaxis de Railway para leer variables de otro servicio del mismo proyecto — no necesitas copiarlas a mano.
+
+4. Railway detecta el `Dockerfile` automáticamente y hace el deploy. El `docker/entrypoint.sh` corre las migraciones (y el seeder si `RUN_SEEDER=true`) antes de levantar el servidor.
+5. Una vez arriba, actualiza el badge/link de "Demo en Vivo" al inicio de este README con la URL real.
+
+### Vercel (alternativa serverless)
+El proyecto también incluye configuración para Vercel en `vercel.json` (requiere una MySQL gestionada externa, ya que Vercel no aloja bases de datos).
 
 ## 👨‍💻 Desarrollo
 
@@ -224,9 +315,6 @@ El proyecto incluye configuración para Vercel en `vercel.json`
 ```bash
 # Linter de código
 ./vendor/bin/pint
-
-# Análisis estático
-./vendor/bin/phpstan analyse
 
 # Generar migraciones
 php artisan make:migration create_table_name
@@ -245,7 +333,9 @@ php artisan make:model ModelName -mfc
 
 ## 📄 Licencia
 
-Este proyecto es privado y pertenece a la organización. No está disponible bajo licencia de código abierto.
+Este proyecto está disponible bajo la [Licencia MIT](LICENSE). Es un fork/revival de
+[Junta Transparente](https://github.com/fit-dran/juntatransparente) (proyecto de título
+universitario); se mantiene el crédito a sus autores originales.
 
 ## 📞 Contacto
 
