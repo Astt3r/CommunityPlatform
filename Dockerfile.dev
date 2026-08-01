@@ -1,0 +1,19 @@
+# syntax=docker/dockerfile:1
+#
+# Local test/dev image: adds Pint, Pest, Dusk and a headless Chromium on
+# top of the production image. Not used by Railway/production builds —
+# build the main Dockerfile (target "app") first, then this one.
+#
+#   docker build --target app -t junta-transparente:app .
+#   docker build -f Dockerfile.dev -t junta-transparente-dev .
+
+FROM junta-transparente:app
+
+RUN apt-get update && apt-get install -y --no-install-recommends chromium chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN composer install --no-interaction --optimize-autoloader
+
+ENV CHROME_BINARY=/usr/bin/chromium
+ENTRYPOINT []
+CMD ["bash"]

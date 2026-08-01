@@ -35,12 +35,3 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 ENTRYPOINT ["/entrypoint.sh"]
-
-# ---- Dev/test image (adds dev dependencies: Pint, Pest, Dusk) ----
-FROM app AS dev
-RUN apt-get update && apt-get install -y --no-install-recommends chromium chromium-driver \
-    && rm -rf /var/lib/apt/lists/*
-RUN composer install --no-interaction --optimize-autoloader
-ENV CHROME_BINARY=/usr/bin/chromium
-ENTRYPOINT []
-CMD ["bash"]
