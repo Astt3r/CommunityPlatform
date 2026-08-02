@@ -22,6 +22,12 @@ Digitalizar y modernizar la gestión de comunidades vecinales, proporcionando tr
 
 ## ✨ Características Principales
 
+### 🗳️ **Votación en Vivo durante Reuniones** (WebSockets)
+- Un `board_member`/`admin` abre una pregunta con opciones durante una reunión
+- Todos los asistentes ven el conteo actualizarse **en tiempo real**, sin recargar la página
+- Un voto por vecino (garantizado a nivel de base de datos), resultado que queda como historial
+- Implementado con [Laravel Reverb](https://reverb.laravel.com) (WebSocket server self-hosted, sin depender de Pusher ni terceros) — ver [detalle de despliegue](#️-votación-en-vivo-websockets-con-laravel-reverb)
+
 ### 👥 **Gestión de Usuarios Multi-Rol**
 El sistema define 3 roles (`admin`, `board_member`, `resident`):
 - **Administrador** (`admin`): Control total del sistema y de todas las juntas de vecinos
@@ -63,6 +69,7 @@ El sistema define 3 roles (`admin`, `board_member`, `resident`):
 - **Base de Datos**: MySQL 8.4+
 - **Autenticación**: Laravel Sanctum
 - **API**: RESTful con Inertia.js
+- **Tiempo real**: Laravel Reverb (WebSockets self-hosted) para la votación en vivo
 
 ### Frontend
 - **Framework**: React 18.x
@@ -319,6 +326,17 @@ Las credenciales demo (`admin@example.com` / `password`, etc.) están documentad
    - Activa **Cron Schedule** con, por ejemplo, `0 */6 * * *` (cada 6 horas).
    - Copia las mismas variables de entorno `DB_*`/`APP_KEY` del servicio principal (o referénciales con `${{app.VARIABLE}}`).
 4. Railway levanta ese servicio solo en cada horario programado, corre `migrate:fresh --seed` y se apaga — sin dejar un proceso corriendo 24/7.
+
+#### 🗳️ Votación en vivo (WebSockets con Laravel Reverb)
+
+La votación en tiempo real durante una reunión (ver sección de funcionalidades) usa [Laravel Reverb](https://reverb.laravel.com), un servidor WebSocket self-hosted — sin depender de un servicio de terceros como Pusher. En Railway corre como un **tercer servicio**, mismo patrón que el reseed automático:
+
+1. En el mismo proyecto de Railway, crea un **tercer servicio** apuntando al mismo repo/Dockerfile.
+2. En **Settings → Deploy**, cambia el **Custom Start Command** a `php artisan reverb:start --host=0.0.0.0 --port=8080`.
+3. En **Settings → Networking**, genera un dominio público apuntando explícitamente al **puerto 8080** (Reverb no lee la variable `$PORT` de Railway).
+4. Variables de entorno de este servicio: `REVERB_APP_ID`, `REVERB_APP_KEY`, `REVERB_APP_SECRET` (genera valores propios), `REVERB_SERVER_HOST=0.0.0.0`, `REVERB_SERVER_PORT=8080`, `APP_KEY` (el mismo del servicio principal) y `CACHE_STORE=array` (evita que el comando dependa de una base de datos solo para su chequeo interno de reinicio).
+5. En el servicio principal (`junta-app`), agrega las mismas credenciales `REVERB_APP_ID`/`REVERB_APP_KEY`/`REVERB_APP_SECRET`, más `REVERB_HOST=<dominio del servicio Reverb>`, `REVERB_PORT=443`, `REVERB_SCHEME=https` y `BROADCAST_CONNECTION=reverb`.
+6. Como Vite incrusta las variables `VITE_REVERB_*` en el bundle al momento del build, agrega también `VITE_REVERB_APP_KEY`, `VITE_REVERB_HOST`, `VITE_REVERB_PORT=443` y `VITE_REVERB_SCHEME=https` como variables del servicio principal — el `Dockerfile` las declara como build `ARG`s en el stage `frontend` para que lleguen al `npm run build`. Despliega primero el servicio Reverb (su dominio es estable una vez generado) y recién después el servicio principal, para que el build tome el dominio correcto.
 
 ### Vercel (alternativa serverless)
 El proyecto también incluye configuración para Vercel en `vercel.json` (requiere una MySQL gestionada externa, ya que Vercel no aloja bases de datos).
